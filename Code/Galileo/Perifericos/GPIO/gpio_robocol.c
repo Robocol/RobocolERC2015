@@ -20,14 +20,14 @@
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-static char* u8toa(uint8_t i) {
+char* u8toa(uint8_t i) {
 
 	char* buff=malloc(4);	
 	sprintf(buff, "%d", i);
 	return buff;
 }
 
-static void gpio_write_file(char* ruta, char* buff, uint8_t len ){
+void gpio_write_file(char* ruta, char* buff, uint8_t len ){
 	//Se abre el archivo para incluir el GPIO en sysfs
 	int fd;
 	fd=open(ruta,O_WRONLY);
