@@ -21,8 +21,13 @@
 */
 /* ===================================================================*/
 char* u8toa(uint8_t i) {
-
 	char* buff=malloc(4);	
+	sprintf(buff, "%d", i);
+	return buff;
+}
+
+char* u32toa(uint32_t i) {
+	char* buff=malloc(11);	
 	sprintf(buff, "%d", i);
 	return buff;
 }
@@ -44,7 +49,6 @@ void g_write_file(char* ruta, char* buff, uint8_t len ){
 		//En caso de error, se notifica y se cierra el archivo			
 		printf("Error al escribir en %s",ruta );
 		perror("Descripción");
-		close(fd);
 	}
 	// Se cierra el archivo
 	close(fd);
