@@ -27,7 +27,7 @@ char* u8toa(uint8_t i) {
 	return buff;
 }
 
-void gpio_write_file(char* ruta, char* buff, uint8_t len ){
+void g_write_file(char* ruta, char* buff, uint8_t len ){
 	//Se abre el archivo para incluir el GPIO en sysfs
 	int fd;
 	fd=open(ruta,O_WRONLY);
@@ -51,16 +51,16 @@ void gpio_write_file(char* ruta, char* buff, uint8_t len ){
 }
 
 
-static void gpio_export(char* str_num, int8_t len ){
+static void gpio_export(char* str_num, uint8_t len ){
 
-	gpio_write_file("/sys/class/gpio/export",str_num,len);
+	g_write_file("/sys/class/gpio/export",str_num,len);
 
 }
 
 
-static void gpio_unexport(char* str_num, int8_t len ){
+static void gpio_unexport(char* str_num, uint8_t len ){
 
-	gpio_write_file("/sys/class/gpio/unexport",str_num,len);
+	g_write_file("/sys/class/gpio/unexport",str_num,len);
 
 }
 
@@ -105,10 +105,10 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada){
 
 	if(!esEntrada){
 		char buf[]="out";
-		gpio_write_file(ruta,buf,3);
+		g_write_file(ruta,buf,3);
 	}else{
 		char buf[]="in";
-		gpio_write_file(ruta,buf,2);		
+		g_write_file(ruta,buf,2);		
 	}
 
 	//Se extrae el GPIO de sysfs
@@ -161,10 +161,10 @@ gpio_st gpio_gal_value(uint8_t num, int valor){
 	//en value
 	if(!valor){
 		char buf[]="0";
-		gpio_write_file(ruta,buf,1);
+		g_write_file(ruta,buf,1);
 	}else{
 		char buf[]="1";
-		gpio_write_file(ruta,buf,1);
+		g_write_file(ruta,buf,1);
 	}
 	
 	//Se extrae el GPIO de sysfs

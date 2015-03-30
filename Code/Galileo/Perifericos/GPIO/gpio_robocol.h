@@ -99,7 +99,7 @@ char* u8toa(uint8_t i);
 
 /*
 ** ===================================================================
-**     Método      :  gpio_write_file
+**     Método      :  g_write_file
 */
 /*!
 **     @resumen
@@ -110,7 +110,7 @@ char* u8toa(uint8_t i);
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-void gpio_write_file(char* ruta, char* buff, uint8_t len );
+void g_write_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================
@@ -125,7 +125,7 @@ void gpio_write_file(char* ruta, char* buff, uint8_t len );
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-static void gpio_export(char* buff, int8_t len );
+static void gpio_export(char* buff, uint8_t len );
 
 /*
 ** ===================================================================
@@ -140,7 +140,7 @@ static void gpio_export(char* buff, int8_t len );
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-static void gpio_unexport(char* buff, int8_t len );
+static void gpio_unexport(char* buff, uint8_t len );
 
 /*
 ** ===================================================================
