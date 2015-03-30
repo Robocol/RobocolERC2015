@@ -1,0 +1,17 @@
+Entregas
+Modificar ingreso de estructuras para que sea tan solo en la creación de las mismas . Crear estructuras con punteros
+a tantas estructuras sean posibles por el hardware al mismo tiempo e inicializar los punteros de las no utilizadas hasta el
+momento como null.
+Quitar static de uto8a libreria gpio
+Cambio de envio de kp y ki para que se realice en dos pasos con 2 bytes.
+Libreria puente h observar acople con comunicación teniendo que setpoint es pwm o valor a llegar según el modo en el que este	
+Modificación uint8_t a uint16_t en lireria puente h 
+Modificación intt8_t a uint8_t en libreria gpio
+Modificación de define Macros con static const
+Prueba UART para Bluetooth
+Manejo de memoria en libreria gpios Robocol
+Modificación constantes de error en librerias
+
+Desarrollo
+Creación comandos scp y mejora ssh
+
