@@ -37,9 +37,9 @@ multiplexores, referirse al esquema de conexión de los GPIO par ala Intel Galil
 #define PIN0		0x32	//Pin 0 corresponde a gpio50
 #define PIN1		0x33	//Pin 1 corresponde a gpio51
 #define PIN2		0x20	//Pin 2 corresponde a gpio32
-#define PIN2FAST	0x20	//Pin 2 fast corresponde a gpio14
+#define PIN2FAST	0x0D	//Pin 2 fast corresponde a gpio14
 #define PIN3		0x12	//Pin 3 corresponde a gpio18
-#define PIN3FAST	0x20	//Pin 3 fast corresponde a gpio15
+#define PIN3FAST	0x0E	//Pin 3 fast corresponde a gpio15
 #define PIN4		0x1C	//Pin 4 corresponde a gpio28
 #define PIN5		0x11	//Pin 5 corresponde a gpio17
 #define PIN6		0x18	//Pin 6 corresponde a gpio24
@@ -97,6 +97,19 @@ uint8_t init;
 /* ===================================================================*/
 char* u8toa(uint8_t i);
 
+/*
+** ===================================================================
+**     Método      :  u32toa
+*/
+/*!
+**     @resumen
+**          Convierte un uint32_t a una cadena de caracteres (string)
+**     @param
+**          i 	    	   	- Número a convertir
+**     @preturn
+**          				- Apuntador a la primera posición del array.
+*/
+/* ===================================================================*/
 char* u32toa(uint32_t i);
 
 /*
@@ -105,41 +118,58 @@ char* u32toa(uint32_t i);
 */
 /*!
 **     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
+**          Escribe de un archivo una cadena de caracteres del tamaño 
+**			especificado ingresada por parámetro.
 **     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
+**          ruta    	   	- Ruta del archivo a escribir.
+**     @param
+**          len				- Largo de la cadena de caracteres.
 */
 /* ===================================================================*/
 void g_write_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================
-**     Método      :  u8toa
+**     Método      :  g_read_file
 */
 /*!
 **     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
+**          Lee un archivo una cadena de caracteres del tamaño 
+**			especificada  por parámetro
 **     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
+**          ruta    	   	- Ruta del archivo a escribir.
+**     @param
+**          len				- Largo de la cadena de caracteres.
 */
 /* ===================================================================*/
-static void gpio_export(char* buff, uint8_t len );
+void g_write_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================
-**     Método      :  u8toa
+**     Método      :  gpio_export
 */
 /*!
 **     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
+**          Exporta el gpio especificado al Sysfs
 **     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
+**          str_num    	   	- String del número del gpio a exportar
+**     @return
+**          				- Estado de finalización
+*/
+/* ===================================================================*/
+static void gpio_export(char* str_num, uint8_t len );
+
+/*
+** ===================================================================
+**     Método      :  gpio_unexport
+*/
+/*!
+**     @resumen
+**          Retira el gpio especificado al Sysfs
+**     @param
+**          str_num    	   	- String del número del gpio a retira
+**     @return
+**          				- Estado de finalización
 */
 /* ===================================================================*/
 static void gpio_unexport(char* buff, uint8_t len );
@@ -198,7 +228,7 @@ gpio_st reg_set(void);
 
 gpio_st reg_set_value(char* value);
 
-gpio_st gpio_get(uint8_t port, uint8_t* buff);
+gpio_st gpio_exp_get(uint8_t port, uint8_t* buff);
 
 gpio_st reg_get(char* buff);
 
