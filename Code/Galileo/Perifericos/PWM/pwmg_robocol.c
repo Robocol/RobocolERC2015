@@ -22,7 +22,7 @@ pwm_st pwm_build(uint8_t pwm_n,uint32_t period, uint8_t duty){
 		return PWM_ERROR;
 	}
 
-	if(handle_muxes(pwm_n)!=0){
+	if(handle_muxes(pwm_nstatic pwm_st handle_muxes(uint8_t pwm_n))!=0){
 		printf("Error en la habilitacion del multiplexor para pwm%d\n",pwm );
 		return PWM_ERROR;
 	}

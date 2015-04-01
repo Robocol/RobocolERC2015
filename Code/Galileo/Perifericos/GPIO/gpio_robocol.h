@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <string.h>
 #include <fcntl.h>
 #include "i2c_robocol.h"
 
@@ -73,13 +72,6 @@ typedef uint8_t gpio_st; /* Estado de salida de la función*/
 
 /*--------------------------------------------------------------------------*/
 /*
- *                 	  VARIABLES GLOBALES
- */
-
-uint8_t init;
-
-/*--------------------------------------------------------------------------*/
-/*
  *                 FUNCIONES DE LA LIBRERIA
  */
 
@@ -127,7 +119,7 @@ char* u32toa(uint32_t i);
 **          len				- Largo de la cadena de caracteres.
 */
 /* ===================================================================*/
-void g_write_file(char* ruta, char* buff, uint8_t len );
+gpio_st g_write_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================
@@ -143,7 +135,7 @@ void g_write_file(char* ruta, char* buff, uint8_t len );
 **          len				- Largo de la cadena de caracteres.
 */
 /* ===================================================================*/
-void g_write_file(char* ruta, char* buff, uint8_t len );
+gpio_st g_write_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================
@@ -158,7 +150,7 @@ void g_write_file(char* ruta, char* buff, uint8_t len );
 **          				- Estado de finalización
 */
 /* ===================================================================*/
-static void gpio_export(char* str_num, uint8_t len );
+static gpio_st gpio_export(char* str_num, uint8_t len );
 
 /*
 ** ===================================================================
@@ -173,7 +165,7 @@ static void gpio_export(char* str_num, uint8_t len );
 **          				- Estado de finalización
 */
 /* ===================================================================*/
-static void gpio_unexport(char* buff, uint8_t len );
+static gpio_st gpio_unexport(char* buff, uint8_t len );
 
 /*
 ** ===================================================================
