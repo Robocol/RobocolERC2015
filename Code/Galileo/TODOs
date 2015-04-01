@@ -12,48 +12,46 @@
 %%PRIORIDAD 1																				  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-	1. Dar posibilidad de manejar mas de un(n)expansor de pines desde la libreria gpio_robocol
-	2. No dejar crear pwm por defecto frente a un fallo en utilizacion de la libreria.
-	3. Diagnosticar el estado de los mux en  pwmg_robocol, adc_robocol.
-	4. Revisar declaracion de variables en el comienzod de lo metodos
-	5. Modificar creacion de ph_dev con inclusion de spi_dev dentro de la libreria ph_robocol
+	%%%PENDIENTES%%%
+	. Terminación y prueba de libreria stepper.
+	. Diagnosticar el estado de los mux en  pwmg_robocol, adc_robocol.
+	. Modificar creacion de ph_dev con inclusion de spi_dev dentro de la libreria ph_robocol
+	. Unificacion de librerias de perifericos con libreria de RAW_SOCKET.
+
+	%%%FINALIZADAS%%%
+	. Terminación y prueba de libreria PWM (LISTO)
+	. Dar posibilidad de manejar mas de un(n)expansor de pines desde la libreria gpio_robocol(LISTO)
+	. No dejar crear pwm por defecto frente a un fallo en utilizacion de la libreria.(LISTO)
+	. Revisar declaracion de variables en el comienzo de lo metodos(LISTO)
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%PRIORIDAD 2																				  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	1. Organizar definicion de variables de estado de salida de metodos en las diferentes
+
+	%%%PENDIENTES%%%
+	. Prueba y libreria de GPS en intel Galileo.
+	. Organizar definicion de variables de estado de salida de metodos en las diferentes
 	   librerias.
-	2. Trasladar funciones miscelaneas a una libreria que las contenga:
+	. Trasladar funciones miscelaneas a una libreria que las contenga:
 		a. u8toa
 		b. u32toa
 		c. g_write_file
-	3. Actualizar la documentacion.
-	4. Quitar define de los pines de la libreria spi.
-	5. Creación de metodo para cerrar el dispositivo spi en la libreria spi_robocol.
-	6. Declarar tipos de variables para estados de comunicacion y operacion en libreria puente h.
-		Cambiar tipo de la variable que indica estado de terminacion de los metodos en libreria
+	. Actualizar la documentacion.(ADC,PWM,UART,GPIO)
+	. Creación de metodo para cerrar el dispositivo spi en la libreria spi_robocol.
+	. Declarar tipos de variables para estados de comunicacion y operacion en libreria puente h.
+	. Cambiar tipo de la variable que indica estado de terminacion de los metodos en libreria
 		puente h.
+
+	%%%FINALIZADAS%%%
+	. Quitar define de los pines de la libreria spi.(LISTO)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%PRIORIDAD 3																				  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-	1. Probar el funcs de la libreria i2c_robocol
-	2. Quitar el init de libreria gpio_robocol.
-	3. Cambiar definicion de constantes de #define a static const ... .
-
-Entregas
-Modificar ingreso de estructuras para que sea tan solo en la creación de las mismas . Crear estructuras con punteros
-a tantas estructuras sean posibles por el hardware al mismo tiempo e inicializar los punteros de las no utilizadas hasta el
-momento como null.
-Quitar static de uto8a libreria gpio
-Cambio de envio de kp y ki para que se realice en dos pasos con 2 bytes.
-Libreria puente h observar acople con comunicación teniendo que setpoint es pwm o valor a llegar según el modo en el que este	
-Modificación uint8_t a uint16_t en lireria puente h 
-Modificación intt8_t a uint8_t en libreria gpio
-Modificación de define Macros con static const
-Prueba UART para Bluetooth
-Manejo de memoria en libreria gpios Robocol
-Modificación constantes de error en librerias
-
+	%%%PENDIENTES%%%
+	. Probar el funcs de la libreria i2c_robocol
+	. Quitar el init de libreria gpio_robocol.
+	. Cambiar definicion de constantes de #define a static const ... .
 
