@@ -31,7 +31,9 @@
 	3. Actualizar la documentacion.
 	4. Quitar define de los pines de la libreria spi.
 	5. Creación de metodo para cerrar el dispositivo spi en la libreria spi_robocol.
-
+	6. Declarar tipos de variables para estados de comunicacion y operacion en libreria puente h.
+		Cambiar tipo de la variable que indica estado de terminacion de los metodos en libreria
+		puente h.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%PRIORIDAD 3																				  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
