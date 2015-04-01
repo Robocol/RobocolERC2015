@@ -12,11 +12,12 @@
 
 /*
 ** ===================================================================
-**     Método      :  ph_enable
+**     Método      :  ph_build
 */
 /*!
 **     @resumen
-**          Habilita el puente H ingresado por parámetro.
+**          Construlle el dispositivo a partir de la información en la structura
+**			suministrada por el usuario.
 **     @param
 **          dev     	   	- Puntero al dispositivo sobre el que recae la 
 **							acción.
@@ -25,8 +26,13 @@
 */
 /* ===================================================================*/
 ph_st ph_build(ph_dev* dev){
-	spi_device new_spi={&(*dev).spi,0,(*dev).pin_cs};
+	spi_device new_spi;
+	spi_create_device(new_spi,0,(*dev).pin_cs};
 	(*dev).spi=new_spi;
+
+	spi_start("/dev/spidev1.0",100000);
+
+	return PH_OK;
 }
 
 /*

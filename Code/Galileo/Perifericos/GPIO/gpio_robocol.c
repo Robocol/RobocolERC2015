@@ -115,6 +115,8 @@ void g_read_file(char* ruta, char* buff, uint8_t len ){
 	close(fd);
 }
 
+
+
 /*
 ** ===================================================================
 **     Método      :  gpio_export
@@ -301,9 +303,8 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 	}
 	
 	//Se incluye el GPIO en sysfs
-	if(gpio_export(num_str,len)!=0){
-		return GPIO_ERROR
-	}
+	gpio_export(num_str,len);
+	
 	
 	//Se define la ruta del archivo de value
 	char* ruta=malloc(40);
@@ -313,19 +314,139 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 	//Dependiendo de el valor especificado, se escribe 
 	//en value
 	
-	if(g_read_file(ruta,buf,1)!=0){
-		return GPIO_ERROR;
-	}
+	g_read_file(ruta,buf,1);
+
 	
-	*value = itoa(buf);
+	*valor = atoi(buf);
 	
 	//Se extrae el GPIO de sysfs
-	if(gpio_unexport(num_str,len)!=0){
-		return GPIO_ERROR
-	}
+	gpio_unexport(num_str,len);
+	
 	return GPIO_OK;
 }
 
+
+/*
+** ===================================================================
+**     Método      :  gpio_gal_muxcheck
+*/
+/*!
+**     @resumen
+**          Realiza el chequeo de multiplexores para pines en la Galileo
+**
+**     @param
+**          num     	   	- Número del GPIO
+*/
+/* ===================================================================*/
+gpio_st gpio_gal_muxcheck(uint8_t num){
+	uint8_t mux_val;
+
+	/*Checkeo de multiplexores*/
+	if(num==PIN0){
+		gpio_gal_get(40,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PIN1){
+		gpio_gal_get(41,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PIN2FAST){
+		gpio_gal_get(31,&mux_val);
+		if(mux_val!=LOW){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PIN2){
+		gpio_gal_get(31,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==10){
+		gpio_gal_get(42,&mux_val);
+		if(mux_val!=LOW){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==42){
+		gpio_gal_get(42,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==25){
+		gpio_gal_get(43,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==38){
+		gpio_gal_get(54,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==39){
+		gpio_gal_get(55,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PINA0){
+		gpio_gal_get(37,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PINA1){
+		gpio_gal_get(36,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PINA2){
+		gpio_gal_get(23,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PINA3){
+		gpio_gal_get(22,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}
+	}else if(num==PINA4){
+		gpio_gal_get(21,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}else{
+			gpio_gal_get(29,&mux_val);
+			if(mux_val!=HIGH){
+				printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+				return GPIO_ERROR;
+			}
+		}
+	}else if(num==PINA5){
+		gpio_gal_get(20,&mux_val);
+		if(mux_val!=HIGH){
+			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+			return GPIO_ERROR;
+		}else{
+			gpio_gal_get(29,&mux_val);
+			if(mux_val!=HIGH){
+				printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+				return GPIO_ERROR;
+			}
+		}
+	}
+	return GPIO_OK;
+}
 
 /*
 ** ===================================================================
@@ -341,118 +462,14 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 */
 /* ===================================================================*/
 gpio_st gpio_gal_set(uint8_t num){
-	uint8_t mux_val;
 
-	/*Checkeo de multiplexores*/
-	if(num==50){
-		gpio_gal_get(40,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
+	if(gpio_gal_muxcheck(num)==0){
+		/*Despues de la comprovación*/
+		if(gpio_gal_value(num,HIGH)!=0){
 			return GPIO_ERROR;
 		}
-	}else if(num==51){
-		gpio_gal_get(41,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==14){
-		gpio_gal_get(31,mux_val);
-		if(mux_val!=LOW){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==32){
-		gpio_gal_get(31,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==10){
-		gpio_gal_get(42,mux_val);
-		if(mux_val!=LOW){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==42){
-		gpio_gal_get(42,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==25){
-		gpio_gal_get(43,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==38){
-		gpio_gal_get(54,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==39){
-		gpio_gal_get(55,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==44){
-		gpio_gal_get(37,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==45){
-		gpio_gal_get(36,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==46){
-		gpio_gal_get(23,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==47){
-		gpio_gal_get(22,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==48){
-		gpio_gal_get(21,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}else{
-			gpio_gal_get(29,mux_val);
-			if(mux_val!=HIGH){
-				printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-				return GPIO_ERROR;
-			}
-		}
-	}else if(num==49){
-		gpio_gal_get(20,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}else{
-			gpio_gal_get(29,mux_val);
-			if(mux_val!=HIGH){
-				printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-				return GPIO_ERROR;
-			}
-		}
+		return GPIO_OK;
 	}
-
-	/*Despues de la comprovación*/
-	if(gpio_gal_value(num,HIGH)!=0){
-		return GPIO_ERROR
-	}
-	return GPIO_OK
 }
 
 /*
@@ -472,112 +489,11 @@ gpio_st gpio_gal_clear(uint8_t num){
 	uint8_t mux_val;
 
 	/*Checkeo de multiplexores*/
-	if(num==50){
-		gpio_gal_get(40,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==51){
-		gpio_gal_get(41,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==14){
-		gpio_gal_get(31,mux_val);
-		if(mux_val!=LOW){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==32){
-		gpio_gal_get(31,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==10){
-		gpio_gal_get(42,mux_val);
-		if(mux_val!=LOW){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==42){
-		gpio_gal_get(42,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==25){
-		gpio_gal_get(43,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==38){
-		gpio_gal_get(54,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==39){
-		gpio_gal_get(55,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==44){
-		gpio_gal_get(37,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==45){
-		gpio_gal_get(36,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==46){
-		gpio_gal_get(23,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==47){
-		gpio_gal_get(22,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}
-	}else if(num==48){
-		gpio_gal_get(21,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}else{
-			gpio_gal_get(29,mux_val);
-			if(mux_val!=HIGH){
-				printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-				return GPIO_ERROR;
-			}
-		}
-	}else if(num==49){
-		gpio_gal_get(20,mux_val);
-		if(mux_val!=HIGH){
-			printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-			return GPIO_ERROR;
-		}else{
-			gpio_gal_get(29,mux_val);
-			if(mux_val!=HIGH){
-				printf("El gpio %d\n no está habilitado por los multiplexores correspondientes ",num);
-				return GPIO_ERROR;
-			}
-		}
-	}
+	if(gpio_gal_muxcheck(num)==0){
 
-	if(gpio_gal_value(num,0)!=0){
-		return GPIO_ERROR;
+		if(gpio_gal_value(num,0)!=0){
+			return GPIO_ERROR;
+		}
 	}
 	return GPIO_OK;
 }

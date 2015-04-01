@@ -14,7 +14,7 @@
 
 	1. Dar posibilidad de manejar mas de un(n)expansor de pines desde la libreria gpio_robocol
 	2. No dejar crear pwm por defecto frente a un fallo en utilizacion de la libreria.
-	3. Diagnosticar el estado de los mux en gpio_robocol, pwmg_robocol, adc_robocol.
+	3. Diagnosticar el estado de los mux en  pwmg_robocol, adc_robocol.
 	4. Revisar declaracion de variables en el comienzod de lo metodos
 	5. Modificar creacion de ph_dev con inclusion de spi_dev dentro de la libreria ph_robocol
 
