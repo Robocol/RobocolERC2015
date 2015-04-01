@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <fcntl.h>
 #include "i2c_robocol.h"
 
@@ -208,7 +209,7 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada);
 **							requiera isntanciar el GPIO.
 */
 /* ===================================================================*/
-gpio_st gpio_gal_value(uint8_t num,int valor);
+gpio_st gpio_gal_value(uint8_t num,uint8_t valor);
 
 gpio_st gpio_gal_set(uint8_t num);
 
