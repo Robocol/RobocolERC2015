@@ -26,11 +26,15 @@
 */
 /* ===================================================================*/
 ph_st ph_build(ph_dev* dev){
+	
 	spi_device new_spi;
-	spi_create_device(new_spi,0,(*dev).pin_cs};
-	(*dev).spi=new_spi;
+	uint8_t addr=0b0111000;
+
+	spi_create_device(&new_spi,0,(*dev).pin_cs);
+	(*dev).spi=&new_spi;
 
 	spi_start("/dev/spidev1.0",100000);
+	build_expander(addr);
 
 	return PH_OK;
 }
@@ -325,6 +329,38 @@ ph_st ph_setVel(ph_dev* dev,uint8_t vel){
 	uint8_t rx,tx;
 
 	tx=SP_VELOCIDAD;
+	rx=0x00;
+	if(spi_rw((*dev).spi,&tx,&rx,1)){
+		perror("Error in SP_VELOCIDAD");
+	}
+
+	if(spi_rw((*dev).spi,&vel,&rx,1)){
+		perror("Error while setting VELOCIDAD");
+	}
+	return (ph_st)rx;
+}
+
+/*
+** ===================================================================
+**     Método      :  ph_set
+*/
+/*!
+**     @resumen
+**          Modifica velocidad objetivo del controlador
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae la 
+**							acción.
+**     @param
+**          vel     	   	- Nueva velocidad.
+**								Valor entre 0 y 255.
+**     @return
+**                         	- Estado salida del método. 
+*/
+/* ===================================================================*/
+ph_st ph_setCorriente(ph_dev* dev,uint8_t vel){
+	uint8_t rx,tx;
+
+	tx=SP_CORRIENTE;
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in SP_VELOCIDAD");

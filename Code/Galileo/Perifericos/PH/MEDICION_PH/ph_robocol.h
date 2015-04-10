@@ -84,11 +84,10 @@
 typedef int ph_st;
 
 typedef struct{
-	uint8_t pin_cs;		//
+	spi_device* spi;		//
 	uint8_t	pin_in_a;
 	uint8_t	pin_in_b;
 	uint8_t	pin_enable;
-	spi_device* spi;    //No es necesario que el usuario instancie este campo.
 }ph_dev;
 
 /*--------------------------------------------------------------------------*/
@@ -198,163 +197,28 @@ ph_st ph_setEstado(ph_dev* dev,uint8_t est);
 ph_st ph_setKPV(ph_dev* dev,uint8_t kpv);
 
 
-/*
-** ===================================================================
-**     Método      :  ph_setKIV
-*/
-/*!
-**     @resumen
-**          Modifica la ganancia integral del controlador PI de 
-**			velocidad
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          kiv     	   	- Ganancia a utilizar.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
 ph_st ph_setKIV(ph_dev* dev,uint8_t kiv);
 
-/*
-** ===================================================================
-**     Método      :  ph_setKPC
-*/
-/*!
-**     @resumen
-**          Modifica la ganancia proporcional del controlador PI de 
-**			corriente
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          kpc     	   	- Ganancia a utilizar.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
+
 ph_st ph_setKPC(ph_dev* dev,uint8_t kpc);
 
-/*
-** ===================================================================
-**     Método      :  ph_setKIC
-*/
-/*!
-**     @resumen
-**          Modifica la ganancia integral del controlador PI de 
-**			corriente.
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          kic     	   	- Ganancia a utilizar.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
+
 ph_st ph_setKIC(ph_dev* dev,uint8_t kic);
 
-/*
-** ===================================================================
-**     Método      :  ph_setVel
-*/
-/*!
-**     @resumen
-**          Modifica velocidad objetivo del controlador
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          vel     	   	- Nueva velocidad.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
+
 ph_st ph_setVel(ph_dev* dev,uint8_t vel);
 
-/*
-** ===================================================================
-**     Método      :  ph_getCorriente
-*/
-/*!
-**     @resumen
-**          Obtiene el valor de corriente medido por el puente H
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          corr     	   	- Corriente medida.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
-ph_st getCorriente(ph_dev* dev, uint8_t* corr);
 
-/*
-** ===================================================================
-**     Método      :  ph_getVelocidad
-*/
-/*!
-**     @resumen
-**          Obtiene el valor de velocidad medido por el puente H
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          vel     	   	- Puntero a la posición de memoria donde se 
-**							guarda la velocidad.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
-ph_st getVelocidad(ph_dev* dev,uint8_t* vel);
+ph_st ph_getVelocidad(ph_dev* dev,uint8_t* vel);
 
-/*
-** ===================================================================
-**     Método      :  ph_getEstado
-*/
-/*!
-**     @resumen
-**          Obtiene el valor de corriente medido por el puente H
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          est     	   	- Puntero a la posición de memoria donde 
-**							almacenar el estado.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
-ph_st getEstado(ph_dev* dev,uint8_t* est);
 
-/*
-** ===================================================================
-**     Método      :  ph_getTemperatura
-*/
-/*!
-**     @resumen
-**          Obtiene el valor de temperatura medido por el puente H
-**     @param
-**          dev     	   	- Puntero al dispositivo sobre el que recae la 
-**							acción.
-**     @param
-**          est     	   	- Puntero a la posición de memoria donde guardar
-**							la temperatura.
-**								Valor entre 0 y 255.
-**     @return
-**                         	- Estado salida del método. 
-*/
-/* ===================================================================*/
-ph_st getTemperatura(ph_dev* dev,uint8_t* temp);
+ph_st ph_getCorriente(ph_dev* dev,uint8_t* corr);
+
+
+ph_st ph_getEstado(ph_dev* dev,uint8_t* est);
+
+
+ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp);
 
 
 #endif

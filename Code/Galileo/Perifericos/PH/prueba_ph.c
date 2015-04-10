@@ -37,6 +37,9 @@ devptr=&dev1;
 				"\t cambiar-kpc\t\t-Cambia el valor de KPC. Valor de entrada entre 0 y 255\n"
 				"\t cambiar-kiv\t\t-Cambia el valor de KIV. Valor de entrada entre 0 y 255\n"
 				"\t cambiar-kpv\t\t-Cambia el valor de KPV. Valor de entrada entre 0 y 255\n"
+				"\t sp_vel\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
+				"\t sp_cor\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
+				"\t cambiar_motor\t\t\t-Cambia el motor. Valor de entrada 1 o 2\n"
 				"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
 
 while(1){
@@ -119,7 +122,21 @@ while(1){
 			printf("Cambiando KIC a: %d \n",buf);
 			ph_setKIC(devptr,buf);
 
-		}else if(!strcmp(line,"enable\n")){
+		}else if(!strcmp(line,"sp_vel\n")){
+			printf("Ingrese el SP_VELOCIDAD deseado:\n");
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			printf("Cambiando SP_VELOCIDAD a: %d \n",buf);
+			ph_setKIC(devptr,buf);
+
+		}else  if(!strcmp(line,"sp_cor\n")){
+			printf("Ingrese el SP_CORRIENTE deseado:\n");
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			printf("Cambiando SP_CORRIENTE a: %d \n",buf);
+			ph_setKIC(devptr,buf);
+
+		}else  if(!strcmp(line,"enable\n")){
 			printf("Ingrese 1 para activar, 0 para desactivar:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
@@ -153,7 +170,7 @@ while(1){
 			}
 
 		}else{
-			printf("Comando inválido. Utilice una de las siguientes opciones:\n" 
+			printf("Bienvenido al test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t enable\t\t\t-Habilita o deshabilita el puente H. Valores de entrada 1 o 0\n"
 				"\t medir-velocidad\t-Imprime la velocidad actual del motor\n "
 				"\t medir-temperatura\t-Imprime la temperatura actual del motor\n "
@@ -167,7 +184,10 @@ while(1){
 				"\t cambiar-kpc\t\t-Cambia el valor de KPC. Valor de entrada entre 0 y 255\n"
 				"\t cambiar-kiv\t\t-Cambia el valor de KIV. Valor de entrada entre 0 y 255\n"
 				"\t cambiar-kpv\t\t-Cambia el valor de KPV. Valor de entrada entre 0 y 255\n"
-				"\t debug\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
+				"\t sp_vel\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
+				"\t sp_cor\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
+				"\t cambiar_motor\t\t\t-Cambia el motor. Valor de entrada 1 o 2\n"
+				"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
 		}
 		printf("--------------------------------------------------------------\n");
 	}

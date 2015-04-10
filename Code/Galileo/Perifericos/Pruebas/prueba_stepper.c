@@ -1,43 +1,22 @@
-#include <string.h>
-#include "ph_robocol.h"
+
+#include "stepper_robocol.h"
 
 int main(){
-size_t size=40;
-char* line=malloc(size);
-uint8_t temp, vel,corr,est,debug;
-ph_dev* devptr;
-int buf;
-
-temp, vel,corr,est,debug=0x5A;
-
-printf("----------Prueba Driver Puente H----------\n");
-
-
-ph_dev dev1={PINA0,0,1,4};
-ph_dev dev2={PINA1,2,3,4};
-
-ph_build(&dev1);
-ph_build(&dev2);
-
-
-devptr=&dev1;
+	
+	printf("Probando el stepper\n");
 
 
 		printf("Bienvenido al test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
-				"\t enable\t\t\t-Habilita o deshabilita el puente H. Valores de entrada 1 o 0\n"
-				"\t medir-velocidad\t-Imprime la velocidad actual del motor\n "
-				"\t medir-temperatura\t-Imprime la temperatura actual del motor\n "
-				"\t medir-corriente\t-Imprime la corriente actual que atravieza el motor\n"
-				"\t dar-estado\t \t-Imprime el estado de operación actual del motor\n"
-				"\t cambiar-pwm\t\t-Cambia ciclo útil del PWM. Valor de entrada entre 0 y 255\n"
-				"\t cambiar-direccion\t-Cambia la dirección de giro del motor. Valor de entrada 1 o 0\n"
-				"\t cambiar-velocidad\t-Cambia la velocidad objetivo del controlador. Valor de entrada entre ------\n"
-				"\t cambiar-estado\t \t-Cambia el estado de operación del puente H. VAlor de entrada entre 16 o 32 TODO: Parser\n"
-				"\t cambiar-kic\t\t-Cambia el valor de KIC. Valor de entrada entre 0 y 255\n"
-				"\t cambiar-kpc\t\t-Cambia el valor de KPC. Valor de entrada entre 0 y 255\n"
-				"\t cambiar-kiv\t\t-Cambia el valor de KIV. Valor de entrada entre 0 y 255\n"
-				"\t cambiar-kpv\t\t-Cambia el valor de KPV. Valor de entrada entre 0 y 255\n"
-				"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
+				"\t e\t\t- Enable\n"
+				"\t d\t\t- Disable\n "
+				"\t tval\t\t\n "
+				"\t ton\t\t\n"
+				"\t toff\t\t\n"
+				"\t ocdt\t\t\n"
+				"\t step_sel\t\t\n"
+				"\t alarm\t\t\n"
+				"\t status\t\t\n"
+				"\t dir\t\t");
 
 while(1){
 
@@ -46,24 +25,38 @@ while(1){
 		printf("El comando ingresado fue: %s \n",line);
 
 		//Mediciones
-		if(!strcmp(line,"medir-temperatura\n")){
-			getTemperatura(devptr,&temp);
-			printf("Temperatura: %d \n",temp);
+		if(!strcmp(line,"e\n")){
+			stp_enable(devptr);
+			printf("Stepper habilitado");
 
-		}else if(!strcmp(line,"medir-velocidad\n")){
-			getVelocidad(devptr,&vel);
-			printf("Velocidad: %d \n",vel);
+		}else if(!strcmp(line,"d\n")){
+			stp_disable(devptr);
+			printf("Stepper deshabilitado");
 
-		}else if(!strcmp(line,"medir-corriente\n")){
-			getCorriente(devptr,&corr);
-			printf("Corriente: %d \n",corr);
+		}else if(!strcmp(line,"tval\n")){
+			stp_getTValdevptr,&tval);
+			printf("TVAL: %d \n",tval);
 
-		}else if(!strcmp(line,"dar-estado\n")){
-			getEstado(devptr,&est);
+		}else if(!strcmp(line,"ton\n")){
+			stp_getTOnMin(devptr,&est);
 			printf("Estado: %d \n",est);
+		}else if(!strcmp(line,"toff\n")){
+			stp_getTValdevptr,&tval);
+			printf("TVAL: %d \n",tval);
+		}else if(!strcmp(line,"ocdt\n")){
+			stp_getTValdevptr,&tval);
+			printf("TVAL: %d \n",tval);
+		}else if(!strcmp(line,"step_sel\n")){
+			stp_getTValdevptr,&tval);
+			printf("TVAL: %d \n",tval);
+		}else if(!strcmp(line,"tval\n")){
+			stp_getTValdevptr,&tval);
+			printf("TVAL: %d \n",tval);
+		}
+		
 		
 		//Setters
-		}else if(!strcmp(line,"cambiar-pwm\n")){
+		}else if(!strcmp(line,"toff\n")){
 			printf("Ingrese el PWM deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
