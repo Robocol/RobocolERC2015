@@ -25,6 +25,7 @@ stp_st stp_build(stp_device* dev){
 	spi_device new_spi;
 	spi_create_device(new_spi,0,(*dev).pin_cs};
 	(*dev).spi=new_spi;
+	pwm_build((*dev).pin_pwm, (*dev).periodo , DUTY_CYCLE);
 
 	spi_start("/dev/spidev1.0",100000);
 
@@ -771,12 +772,16 @@ stp_st stp_setConfig(stp_device* dev, int32_t* config){
 */
 /* ===================================================================*/
 stp_st stp_enable(stp_device* dev){
-
+	if(pwm_enable((*dev).pin_pwm)){
+		printf("Error habilitando el pwm desde galileo para manejo de sterpper\n");
+		return STP_ERROR;
+	}
 
 	if(stp_setParam(dev,ENABLE,NULL,0)){
 		printf("Error asignando posición\n");
 		return STP_ERROR;
 	}
+
 
 	return STP_OK;
 }
@@ -795,12 +800,38 @@ stp_st stp_enable(stp_device* dev){
 */
 /* ===================================================================*/
 stp_st stp_disable(stp_device* dev){
-
+	if(pwm_disable((*dev).pin_pwm)){
+		printf("Error Deshabilitando el pwm desde galileo para manejo de sterpper\n");
+		return STP_ERROR;
+	}
 
 	if(stp_setParam(dev,DISABLE,NULL,0)){
 		printf("Error asignando posición\n");
 		return STP_ERROR;
 	}
 
+	return STP_OK;
+}
+
+
+/*
+** ===================================================================
+**     Método      :  stp_period
+*/
+/*!
+**     @resumen
+**          Cambia el periodo del pwm para el manejo del stepper.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_period(stp_device* dev, uint32_t period){
+	if(pwm_set_period((*dev).pin_pwm,period)){
+		printf("Error Deshabilitando el pwm desde galileo para manejo de stepper\n");
+		return STP_ERROR;
+	}
+	(*dev).period=period;
 	return STP_OK;
 }
