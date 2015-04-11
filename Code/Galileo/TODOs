@@ -19,6 +19,8 @@
 	. Unificacion de librerias de perifericos con libreria de RAW_SOCKET.
 
 	%%%FINALIZADAS%%%
+	. Implementacion de makefiles con rutas relativas para posibilidad de compilacion desde el
+	  repositorio.(LISTO)
 	. Terminación y prueba de libreria PWM (LISTO)
 	. Dar posibilidad de manejar mas de un(n)expansor de pines desde la libreria gpio_robocol(LISTO)
 	. No dejar crear pwm por defecto frente a un fallo en utilizacion de la libreria.(LISTO)
@@ -37,13 +39,16 @@
 		a. u8toa
 		b. u32toa
 		c. g_write_file
-	. Actualizar la documentacion.(ADC,PWM,UART,GPIO)
+	. Actualizar la documentacion.(PWM,UART,GPIO)
 	. Creación de metodo para cerrar el dispositivo spi en la libreria spi_robocol.
 	. Declarar tipos de variables para estados de comunicacion y operacion en libreria puente h.
 	. Cambiar tipo de la variable que indica estado de terminacion de los metodos en libreria
 		puente h.
+	. Implementar filtro digtal de la libreria ADC.
+	. Modificar la manera en la que se obtienen los datos del ADC.
 
 	%%%FINALIZADAS%%%
+	. Actualizar la documentacion.(ADC)
 	. Quitar define de los pines de la libreria spi.(LISTO)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,4 +59,6 @@
 	. Probar el funcs de la libreria i2c_robocol
 	. Quitar el init de libreria gpio_robocol.
 	. Cambiar definicion de constantes de #define a static const ... .
+	. Implementar filtro digtal de la libreria ADC.
+	. Modificar la manera en la que se obtienen los datos del ADC.
 

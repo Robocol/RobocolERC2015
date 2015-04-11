@@ -203,6 +203,8 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada);
 /* ===================================================================*/
 gpio_st gpio_gal_value(uint8_t num,uint8_t valor);
 
+gpio_st gpio_muxlock(uint8_t num);
+
 gpio_st gpio_gal_set(uint8_t num);
 
 gpio_st gpio_gal_clear(uint8_t num);
