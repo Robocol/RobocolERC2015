@@ -1,12 +1,24 @@
 ################################################################################################
 #	FORMATO DE REGLAS																		   #
 ################################################################################################
-#	Variables previamente definidas:
-#		ODIR: Directorio de almacenamiento de los object files .go (Galileo Object)
 #
 #$(ODIR)/foo.go: $(ROUTETOFOO)/foo.c $(ROUTETOFOO)/foo.h $(ODIR)/object_needed1.go \
 #            										    $(ODIR)/object_needed2.go
-#	gcc -c -o $@ $< -I $(ROUTETOFOO)
+#	$(CC) -c -o $@ $< -I $(ROUTETOFOO):
+#
+#		VARIABLES PREDEFINIDAS
+#
+#		ODIR: Directorio de almacenamiento de los object files .go (Galileo Object)
+#
+#		CC: Compilador definido dentro del Makefile de cada uno de los perifericos para la
+#			realizacion del proceso de creacion de objetos y ejecutables
+#		
+#		ROUTEFOO: Es la ruta definida para la busqueda de los elementos a compilar.Corresponde
+#				  a cada una de las carpetas donde se encuentran los programas que utilizan
+#				  los elementos de las librerias contenidos como precompilados en la ruta 
+#				  ODIR.
+#
+#
 ################################################################################################
 
 ################################################################################################
@@ -33,7 +45,7 @@ $(ODIR)/gpio_robocol$(LEXT): ../GPIO/gpio_robocol.c ../GPIO/gpio_robocol.h $(ODI
 $(ODIR)/spi_robocol$(LEXT): ../SPI/spi_robocol.c ../SPI/spi_robocol.h $(ODIR)/i2c_robocol$(LEXT) \
                                                                  $(ODIR)/gpio_robocol$(LEXT)
 	$(CC) -c -o $@ $< -I../GPIO \
-                    -I../I2C  \
+                    -I../I2C \
                     -I../SPI
 
 
@@ -48,8 +60,6 @@ $(ODIR)/ph_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_rob
                       -I../I2C  \
                       -I../SPI  \
                       -I../PH
-
-
 
 .PHONY: clean
 
