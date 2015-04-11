@@ -71,7 +71,7 @@
 #define FAIL_EST 		0x30
 /*--------------------------------------------------------------------------*/
 /*
- *                  CONSTANTES DE DEBUG
+ *                  	CONSTANTES DE DEBUG
  */
 
 #define PH_OK 			0x00
@@ -79,7 +79,7 @@
 
 /*--------------------------------------------------------------------------*/
 /*
- *                  DEFINICIÓN DE TYPES
+ *                  	DEFINICIÓN DE TYPES
  */
 typedef int ph_st;
 
