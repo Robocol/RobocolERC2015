@@ -20,6 +20,7 @@
 #include <linux/types.h>
 #include "gpio_robocol.h"
 #include "spi_robocol.h"
+#include "pwmg_robocol.h"
 #include "misc_robocol.h"
 
 /*--------------------------------------------------------------------------*/
@@ -81,6 +82,9 @@
 #define	DIR						0x04	//
 #define	HiZ						0x00	//
 
+ /*Duty Cycle PWM*/
+ #define DUTY_CYCLE 			0x32 	//
+
 /*--------------------------------------------------------------------------*/
 /*
  *                   TYPES DE LA LIBRERIA
@@ -90,16 +94,17 @@ typedef struct stp_device{
 	uint8_t pin_cs;
 	uint8_t pin_dir;
 	uint8_t pin_stndby;
-	uint8_t pin_stck;
 	uint8_t pin_flag;
 	spi_device* spi;
+	uint8_t pin_pwm;
+	uint32_t period;
 }stp_device;
 
-MODOS
+// MODOS
 
-velocidad constante
-Ir a Posición Absoluta
-Ir a posiciíon relativa
+// velocidad constante
+// Ir a Posición Absoluta
+// Ir a posiciíon relativa
 
 
 /*--------------------------------------------------------------------------*/
@@ -428,10 +433,6 @@ stp_st stp_getConfig(stp_device* dev, int32_t* osc_sel);
 */
 /* ===================================================================*/
 stp_st stp_getStatus(stp_device* dev, int32_t* stats);
-
-
-
-
 
 
 

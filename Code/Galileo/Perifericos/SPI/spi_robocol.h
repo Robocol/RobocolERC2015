@@ -105,7 +105,7 @@
 
 Nota: Esta librería no garantiza que el gpio que está asociado al pin se encuentre 
 conectado por los multiplexores de selección. Para configurar adecuadamente estos 
-multiplexores, referirse al esquema de conexión de los GPIO par ala Intel Galileo Gen1.
+multiplexores, referirse al esquema de conexión de los GPIO para la Intel Galileo Gen1.
  */
 /* =====================================================================================*/
 

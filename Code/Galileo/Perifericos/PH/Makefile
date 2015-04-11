@@ -24,7 +24,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 ################################################################################################
 
 #Regla de compilación de ejecutable para prueba del driver
-prueba_spi: $(OBJ)
+prueba_ph: $(OBJ)
 	$(CC) -o $@$(EEXT) prueba_ph.c $^ $(CFLAGS)
 
 #Regla de compilación para creación de logs
@@ -32,4 +32,3 @@ logvc_ph: $(OBJ)
 	$(CC) -o $@$(EEXT) logvc_ph.c $^ $(CFLAGS)
 
 include ../Makefile
-
