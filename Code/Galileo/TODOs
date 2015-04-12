@@ -24,8 +24,7 @@
 	. Terminación y prueba de libreria PWM (LISTO)
 	. Dar posibilidad de manejar mas de un(n)expansor de pines desde la libreria gpio_robocol(LISTO)
 	. No dejar crear pwm por defecto frente a un fallo en utilizacion de la libreria.(LISTO)
-	. Revisar declaracion de variables en el comienzo de lo metodos(LISTO)
-	
+	. Revisar declaracion de variables en el comienzo de lo metodos(LISTO)	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%PRIORIDAD 2																				  %%
@@ -44,6 +43,7 @@
 	. Declarar tipos de variables para estados de comunicacion y operacion en libreria puente h.
 	. Cambiar tipo de la variable que indica estado de terminacion de los metodos en libreria
 		puente h.
+	. Cambiar llamadas ligadas a libreria random hacia aquellas implementadas en misc.
 	. Implementar filtro digtal de la libreria ADC.
 	. Modificar la manera en la que se obtienen los datos del ADC.
 
