@@ -42,8 +42,10 @@
 #define		CONFIG		0x18		//
 #define		STATUS		0xD0		//
 
-#define		ENABLE		0xA8
-#define		DISABLE		0xB8
+#ifndef ENABLE
+	#define		ENABLE		0xA8
+	#define		DISABLE		0xB8
+ #endif
 
 /*Máscaras de EL_POS*/
 #define	STEP					0x07	//
@@ -482,7 +484,7 @@ stp_st stp_getStatus(stp_device* dev, int32_t* stats);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setPosition(stp_device* dev, int32_t* pos);
+stp_st stp_setPosition(stp_device* dev, int32_t pos);
 
 
 /*
@@ -504,7 +506,7 @@ stp_st stp_setPosition(stp_device* dev, int32_t* pos);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setTVAL(stp_device* dev, int8_t* tval);
+stp_st stp_setTVAL(stp_device* dev, int8_t tval);
 
 /*
 ** ===================================================================
@@ -525,7 +527,7 @@ stp_st stp_setTVAL(stp_device* dev, int8_t* tval);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setTONMIN(stp_device* dev, int8_t* tonm);
+stp_st stp_setTonMin(stp_device* dev, int8_t tonm);
 
 /*
 ** ===================================================================
@@ -546,7 +548,7 @@ stp_st stp_setTONMIN(stp_device* dev, int8_t* tonm);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setTOffMin(stp_device* dev, int8_t* toffm);
+stp_st stp_setTOffMin(stp_device* dev, int8_t toffm);
 /*
 ** ===================================================================
 **     Método      :  stp_setOCDT
@@ -566,7 +568,7 @@ stp_st stp_setTOffMin(stp_device* dev, int8_t* toffm);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setOCDT(stp_device* dev, int8_t* ocdt);
+stp_st stp_setOCDT(stp_device* dev, int8_t ocdt);
 /*
 ** ===================================================================
 **     Método      :  stp_setStepSel
@@ -586,7 +588,7 @@ stp_st stp_setOCDT(stp_device* dev, int8_t* ocdt);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setStepSel(stp_device* dev, int8_t* step_sel);
+stp_st stp_setStepSel(stp_device* dev, int8_t step_sel);
 
 /*
 ** ===================================================================
@@ -607,7 +609,7 @@ stp_st stp_setStepSel(stp_device* dev, int8_t* step_sel);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setAlarmEn(stp_device* dev, int8_t* al_en);
+stp_st stp_setAlarmEn(stp_device* dev, int8_t al_en);
 
 /*
 ** ===================================================================
@@ -628,7 +630,7 @@ stp_st stp_setAlarmEn(stp_device* dev, int8_t* al_en);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setConfig(stp_device* dev, int32_t* config);
+stp_st stp_setConfig(stp_device* dev, int32_t config);
 
 /*
 ** ===================================================================

@@ -531,7 +531,7 @@ stp_st stp_getStatus(stp_device* dev, int32_t* stats){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setPosition(stp_device* dev, int32_t* pos){
+stp_st stp_setPosition(stp_device* dev, int32_t pos){
 
 	uint8_t* ptr=(uint8_t*)&pos;
 	if(stp_setParam(dev,ABS_POS,ptr,3)){
@@ -563,9 +563,9 @@ stp_st stp_setPosition(stp_device* dev, int32_t* pos){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setTVAL(stp_device* dev, int8_t* tval){
+stp_st stp_setTVal(stp_device* dev, int8_t tval){
 
-	if(stp_setParam(dev,TVAL,tval,1)){
+	if(stp_setParam(dev,TVAL,&tval,1)){
 		printf("Error asignando TVAL\n");
 		return STP_ERROR;
 	}
@@ -592,9 +592,9 @@ stp_st stp_setTVAL(stp_device* dev, int8_t* tval){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setTONMIN(stp_device* dev, int8_t* tonm){
+stp_st stp_setTOnMin(stp_device* dev, int8_t tonm){
 
-	if(stp_setParam(dev,TON_MIN,tonm,1)){
+	if(stp_setParam(dev,TON_MIN,&tonm,1)){
 		printf("Error asignando TON_MIN\n");
 		return STP_ERROR;
 	}
@@ -621,9 +621,9 @@ stp_st stp_setTONMIN(stp_device* dev, int8_t* tonm){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setTOffMin(stp_device* dev, int8_t* toffm){
+stp_st stp_setTOffMin(stp_device* dev, int8_t toffm){
 
-	if(stp_setParam(dev,TOFF_MIN,toffm,1)){
+	if(stp_setParam(dev,TOFF_MIN,&toffm,1)){
 		printf("Error asignando TEOFF_MIN\n");
 		return STP_ERROR;
 	}
@@ -650,9 +650,9 @@ stp_st stp_setTOffMin(stp_device* dev, int8_t* toffm){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setOCDT(stp_device* dev, int8_t* ocdt){
+stp_st stp_setOCDT(stp_device* dev, int8_t ocdt){
 
-	if(stp_setParam(dev,OCD_TH,ocdt,1)){
+	if(stp_setParam(dev,OCD_TH,&ocdt,1)){
 		printf("Error asignando OCD_TH\n");
 		return STP_ERROR;
 	}
@@ -679,12 +679,12 @@ stp_st stp_setOCDT(stp_device* dev, int8_t* ocdt){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setStepSel(stp_device* dev, int8_t* step_sel){
+stp_st stp_setStepSel(stp_device* dev, int8_t step_sel){
 
-	*step_sel &= 0x07;
-	*step_sel |= 0x88;
+	step_sel &= 0x07;
+	step_sel |= 0x88;
 
-	if(stp_setParam(dev,STEP_MODE,step_sel,1)){
+	if(stp_setParam(dev,STEP_MODE,&step_sel,1)){
 		printf("Error asignando STEP_SEL\n");
 		return STP_ERROR;
 	}
@@ -712,9 +712,9 @@ stp_st stp_setStepSel(stp_device* dev, int8_t* step_sel){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setAlarmEn(stp_device* dev, int8_t* al_en){
+stp_st stp_setAlarmEn(stp_device* dev, int8_t al_en){
 
-	if(stp_setParam(dev,ALARM_EN,al_en,1)){
+	if(stp_setParam(dev,ALARM_EN,&al_en,1)){
 		printf("Error asignando ALARM_EN\n");
 		return STP_ERROR;
 	}
@@ -741,7 +741,7 @@ stp_st stp_setAlarmEn(stp_device* dev, int8_t* al_en){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_setConfig(stp_device* dev, int32_t* config){
+stp_st stp_setConfig(stp_device* dev, int32_t config){
 
 	uint8_t* ptr=(uint8_t*)&config;
 

@@ -4,18 +4,18 @@
 int main(){
 size_t size=40;
 char* line=malloc(size);
-uint32_t status,config=0;
-int8_t step;
-uint8_t temp, vel,corr,est,debug;
-ph_dev* devptr;
+uint32_t position,status,config=0;
+int8_t step,ocd;
+uint8_t alarm,corr,debug;
+stp_device* devptr;
 int32_t buf;
 
-temp, vel,corr,est,debug=0x5A;
+debug=0x5A;
 
-printf("----------Prueba Driver Puente H----------\n");
+printf("----------Prueba Driver Stepper----------\n");
 
 
-stp_dev dev1={PIN6,PIN2,0,1,3,5000000};
+stp_device dev1={PIN6,PIN2,0,1,3,5000000};
 
 stp_build(&dev1);
 
@@ -64,12 +64,12 @@ while(1){
 			printf("Step: %X \n",step);
 
 		}else if(!strcmp(line,"get-posicion\n")){
-			stp_getPosition(devptr,&step);
-			printf("Posición: %X \n",step);
+			stp_getPosition(devptr,&position);
+			printf("Posición: %X \n",position);
 
 		}else if(!strcmp(line,"get-ocdt\n")){
 			stp_getOCDT(devptr,&ocd);
-			printf("Estado: %d \n",est);
+			printf("OCD: %d \n",ocd);
 		
 		//Setters
 		}else if(!strcmp(line,"periodo\n")){
@@ -83,7 +83,7 @@ while(1){
 			printf("Ingresela dirección: 0 - clockwise; 1 - counterclockwise:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
-			printf("Cambiando periodo a: %d \n",buf);
+			printf("Cambiando direccipon a a: %d \n",buf);
 			stp_period(devptr,buf);
 	
 		}else if(!strcmp(line,"set_posicion\n")){
@@ -112,7 +112,7 @@ while(1){
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando TOFFMIN a: %d \n",buf);
-			stp_setOffMin(devptr,buf);
+			stp_setTOffMin(devptr,buf);
 
 		}else if(!strcmp(line,"set-ocdt\n")){
 			printf("Ingrese el OCDT deseado:\n");
