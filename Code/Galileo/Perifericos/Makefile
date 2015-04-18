@@ -123,6 +123,19 @@ $(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h $(ODIR)/i2
                       -I../ADC                   
 
 
+################################################################################################
+#	MISC 																			   	   	   #
+################################################################################################
+
+$../(ODIR)/misc_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
+                                                            $(ODIR)/gpio_robocol$(LEXT)   \
+                                                            $(ODIR)/spi_robocol$(LEXT)
+	$(CC) -c -o $@ $< -I../GPIO \
+                      -I../I2C  \
+                      -I../SPI  \
+                      -I../PH
+
+
 .PHONY: clean
 
 clean:
