@@ -21,16 +21,12 @@
 */
 /* ===================================================================*/
 stp_st stp_build(stp_device* dev){
-
 	spi_device* new_spi;
 	spi_create_device(new_spi,0,(*dev).pin_cs);
 	(*dev).spi=new_spi;
-	pwm_build((*dev).pin_pwm, (*dev).periodo , DUTY_CYCLE);
-
+	pwm_build((*dev).pin_pwm, (*dev).period , DUTY_CYCLE);
 	spi_start("/dev/spidev1.0",100000);
-
 	return STP_OK;
-
 }
 
 /*
@@ -63,9 +59,8 @@ stp_st stp_setParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 		printf("Error en SPI\n");
 		return STP_ERROR;
 	}
-
-	for(int i=0;i<len,i++){
-
+	int i;
+	for(i=0;i<len;i++){
 		tx=*(buff+(len-i-1));
 		if(spi_rw((*dev).spi, &tx, &rx,1)){
 			printf("Error en SPI\n");
@@ -108,8 +103,8 @@ stp_st stp_getParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 		printf("Error en SPI\n");
 		return STP_ERROR;
 	}
-
-	for(int i=0;i<len,i++){
+	int i;
+	for(i=0;i<len;i++){
 		if(spi_rw((*dev).spi, &tx, &rx,1)){
 			printf("Error en SPI\n");
 			return STP_ERROR;
@@ -452,7 +447,7 @@ stp_st stp_getConfig(stp_device* dev, int32_t* osc_sel){
 		return STP_ERROR;
 	}
 
-	osc_sel=little_endian_to_i32(buff);
+	*osc_sel=array_to_i32(buff);
 
 	return STP_OK;
 }
@@ -484,7 +479,7 @@ stp_st stp_getStatus(stp_device* dev, int32_t* stats){
 		return STP_ERROR;
 	}
 
-	stats=little_endian_to_i32(buff);
+	*stats=array_to_i32(buff);
 
 	return STP_OK;
 }
@@ -538,8 +533,8 @@ stp_st stp_getStatus(stp_device* dev, int32_t* stats){
 /* ===================================================================*/
 stp_st stp_setPosition(stp_device* dev, int32_t* pos){
 
-	uint8_t ptr=(uint8_t*)&pos;
-	if(stp_setParam(dev,ABS_POS,ptr[1],3)){
+	uint8_t* ptr=(uint8_t*)&pos;
+	if(stp_setParam(dev,ABS_POS,ptr,3)){
 		printf("Error asignando posición\n");
 		return STP_ERROR;
 	}
@@ -750,7 +745,7 @@ stp_st stp_setConfig(stp_device* dev, int32_t* config){
 
 	uint8_t* ptr=(uint8_t*)&config;
 
-	if(stp_setParam(dev,CONFIG,buff[2],2)){
+	if(stp_setParam(dev,CONFIG,ptr,2)){
 		printf("Error asignando CONFIG\n");
 		return STP_ERROR;
 	}

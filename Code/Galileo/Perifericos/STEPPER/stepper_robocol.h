@@ -91,7 +91,7 @@
 
  /*Estado de salida de métodos*/
  #define STP_ERROR 				0x01	//
- #define STP_OK			 		0x00	/
+ #define STP_OK			 		0x00	//
 /*--------------------------------------------------------------------------*/
 /*
  *                   TYPES DE LA LIBRERIA
