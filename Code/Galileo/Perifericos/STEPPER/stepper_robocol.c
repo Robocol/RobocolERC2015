@@ -22,8 +22,8 @@
 /* ===================================================================*/
 stp_st stp_build(stp_device* dev){
 
-	spi_device new_spi;
-	spi_create_device(new_spi,0,(*dev).pin_cs};
+	spi_device* new_spi;
+	spi_create_device(new_spi,0,(*dev).pin_cs);
 	(*dev).spi=new_spi;
 	pwm_build((*dev).pin_pwm, (*dev).periodo , DUTY_CYCLE);
 

@@ -669,7 +669,7 @@ stp_st stp_disable(stp_device* dev);
 **							la acción.
 */
 /* ===================================================================*/
-stp_st stp_period(stp_device* dev, uint32_t period)
+stp_st stp_period(stp_device* dev, uint32_t period);
 
 /*
 ** ===================================================================
@@ -687,6 +687,6 @@ stp_st stp_period(stp_device* dev, uint32_t period)
 **							son: CLOCK_WISE o COUNTER_CLOCK_WISE
 */
 /* ===================================================================*/
-stp_st stp_dir(stp_device* dev, uint32_t dir)
+stp_st stp_dir(stp_device* dev, uint32_t dir);
 
 #endif
