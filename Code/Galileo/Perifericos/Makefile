@@ -113,6 +113,15 @@ $(ODIR)/ph_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_rob
                       -I../SPI  \
                       -I../PH
 
+################################################################################################
+#	PUENTE H 																			   	   #
+################################################################################################
+$(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
+                                                                     $(ODIR)/gpio_robocol$(LEXT)   
+	$(CC) -c -o $@ $< -I../GPIO \
+                      -I../I2C  \
+                      -I../ADC                   
+
 
 .PHONY: clean
 
