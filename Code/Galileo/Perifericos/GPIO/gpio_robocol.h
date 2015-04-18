@@ -77,68 +77,6 @@ typedef uint8_t gpio_st; /* Estado de salida de la función*/
 
 /*
 ** ===================================================================
-**     Método      :  u8toa
-*/
-/*!
-**     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
-**     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
-*/
-/* ===================================================================*/
-char* u8toa(uint8_t i);
-
-/*
-** ===================================================================
-**     Método      :  u32toa
-*/
-/*!
-**     @resumen
-**          Convierte un uint32_t a una cadena de caracteres (string)
-**     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
-*/
-/* ===================================================================*/
-char* u32toa(uint32_t i);
-
-/*
-** ===================================================================
-**     Método      :  g_write_file
-*/
-/*!
-**     @resumen
-**          Escribe de un archivo una cadena de caracteres del tamaño 
-**			especificado ingresada por parámetro.
-**     @param
-**          ruta    	   	- Ruta del archivo a escribir.
-**     @param
-**          len				- Largo de la cadena de caracteres.
-*/
-/* ===================================================================*/
-gpio_st g_write_file(char* ruta, char* buff, uint8_t len );
-
-/*
-** ===================================================================
-**     Método      :  g_read_file
-*/
-/*!
-**     @resumen
-**          Lee un archivo una cadena de caracteres del tamaño 
-**			especificada  por parámetro
-**     @param
-**          ruta    	   	- Ruta del archivo a escribir.
-**     @param
-**          len				- Largo de la cadena de caracteres.
-*/
-/* ===================================================================*/
-gpio_st g_write_file(char* ruta, char* buff, uint8_t len );
-
-/*
-** ===================================================================
 **     Método      :  gpio_export
 */
 /*!

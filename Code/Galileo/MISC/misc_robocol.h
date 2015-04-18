@@ -78,19 +78,5 @@ char* u8toa(uint8_t i);
 /* ===================================================================*/
 char* u32toa(uint32_t i);
 
-/*
-** ===================================================================
-**     Método      :  little_endian_to_u32
-*/
-/*!
-**     @resumen
-**          Convierte un uint32_t a una cadena de caracteres (string)
-**     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
-*/
-/* ===================================================================*/
-int32_t little_endian_to_i32(uint8_t array, uint8_t len); 
 
 #endif
