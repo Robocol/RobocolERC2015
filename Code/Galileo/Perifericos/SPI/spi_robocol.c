@@ -103,15 +103,23 @@ spi_st spi_start(char* ruta, int speed)
 */
 /* ===================================================================*/
 spi_st spi_create_device(spi_device* dev, uint8_t pMode, uint8_t pPin){
-
-	// Configuración de pin CS como salida
-	gpio_set_dir(pPin, OUT);
-	// Valor del CS en 1, dejando desactivado el dispositivo
-	gpio_gal_value(pPin, 1);
-
 	//Creación de dispositivo SPI virtual
-	spi_device new={pMode,pPin,8,8,0};
-	*dev=new;
+	spi_device new_device={pMode,pPin,8,8,0};
+	
+	// Configuración de pin CS como salida
+	if(gpio_set_dir(pPin, OUT)!=0){
+		printf("Error en el set de dirección para pin %d(spi_robocol.c)\n",pPin );
+		return SPI_ERROR;
+	}
+	// Valor del CS en 1, dejando desactivado el dispositivo
+	if(gpio_gal_value(pPin, 1)!=0){
+		printf("Error en el set del valor para pin %d(spi_robocol.c)\n",pPin );
+		return SPI_ERROR;
+	}
+	printf("Despues de gpio_gal_value\n");
+
+
+	*dev=new_device;
 
 	return SPI_OK;
 }

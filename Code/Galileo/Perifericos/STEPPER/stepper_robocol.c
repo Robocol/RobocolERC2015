@@ -21,10 +21,22 @@
 */
 /* ===================================================================*/
 stp_st stp_build(stp_device* dev){
-	spi_device* new_spi;
-	spi_create_device(new_spi,0,(*dev).pin_cs);
-	(*dev).spi=new_spi;
-	pwm_build((*dev).pin_pwm, (*dev).period , DUTY_CYCLE);
+	spi_device new_spi;
+
+	if (spi_create_device(&new_spi,0,(*dev).pin_cs)!=0)
+	{
+		printf("Error en la creación del dispositivo spi para el manejo de stepper.(stepper_robocol.c)\n");
+		return STP_ERROR;
+	}
+
+	(*dev).spi=&new_spi;
+	if(pwm_build((*dev).pin_pwm, (*dev).period , DUTY_CYCLE)!=0){
+		printf("Error en la creación del dispositivo pwm para el manejo de stepper.(stepper_robocol.c)\n");
+		return STP_ERROR;
+	}
+	printf("Despues de pwm_build\n");
+
+
 	spi_start("/dev/spidev1.0",100000);
 	return STP_OK;
 }

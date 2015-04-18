@@ -18,6 +18,32 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <string.h>
+
+/* =====================================================================================*/
+/*
+					DEFINICION DE TIPOS
+A continuación se realiza la definición de los tipos necesarios para el 
+funcionamiento de la libreria.
+ */
+/* =====================================================================================*/
+
+typedef uint8_t st_misc;
+
+/* =====================================================================================*/
+/*
+					DEFINICIÓN DE CONSTANTES
+A continuación se realiza la definición de las constantes globales necesarias para el 
+funcionamiento de la libreria.
+ */
+/* =====================================================================================*/
+#ifndef MISC_OK
+#define MISC_OK 0x00
+#endif
+
+#ifndef MISC_ERROR
+#define MISC_ERROR 0x00
+#endif
+
 /*
 ** ===================================================================
 **     Método      :  g_write_file
@@ -31,7 +57,7 @@
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-void g_write_file(char* ruta, char* buff, uint8_t len );
+st_misc g_write_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================
@@ -46,7 +72,7 @@ void g_write_file(char* ruta, char* buff, uint8_t len );
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-void g_read_file(char* ruta, char* buff, uint8_t len );
+st_misc g_read_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================

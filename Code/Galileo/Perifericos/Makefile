@@ -87,19 +87,24 @@ $(ODIR)/i2c_robocol$(LEXT): ../I2C/i2c_robocol.c ../I2C/i2c_robocol.h
 ################################################################################################
 #	GPIO 																			   		   #
 ################################################################################################
-$(ODIR)/gpio_robocol$(LEXT): ../GPIO/gpio_robocol.c ../GPIO/gpio_robocol.h $(ODIR)/i2c_robocol$(LEXT)
+$(ODIR)/gpio_robocol$(LEXT): ../GPIO/gpio_robocol.c ../GPIO/gpio_robocol.h $(ODIR)/i2c_robocol$(LEXT)\
+																		   $(ODIR)/misc_robocol$(LEXT)
 	$(CC) -c -o $@ $< -I../GPIO \
-                   	  -I../I2C
+                   	  -I../I2C \
+                   	  -I../../MISC
 
 
 ################################################################################################
 #	SPI 																			   		   #
 ################################################################################################
 $(ODIR)/spi_robocol$(LEXT): ../SPI/spi_robocol.c ../SPI/spi_robocol.h $(ODIR)/i2c_robocol$(LEXT) \
-                                                                 $(ODIR)/gpio_robocol$(LEXT)
+                                                                 $(ODIR)/gpio_robocol$(LEXT) \
+	    		                                           		 $(ODIR)/misc_robocol$(LEXT)
+
 	$(CC) -c -o $@ $< -I../GPIO \
                    	  -I../I2C 	\
-                      -I../SPI
+                      -I../SPI  \
+                      -I../../MISC
 
 
 ################################################################################################
@@ -107,11 +112,14 @@ $(ODIR)/spi_robocol$(LEXT): ../SPI/spi_robocol.c ../SPI/spi_robocol.h $(ODIR)/i2
 ################################################################################################
 $(ODIR)/ph_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
                                                             $(ODIR)/gpio_robocol$(LEXT)   \
-                                                            $(ODIR)/spi_robocol$(LEXT)
+                                                            $(ODIR)/spi_robocol$(LEXT)	  \
+ 		                                           			$(ODIR)/misc_robocol$(LEXT)  
+
 	$(CC) -c -o $@ $< -I../GPIO \
                       -I../I2C  \
                       -I../SPI  \
-                      -I../PH
+                      -I../PH 	\
+                      -I../../MISC
 
 ################################################################################################
 #	PUENTE H 																			   	   #
@@ -124,22 +132,19 @@ $(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h
 #	MISC 																			   	   	   #
 ################################################################################################
 
-$(ODIR)/misc_robocol$(LEXT): ../../MISC/misc_robocol.c ../../MISC/misc_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
-                                                            $(ODIR)/gpio_robocol$(LEXT)   \
-                                                            $(ODIR)/spi_robocol$(LEXT)
-	$(CC) -c -o $@ $< -I../GPIO \
-                      -I../I2C  \
-                      -I../SPI  \
-                      -I../PH
+$(ODIR)/misc_robocol$(LEXT): ../../MISC/misc_robocol.c ../../MISC/misc_robocol.h
+	$(CC) -c -o $@ $<
 
 ################################################################################################
 #	PWM 																			   	   	   #
 ################################################################################################
 
 $(ODIR)/pwmg_robocol$(LEXT): ../PWM/pwmg_robocol.c ../PWM/pwmg_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
-                                                            			 $(ODIR)/gpio_robocol$(LEXT) 
+                                                            			 $(ODIR)/gpio_robocol$(LEXT)  \
+                                                            			 $(ODIR)/misc_robocol$(LEXT)  
 	$(CC) -c -o $@ $< -I../GPIO \
-                      -I../I2C  
+                      -I../I2C  \
+                      -I../../MISC
 
 
 ################################################################################################

@@ -22,10 +22,6 @@ pwm_st pwm_build(uint8_t pwm_n,uint32_t period, uint8_t duty){
 		return PWM_ERROR;
 	}
 
-	if(handle_muxes(pwm_n)!=0){
-		printf("Error en la habilitacion del multiplexor para pwm%d\n",pwm );
-		return PWM_ERROR;
-	}
 	return PWM_OK;
 }
 
@@ -220,48 +216,6 @@ static pwm_st pwm_unexport(char* str_num){
 	return PWM_OK;
 }
 
-static pwm_st handle_muxes(uint8_t pwm_n){
-	if (pwm_n==3){		
-		// Configuración de pin CS como salida
-		if(gpio_set_dir(30, OUT)!=0){
-			printf("Error en el set de la direccion del gpio30 para multiplexor de pwm 3\n");
-			return PWM_ERROR;
-		}
-		// Valor del CS en 1, dejando desactivado el dispositivo
-		if(gpio_gal_value(30, 1)!=0){
-		    printf("Error en el set del valor del gpio30 para multiplexor de pwm 3\n");
-			return PWM_ERROR;		    
-		}
-	}else if(pwm_n==4){
-		// Configuración de pin CS como salida
-		if(gpio_set_dir(43, OUT)!=0){
-			printf("Error en el set de la direccion del gpio43 para multiplexor de pwm 3\n");
-			return PWM_ERROR;
-		}
-		// Valor del CS en 1, dejando desactivado el dispositivo
-		if(gpio_gal_value(43, 1)!=0){
-		    printf("Error en el set del valor del gpio43 para multiplexor de pwm 3\n");
-			return PWM_ERROR;		    
-		}
-	}else if(pwm_n==7){
-		// Configuración de pin CS como salida
-		printf("Dentro de handle_muxes 7\n");
-		if(gpio_set_dir(42, OUT)!=0){
-			printf("Error en el set de la direccion del gpio43 para multiplexor de pwm 3\n");
-			return PWM_ERROR;			
-		}
-		// Valor del CS en 1, dejando desactivado el dispositivo
-		if(gpio_gal_value(42, 1)!=0){
-		    printf("Error en el set del valor del gpio43 para multiplexor de pwm 3\n");
-			return PWM_ERROR;		    
-		}
-	}else if(pwm_n==1 || pwm_n==5 || pwm_n==6){
-		return PWM_OK;
-	}else{
-		printf("El numero del pwm pasado por parametro no es válido.\n");
-		return PWM_ERROR;
-	}
-}
 
 uint8_t getu32_len(uint32_t i){
 	if (i<10){

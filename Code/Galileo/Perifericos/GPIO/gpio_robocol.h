@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <fcntl.h>
+#include "misc_robocol.h"
 #include "i2c_robocol.h"
 
 /* =====================================================================================*/

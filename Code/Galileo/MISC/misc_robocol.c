@@ -13,7 +13,7 @@
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-void g_write_file(char* ruta, char* buff, uint8_t len ){
+st_misc g_write_file(char* ruta, char* buff, uint8_t len ){
 	//Se abre el archivo para incluir el GPIO en sysfs
 	int fd;
 	fd=open(ruta,O_WRONLY);
@@ -22,6 +22,7 @@ void g_write_file(char* ruta, char* buff, uint8_t len ){
 		//En caso de error, se imprime la razón
 		printf("Error al abrir en %s",ruta );
 		perror("Descripción");
+		return MISC_ERROR;
 	}
 
 	//Se escribe en el archivo el número del GPIO a modificar
@@ -30,9 +31,11 @@ void g_write_file(char* ruta, char* buff, uint8_t len ){
 		//En caso de error, se notifica y se cierra el archivo			
 		printf("Error al escribir en %s",ruta );
 		perror("Descripción");
+		return MISC_ERROR;
 	}
 	// Se cierra el archivo
 	close(fd);
+	return MISC_OK;
 }
 
 /*
@@ -48,7 +51,7 @@ void g_write_file(char* ruta, char* buff, uint8_t len ){
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-void g_read_file(char* ruta, char* buff, uint8_t len ){
+st_misc g_read_file(char* ruta, char* buff, uint8_t len ){
 	//Se abre el archivo para incluir el GPIO en sysfs
 	int fd;
 	fd=open(ruta,O_WRONLY);
@@ -57,6 +60,7 @@ void g_read_file(char* ruta, char* buff, uint8_t len ){
 		//En caso de error, se imprime la razón
 		printf("Error al abrir en %s",ruta );
 		perror("Descripción");
+		return MISC_ERROR;
 	}
 
 	//Se escribe en el archivo el número del GPIO a modificar
@@ -65,9 +69,12 @@ void g_read_file(char* ruta, char* buff, uint8_t len ){
 		//En caso de error, se notifica y se cierra el archivo			
 		printf("Error al escribir en %s",ruta );
 		perror("Descripción");
+		return MISC_ERROR;
 	}
 	// Se cierra el archivo
+
 	close(fd);
+	return MISC_OK;
 }
 
 /*

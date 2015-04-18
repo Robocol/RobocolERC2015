@@ -2,7 +2,7 @@
 #define PWMG_ROBOCOL_H
 
 #include "gpio_robocol.h"
-
+#include "misc_robocol.h"
 
 #define PWM_ERROR 	0x01
 #define PWM_OK 	0x00

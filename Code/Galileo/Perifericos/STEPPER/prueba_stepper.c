@@ -14,10 +14,12 @@ debug=0x5A;
 
 printf("----------Prueba Driver Stepper----------\n");
 
-
 stp_device dev1={PIN6,PIN2,0,1,3,5000000};
 
-stp_build(&dev1);
+if(stp_build(&dev1)!=0){
+
+}
+printf("Tras construccion de stepper\n");
 
 
 devptr=&dev1;

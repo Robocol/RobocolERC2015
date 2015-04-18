@@ -121,10 +121,9 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada){
 */
 /* ===================================================================*/
 gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
-
 	if (gpio_muxlock(num)!=0){
-		printf("El gpio %d\n  no está habilitado por los multiplexores correspondientes.\n"
-			"Realice la configuración para la habilitacion de multiplexores desde la inicializacion del sistema",num);
+		printf("El gpio %d no está habilitado por los multiplexores correspondientes.\n"
+			"Realice la configuración para la habilitacion de multiplexores desde la inicializacion del sistema\n",num);
 		return GPIO_ERROR;
 	}
 
@@ -295,6 +294,18 @@ gpio_st gpio_muxlock(uint8_t num){
 				return GPIO_ERROR;
 			}
 			return GPIO_OK;
+		case 28:
+			return GPIO_OK;
+		case 17:
+			return GPIO_OK;
+		case 24:
+			return GPIO_OK;
+		case 27:
+			return GPIO_OK;
+		case 26:
+			return GPIO_OK;
+		case 19:
+			return GPIO_OK;
 		case 42:
 			printf(msg);
 			return GPIO_ERROR;
@@ -397,7 +408,7 @@ gpio_st gpio_muxlock(uint8_t num){
 			}
 			return GPIO_OK;
 		default:	
-			printf("El gpio pasado por parametro no es valido para la galileo\n");
+			printf("El gpio pasado por parámetro no es válido para la Intel Galileo Gen1\n");
 			return GPIO_ERROR;
 	}
 }
