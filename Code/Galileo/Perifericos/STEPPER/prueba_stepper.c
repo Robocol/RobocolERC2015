@@ -1,5 +1,5 @@
 #include <string.h>
-#include "ph_robocol.h"
+#include "stepper_robocol.h"
 
 int main(){
 size_t size=40;
@@ -15,7 +15,7 @@ temp, vel,corr,est,debug=0x5A;
 printf("----------Prueba Driver Puente H----------\n");
 
 
-stp_dev dev1={PIN6,PIN2,0,3,1};
+stp_dev dev1={PIN6,PIN2,0,1,3,5000000};
 
 stp_build(&dev1);
 
@@ -79,6 +79,13 @@ while(1){
 			printf("Cambiando periodo a: %d \n",buf);
 			stp_period(devptr,buf);
  
+		}else if(!strcmp(line,"dir\n")){
+			printf("Ingresela dirección: 0 - clockwise; 1 - counterclockwise:\n");
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			printf("Cambiando periodo a: %d \n",buf);
+			stp_period(devptr,buf);
+	
 		}else if(!strcmp(line,"set_posicion\n")){
 			printf("Ingrese el marcador de la posición actual:\n");
 			getline(&line,&size,stdin);

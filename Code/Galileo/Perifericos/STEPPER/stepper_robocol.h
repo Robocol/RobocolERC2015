@@ -85,6 +85,9 @@
  /*Duty Cycle PWM*/
  #define DUTY_CYCLE 			0x32 	//
 
+ /*Direcciones*/
+ #define CLOCKWISE 				0x00	//
+ #define COUNTERCLOCKWISE 		0x01	//
 /*--------------------------------------------------------------------------*/
 /*
  *                   TYPES DE LA LIBRERIA
@@ -94,17 +97,17 @@ typedef struct stp_device{
 	uint8_t pin_cs;
 	uint8_t pin_dir;
 	uint8_t pin_stndby;
-	uint8_t pin_flag;
-	spi_device* spi;
+	uint8_t pin_flag;	
 	uint8_t pin_pwm;
 	uint32_t period;
+	spi_device* spi;
 }stp_device;
 
 // MODOS
 
 // velocidad constante
 // Ir a Posición Absoluta
-// Ir a posiciíon relativa
+// Ir a posición relativa
 
 
 /*--------------------------------------------------------------------------*/
@@ -653,8 +656,37 @@ stp_st stp_enable(stp_device* dev);
 /* ===================================================================*/
 stp_st stp_disable(stp_device* dev);
 
+/*
+** ===================================================================
+**     Método      :  stp_period
+*/
+/*!
+**     @resumen
+**          Cambia el periodo del pwm para el manejo del stepper.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_period(stp_device* dev, uint32_t period)
 
-
-
+/*
+** ===================================================================
+**     Método      :  stp_dir
+*/
+/*!
+**     @resumen
+**          Cambia la dirección de giro del stepper según especificado.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCK_WISE o COUNTER_CLOCK_WISE
+*/
+/* ===================================================================*/
+stp_st stp_dir(stp_device* dev, uint32_t dir)
 
 #endif

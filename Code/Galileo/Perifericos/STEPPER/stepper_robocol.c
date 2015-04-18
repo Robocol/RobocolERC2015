@@ -800,6 +800,7 @@ stp_st stp_enable(stp_device* dev){
 */
 /* ===================================================================*/
 stp_st stp_disable(stp_device* dev){
+
 	if(pwm_disable((*dev).pin_pwm)){
 		printf("Error Deshabilitando el pwm desde galileo para manejo de sterpper\n");
 		return STP_ERROR;
@@ -812,7 +813,6 @@ stp_st stp_disable(stp_device* dev){
 
 	return STP_OK;
 }
-
 
 /*
 ** ===================================================================
@@ -828,10 +828,47 @@ stp_st stp_disable(stp_device* dev){
 */
 /* ===================================================================*/
 stp_st stp_period(stp_device* dev, uint32_t period){
+
 	if(pwm_set_period((*dev).pin_pwm,period)){
 		printf("Error Deshabilitando el pwm desde galileo para manejo de stepper\n");
 		return STP_ERROR;
 	}
 	(*dev).period=period;
 	return STP_OK;
+
+}
+
+
+/*
+** ===================================================================
+**     Método      :  stp_dir
+*/
+/*!
+**     @resumen
+**          Cambia la dirección de giro del stepper según especificado.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+stp_st stp_dir(stp_device* dev, uint32_t dir){
+
+	if(dir==CLOCKWISE){
+		if(gpio_gal_set((*dev).pin_dir)){
+			printf("Error cambiando dirección CLOCK_WISE\n");
+			return STP_ERROR;
+		}
+		return STP_OK;
+	}else if(dir==COUNTERCLOCKWISE){
+			if(gpio_gal_set((*dev).pin_dir)){
+			printf("Error cambiando direccion a COUNTER_CLOCK_WISE\n");
+			return STP_ERROR;
+		}
+		return STP_OK;	
+	}
+	
 }
