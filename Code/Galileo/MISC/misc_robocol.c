@@ -137,8 +137,8 @@ int32_t array_to_i32(uint8_t* array, uint8_t len) {
 }
 
 uint8_t* i32_to_array(uint32_t in) {
-
-	ptr = malloc(sizeof uint8_t*4);
+	
+	uint8_t* ptr = malloc(sizeof(uint8_t)*4);
 	memcpy(ptr, &in, sizeof in);
     return ptr;
 }

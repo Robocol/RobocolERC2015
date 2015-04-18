@@ -13,7 +13,8 @@ CFLAGS=-I../I2C \
        -I../../MISC
 
 #Objetos de los cuales depende la compilación de los ejecutables SPI
-_OBJ = spi_robocol$(LEXT) \
+_OBJ = stepper_robocol$(LEXT)\
+	   spi_robocol$(LEXT) \
        i2c_robocol$(LEXT) \
        gpio_robocol$(LEXT)\
        misc_robocol$(LEXT)\
@@ -29,7 +30,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 #Regla de compilación de ejecutable para prueba del driver
 prueba_stepper: $(OBJ)
-	$(CC) -o $@$(EEXT) prueba_spi.c $^ $(CFLAGS)
+	$(CC) -o $@$(EEXT) prueba_stepper.c $^ $(CFLAGS)
 
 include ../Makefile
 

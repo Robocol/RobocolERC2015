@@ -116,18 +116,15 @@ $(ODIR)/ph_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_rob
 ################################################################################################
 #	PUENTE H 																			   	   #
 ################################################################################################
-$(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
-                                                                     $(ODIR)/gpio_robocol$(LEXT)   
-	$(CC) -c -o $@ $< -I../GPIO \
-                      -I../I2C  \
-                      -I../ADC                   
+$(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h  
+	$(CC) -c -o $@ $< -I../../MISC
 
 
 ################################################################################################
 #	MISC 																			   	   	   #
 ################################################################################################
 
-$../(ODIR)/misc_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
+$(ODIR)/misc_robocol$(LEXT): ../../MISC/misc_robocol.c ../../MISC/misc_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
                                                             $(ODIR)/gpio_robocol$(LEXT)   \
                                                             $(ODIR)/spi_robocol$(LEXT)
 	$(CC) -c -o $@ $< -I../GPIO \
@@ -135,7 +132,30 @@ $../(ODIR)/misc_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2
                       -I../SPI  \
                       -I../PH
 
+################################################################################################
+#	PWM 																			   	   	   #
+################################################################################################
 
+$(ODIR)/pwmg_robocol$(LEXT): ../PWM/pwmg_robocol.c ../PWM/pwmg_robocol.h $(ODIR)/i2c_robocol$(LEXT)   \
+                                                            			 $(ODIR)/gpio_robocol$(LEXT) 
+	$(CC) -c -o $@ $< -I../GPIO \
+                      -I../I2C  
+
+
+################################################################################################
+#	STEPPER 																			   	   	   #
+################################################################################################
+
+$(ODIR)/stepper_robocol$(LEXT): ../STEPPER/stepper_robocol.c ../STEPPER/stepper_robocol.h $(ODIR)/i2c_robocol$(LEXT) \
+       																						 $(ODIR)/gpio_robocol$(LEXT)\
+       																						 $(ODIR)/spi_robocol$(LEXT) \
+       																						 $(ODIR)/misc_robocol$(LEXT)\
+       																						 $(ODIR)/pwmg_robocol$(LEXT)
+	$(CC) -c -o $@ $< -I../GPIO \
+                      -I../I2C  \
+                      -I../SPI  \
+                      -I../../MISC\
+                      -I../PWM
 .PHONY: clean
 
 clean:
