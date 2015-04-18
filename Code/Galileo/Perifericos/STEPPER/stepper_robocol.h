@@ -34,7 +34,7 @@
 #define 	TVAL		0x09		//Corriente del regulador de torque en unidades de TCURR_U
 #define 	T_FAST		0x0E		//TOFF_FAST|FALL_STEP 
 #define 	TON_MIN		0x0F		//
-#define 	AOFF_MIN	0x10		//
+#define 	TOFF_MIN	0x10		//
 #define 	ADC_OUT 	0x12		//Valor del ADC
 #define 	OCD_TH		0x13		//Corriente de overcurrent threshold en unidades de OCD_U
 #define 	STEP_MODE	0x16		// 1|SYNC_SEL|1|STEP_SEL
@@ -43,7 +43,7 @@
 #define		STATUS		0xD0		//
 
 #define		ENABLE		0xA8
-#define		ENABLE		0xB8
+#define		DISABLE		0xB8
 
 /*Máscaras de EL_POS*/
 #define	STEP					0x07	//
@@ -88,6 +88,10 @@
  /*Direcciones*/
  #define CLOCKWISE 				0x00	//
  #define COUNTERCLOCKWISE 		0x01	//
+
+ /*Estado de salida de métodos*/
+ #define STP_ERROR 				0x01	//
+ #define STP_OK			 		0x00	/
 /*--------------------------------------------------------------------------*/
 /*
  *                   TYPES DE LA LIBRERIA
@@ -669,7 +673,7 @@ stp_st stp_disable(stp_device* dev);
 **							la acción.
 */
 /* ===================================================================*/
-stp_st stp_period(stp_device* dev, uint32_t period)
+stp_st stp_period(stp_device* dev, uint32_t period);
 
 /*
 ** ===================================================================
@@ -687,6 +691,6 @@ stp_st stp_period(stp_device* dev, uint32_t period)
 **							son: CLOCK_WISE o COUNTER_CLOCK_WISE
 */
 /* ===================================================================*/
-stp_st stp_dir(stp_device* dev, uint32_t dir)
+stp_st stp_dir(stp_device* dev, uint32_t dir);
 
 #endif
