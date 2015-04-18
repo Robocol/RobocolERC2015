@@ -13,13 +13,15 @@ int32_t buf;
 debug=0x5A;
 
 printf("----------Prueba Driver Stepper----------\n");
+spi_device spi={0,0,0,0,0};
+stp_device dev1={PIN6,PIN2,0,1,3,5000000,&spi};
 
-stp_device dev1={PIN6,PIN2,0,1,3,5000000};
-
-if(stp_build(&dev1)!=0){
-
+printf("Pin del stepper_device para chip select de Spi: %d\n",dev1.pin_cs);
+if(stp_build(&dev1)){
+	printf("Error en la construccion de stepper\n" );
 }
 printf("Tras construccion de stepper\n");
+printf("Pin del stepper_device para chip select de Spi: %d\n",(*dev1.spi).pin);
 
 
 devptr=&dev1;
@@ -41,7 +43,6 @@ devptr=&dev1;
 				"\t set-ocdt\t\t\t-Imprime el Overcurrent Detection Threshold actual\n"
 				"\t set-tval\t\t\t-Imprime el TVAL\n"
 				"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
-
 while(1){
 
 		printf("Ingrese un comando\n");
@@ -49,7 +50,7 @@ while(1){
 		printf("El comando ingresado fue: %s \n",line);
 
 		//Mediciones
-		if(!strcmp(line,"stat\n")){
+		if(!strcmp(line,"status\n")){
 			stp_getStatus(devptr,&status);
 			printf("STATUS: %X \n",status);
 
@@ -72,8 +73,16 @@ while(1){
 		}else if(!strcmp(line,"get-ocdt\n")){
 			stp_getOCDT(devptr,&ocd);
 			printf("OCD: %d \n",ocd);
-		
 		//Setters
+		}else if(!strcmp(line,"set\n")){
+			printf("Ingrese el divisor del paso para paso de 1.8 grados:\n");
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			printf("Cambiando divisor de paso a: %d \n",buf);
+			if(stp_setStepSel(devptr,buf)){
+				printf("Error en el cambio de divisor de paso.\n");
+
+			}
 		}else if(!strcmp(line,"periodo\n")){
 			printf("Ingrese el periodo del paso en ns:\n");
 			getline(&line,&size,stdin);
@@ -88,7 +97,7 @@ while(1){
 			printf("Cambiando direccipon a a: %d \n",buf);
 			stp_period(devptr,buf);
 	
-		}else if(!strcmp(line,"set_posicion\n")){
+		}else if(!strcmp(line,"set-posicion\n")){
 			printf("Ingrese el marcador de la posición actual:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
@@ -125,6 +134,7 @@ while(1){
 
 		}else if(!strcmp(line,"enable\n")){
 			printf("Habilitando stepper:\n");
+			printf("Gpio para chip select de spi numero  %d\n",(*(*devptr).spi).pin );
 			stp_enable(devptr);
 	
 		}else if(!strcmp(line,"disable\n")){

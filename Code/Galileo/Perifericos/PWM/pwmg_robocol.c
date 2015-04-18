@@ -26,6 +26,7 @@ pwm_st pwm_build(uint8_t pwm_n,uint32_t period, uint8_t duty){
 }
 
 pwm_st pwm_enable(uint8_t pwm_n){
+	printf("%s\n");
 	char* route=malloc(35);
 	char* str_pwm=malloc(1);
 	char* enable=malloc(1);
@@ -37,15 +38,25 @@ pwm_st pwm_enable(uint8_t pwm_n){
 	enable=u8toa(ENABLE);
 	sprintf(route, "/sys/class/pwm/pwmchip0/pwm%d/enable", pwm_n);
 
-	pwm_export(str_pwm);
+	printf("Exporting pwm...\n");
+	if(pwm_export(str_pwm)){
+		printf("Error en  export durante habilitación de pwm %s (pwmg_robocol.c)\n",str_pwm);
+	}
+
+	printf("Escribiendo enable en archivo de manejo de pwm\n");
 	if(g_write_file(route,enable,1)){
-		printf("Error en la escritura del enable\n");
+		printf("Error en la escritura del enable de pwm %s \n",str_pwm);
 		pwm_unexport(str_pwm);
 		return PWM_ERROR;
 	}
 	free(route);
 	free(enable);
-	pwm_unexport(str_pwm);
+	
+	printf("Unexporting pwm...\n");
+	if(pwm_unexport(str_pwm)!=0){
+		printf("Error en  unexport durante habilitación de pwm %s (pwmg_robocol.c)\n",str_pwm);
+	}
+	
 	free(str_pwm);
 	return PWM_OK;
 }
@@ -55,7 +66,7 @@ pwm_st pwm_disable(uint8_t pwm_n){
 	char* str_pwm=malloc(1);
 	char* disable=malloc(1);
 	if(pwm_n>7 || pwm_n==2 || pwm_n<1 ){
-		printf("El número de pwm ingresado no es valido.\nRealice revisión de documentación de Galileo Gen 1 para observar los valores válidos\n");
+		printf("El número de pwm ingresado no es valido.\n Realice revisión de documentación de Galileo Gen 1 para observar los valores válidos\n");
 		return PWM_ERROR;
 	}
 

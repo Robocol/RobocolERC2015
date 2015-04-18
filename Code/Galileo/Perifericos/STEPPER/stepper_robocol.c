@@ -21,15 +21,17 @@
 */
 /* ===================================================================*/
 stp_st stp_build(stp_device* dev){
-	spi_device new_spi;
-
-	if (spi_create_device(&new_spi,0,(*dev).pin_cs)!=0)
+	spi_device* new_spi=malloc(sizeof(spi_device));
+	printf("Pin_cs en el stp_dev durante stp_build:\t\t%d\n", (*dev).pin_cs);
+	if (spi_create_device(new_spi,0,(*dev).pin_cs)!=0)
 	{
 		printf("Error en la creación del dispositivo spi para el manejo de stepper.(stepper_robocol.c)\n");
 		return STP_ERROR;
 	}
+	printf("Pin en new_spi despues de spi_create_device:\t\t%d\n", (*new_spi).pin);
 
-	(*dev).spi=&new_spi;
+	(*dev).spi=new_spi;
+		printf("Pin en spi de stp_dev:\t\t%d\n", (*(*dev).spi).pin);
 	if(pwm_build((*dev).pin_pwm, (*dev).period , DUTY_CYCLE)!=0){
 		printf("Error en la creación del dispositivo pwm para el manejo de stepper.(stepper_robocol.c)\n");
 		return STP_ERROR;
@@ -254,7 +256,6 @@ stp_st stp_getFallStep(stp_device* dev, int8_t* ft){
 
 	return STP_OK;
 }
-
 /*
 ** ===================================================================
 **     Método      :  stp_getTOnMin
@@ -779,8 +780,9 @@ stp_st stp_setConfig(stp_device* dev, int32_t config){
 */
 /* ===================================================================*/
 stp_st stp_enable(stp_device* dev){
+	
 	if(pwm_enable((*dev).pin_pwm)){
-		printf("Error habilitando el pwm desde galileo para manejo de sterpper\n");
+		printf("Error habilitando el pwm desde galileo para manejo de stepper\n");
 		return STP_ERROR;
 	}
 
@@ -788,6 +790,7 @@ stp_st stp_enable(stp_device* dev){
 		printf("Error asignando posición\n");
 		return STP_ERROR;
 	}
+	printf("Realización de setparam de stepper exitosa.\n");
 
 
 	return STP_OK;

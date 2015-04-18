@@ -240,7 +240,7 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 /* ===================================================================*/
 gpio_st gpio_muxlock(uint8_t num){
 	uint8_t mux_val;
-	const char* msg="Para el sistema Robocol URC2015 no se permite la modificacion de multiplexores desde esta libreria\n";
+	const char* msg="Para el sistema Robocol ERC015 no se permite la modificacion de multiplexores desde esta libreria\n";
 
 	switch(num){
 		case 40:
