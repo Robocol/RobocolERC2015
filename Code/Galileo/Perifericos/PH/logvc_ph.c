@@ -1,10 +1,11 @@
 #include "ph_robocol.h"
-#define CORR 1
-#define VEL 2
 int main(int argc, char const *argv[])
 {
 	FILE *fdl;
+	size_t size=40;
+	char* line=malloc(size);
 	uint8_t medicion=0;
+	uint8_t motor=1;
 	char* nombref=malloc(13);
 	ph_dev* devptr1;						//puntero a puente h
 	ph_dev* devptr2;						//puntero a puente h
@@ -12,59 +13,136 @@ int main(int argc, char const *argv[])
 	uint8_t* buffmed1;
 	uint8_t* buffmed2;
 
+	printf("Bienvenido al menu de medicion de corriente y velocidad de puentes H(ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
+			"\t motor\n"
+			"\t cambiar-medicion\n"
+			"\t iniciar\n");
 
-	if (argc!=2){
-		fprintf(stderr,"Uso:%s <MEDICION>\nMEDICION:\n  corriente\n  velocidad",argv[0] );
-		exit(1);
-	}else{
-		if(strcmp(argv[1],"corriente")){
-			medicion=CORR;
-		}else if(strcmp(argv[1],"velocidad")){
-			medicion=VEL;
-		}else{
-			fprintf(stderr,"Ingrese un valor valido para <MEDICION>\nVALORES VALIDOS:\n  corriente\n  velocidad");
-			exit(1);
+
+	while(1){
+
+			printf("Ingrese un comando\n");
+			getline(&line,&size,stdin);
+			printf("El comando ingresado fue: %s \n",line);
+
+			//Mediciones
+			if(!strcmp(line,"motor\n")){
+				printf("Ingrese 1 o 2 segun el puente h que desea seleccionar\n");
+				getline(&line,&size,stdin);
+				printf("El comando ingresado fue: %s \n",line);	
+				if(!strcmp(line,"1\n")){
+					motor=1;
+					printf("Configuración de motor exitosa\n");
+				}else if(!strcmp(line,"2\n")){
+					motor=2;
+					printf("Configuración de motor exitosa\n");
+				}
+				else{
+					printf("El numero de motor ingresdo por parámtro no es válido\n");
+				}
+			}else if(!strcmp(line,"cambiar-medicion\n")){
+				printf("Ingrese 1 para corriente o 2 para velocidad\n");
+				getline(&line,&size,stdin);
+				printf("El comando ingresado fue: %s \n",line);	
+				if(!strcmp(line,"1\n")){
+					medicion=MEDIR_CORRIENTE;
+					printf("Configuración de medicion exitosa\n");
+				}else if(!strcmp(line,"2\n")){
+					medicion=MEDIR_VELOCIDAD;
+					printf("Configuración de medicion exitosa\n");
+				}
+				else{
+					printf("El numero de medición ingresado por parámtro no es válido\n");
+				}
+			}else if(!strcmp(line,"iniciar\n")){
+
+				printf("Iniciando Medicion\n");
+
+				if (medicion==1)
+				{
+					printf("Medicion de corriente\n");
+					sprintf(nombref,"corriente.log");
+				}else if(medicion==2){
+					printf("Medicion de velocidad\n");
+					sprintf(nombref,"velocidad.log");
+				}else{
+					printf("La medición registrada para este momento no es válida\n");
+					return 1;
+				}
+
+				printf("Realizando creación de archivo para registro de medicion\n");
+				if((fdl=fopen(nombref,"w+"))<0){
+					printf("Error en apertura de archivo para impresion de log\n");
+					perror("Causa:");
+					exit(1);
+				}
+				printf("Creación de archivo exitosa\n");
+
+				if (motor==1){
+					printf("----Medicion para puente H 1----\n");
+					ph_dev dev1={PINA0,0,1,4};			//Creación de primer puente h con pines ina=0, inb=1, enable=4
+					devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
+					printf("Iniciando creación de puenteH\n");
+					if(ph_build(devptr1)){
+						printf("Error en la creación de puenteH 1 \n");
+						return 1;
+					}	
+					printf("Creación exitosa de puenteH 1\n");
+					fprintf(fdl, "//--------%s--------\\\\\n",nombref);
+					free(nombref);
+
+					if (medicion==1)
+					{
+						printf("Dentro del loop de medicion\n");
+						while(1){
+							getCorriente(devptr1,buffmed1);
+							fprintf(fdl, "Motor1: %d \n",*buffmed1);
+						}
+					}else{
+						printf("Dentro del loop de medicion\n");
+						while(1){
+							getVelocidad(devptr1,buffmed1);;
+							fprintf(fdl, "Motor1:%d \n",*buffmed1);
+						}
+					}			
+
+				}else if(motor==2){
+					printf("----Medicion para puente H 2----\n");
+					ph_dev dev2={PINA1,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
+					devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
+					printf("Iniciando creación de puenteH\n");
+					if(ph_build(devptr2)){
+						printf("Error en la creación de puenteH 2 \n");
+						return 1;
+					}
+					printf("Creación exitosa de puenteH 2\n");
+					fprintf(fdl, "//--------%s--------\\\\\n",nombref);
+					free(nombref);
+
+					if (medicion==1)
+					{
+						printf("Dentro del loop de medicion\n");
+						while(1){
+							getCorriente(devptr2,buffmed2);
+							fprintf(fdl, "Motor2: %d \n",*buffmed2);
+						}
+					}else{
+						printf("Dentro del loop de medicion\n");
+						while(1){
+							getVelocidad(devptr2,buffmed2);;
+							fprintf(fdl, "Motor2:%d \n",*buffmed2);
+						}
+					}				
+				}
+			}else{
+			printf("Bienvenido al menu de medicion de corriente y velocidad de puentes H(ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
+					"\t motor\t\t\tCambiar Motor(1 por default)\n"
+					"\t cambiar-medicion\t\t\t0 para corriente.\t1 para velocidad\n(medicion en 0 por default)");
+			printf("--------------------------------------------------------------\n");
 		}
-	}
 
-	if (medicion==1)
-	{
-		sprintf(nombref,"corriente.log");
-	}else{
-		sprintf(nombref,"velocidad.log");
-	}
-
-	if((fdl=fopen(nombref,"w+"))<0){
-		printf("Error en apertura de archivo para impresion de log\n");
-		perror("Causa:");
-		exit(1);
-	}
-	ph_dev dev1={PINA0,0,1,4};			//Creación de primer puente h con pines ina=0, inb=1, enable=4
-	ph_dev dev2={PINA1,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
-
-	devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
-	devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
-
-	ph_build(devptr1);
-	ph_build(devptr2);
-
-	fprintf(fdl, "//--------%s--------\\\\\n",nombref);
-	free(nombref);
-
-	if (medicion==1)
-	{
-		while(1){
-			getCorriente(devptr1,buffmed1);
-			getCorriente(devptr2,buffmed2);
-			fprintf(fdl, "Motor1: %d .... Motor2: %d \n",*buffmed1,*buffmed2);
-		}
-	}else{
-		while(1){
-			getVelocidad(devptr1,buffmed1);
-			getVelocidad(devptr2,buffmed2);
-			fprintf(fdl, "Motor1: %d .... Motor2: %d \n",*buffmed1,*buffmed2);
-		}
 	}
 
 	return 0;
+
 }

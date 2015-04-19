@@ -46,6 +46,7 @@
 	. Cambiar llamadas ligadas a libreria random hacia aquellas implementadas en misc.
 	. Implementar filtro digtal de la libreria ADC.
 	. Modificar la manera en la que se obtienen los datos del ADC.
+	. Ocultar dev definido en i2c_robocol como global para el resto de librerias
 
 	%%%FINALIZADAS%%%
 	. Actualizar la documentacion.(ADC)

@@ -23,8 +23,12 @@
 */
 /* ===================================================================*/
 static gpio_st gpio_export(char* str_num, uint8_t len ){
-
-	g_write_file("/sys/class/gpio/export",str_num,len);
+	printf("Realizando export de gpio en ruta /sys/class/gpio/export para gpio %d(gpio_robocol.c>gpio_export)\n",str_num);
+	if(g_write_file("/sys/class/gpio/export",str_num,len)){
+		printf("Error en la escritura en archivo: sys/class/gpio/export .(gpio_robocol.c>gpio_export)\n");
+		perror("Descripción: ");
+		return GPIO_ERROR;
+	}
 	return GPIO_OK;
 
 }
@@ -46,7 +50,7 @@ static gpio_st gpio_export(char* str_num, uint8_t len ){
 /* ===================================================================*/
 static gpio_st gpio_unexport(char* str_num, uint8_t len ){
 
-	g_write_file("/sys/class/gpio/unexport",str_num,len);
+	//g_write_file("/sys/class/gpio/unexport",str_num,len);
 	return GPIO_OK;
 }
 
@@ -82,23 +86,30 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada){
 	}else{
 		printf("El número de GPIO especificado, no es válido");
 	}
-
+	printf("Llamada a gpio_export.(gpio_robocol.c>gpio_set_dir)\n");
 	//Se incluye el GPIO en sysfs
-	gpio_export(num_str,len);
+	if(gpio_export(num_str,len)){
+		printf("Error en el export de gpio %d. (gpio_robocol.c>gpio_set_dir)\n",num );
+		return GPIO_ERROR;
+	}
 
 	//Se define la ruta del archivo de dirección
 	sprintf(ruta, "/sys/class/gpio/gpio%d/direction", num);
 
 	if(!esEntrada){
 		char buf[]="out";
+		printf("Llamada a gpio_writefile.(gpio_robocol.c>gpio_set_dir)\n");
 		g_write_file(ruta,buf,3);
 	}else{
 		char buf[]="in";
+		printf("Llamada a g_write_file.(gpio_robocol.c>gpio_set_dir)\n");
 		g_write_file(ruta,buf,2);		
 	}
-
+	printf("Llamada a gpio_unexport.(gpio_robocol.c>gpio_set_dir)\n");
 	//Se extrae el GPIO de sysfs
-	gpio_unexport(num_str,len);
+	if(gpio_unexport(num_str,len)){
+		printf("Error en el unexport de gpio %d. (gpio_robocol.c>gpio_set_dir)\n",num );
+	}
 
 	return GPIO_OK;
 }
@@ -121,14 +132,20 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada){
 */
 /* ===================================================================*/
 gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
+	char* num_str;
+	uint8_t len;
+	char* ruta=malloc(40);
+	printf("Num gpio%d\n", num);
+	printf("Verificación para el manejo de muxes(gpio_robocol.c>gpio_gal_value)\n" );
 	if (gpio_muxlock(num)!=0){
 		printf("El gpio %d no está habilitado por los multiplexores correspondientes.\n"
 			"Realice la configuración para la habilitacion de multiplexores desde la inicializacion del sistema\n",num);
 		return GPIO_ERROR;
 	}
+	printf("Fin de la Verificación de muxes(gpio_robocol.c>gpio_gal_value)\n" );
+	printf("Num gpio%d\n", num);
+	num_str=u8toa(num);
 
-	char* num_str=u8toa(num);
-	uint8_t len;
 
 	//Se determina el tamaño y la validez del número dado
 	if(num<=9){
@@ -140,10 +157,12 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 	}
 	
 	//Se incluye el GPIO en sysfs
-	gpio_export(num_str,len);
+	if(gpio_export(num_str,len)){
+		printf("Error en gpio_export(gpio_robocol.c>gpio_gal_value)\n");
+		return GPIO_ERROR;
+	}
 	
 	//Se define la ruta del archivo de value
-	char* ruta=malloc(40);
 	sprintf(ruta, "/sys/class/gpio/gpio%d/value", num);
 
 
@@ -158,7 +177,9 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 	}
 	
 	//Se extrae el GPIO de sysfs
-	gpio_unexport(num_str,len);
+	if(gpio_unexport(num_str,len)){
+		printf("Error en gpio_unexport.(gpio_robocol.c>gpio_gal_value)\n");
+	}
 
 	return GPIO_OK;
 }
@@ -182,11 +203,15 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 */
 /* ===================================================================*/
 gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
-
 	//Se convierte el entero a string
+	printf("Num Gpio %d\n",num );
 	char* num_str=u8toa(num);
 	char* buf;
 	uint8_t len;
+	//Se define la ruta del archivo de value
+	char* ruta=malloc(40);
+
+	printf("Obtención de valor de gpio.(gpio_robocol.c>gpio_gal_get)\n");
 
 	//Se determina el tamaño y la validez del número dado
 	if(num<=9){
@@ -197,20 +222,19 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 		printf("El número de GPIO especificado, no es válido");
 	}
 	
+	printf("Llamada a gpio_export.(gpio_robocol.c>gpio_gal_get)\n");
 	//Se incluye el GPIO en sysfs
-	if(gpio_export(num_str,len)!=0){
+	if(gpio_export(num_str,len)){
+		printf("Error en el export para obtención de valor de gpio en Galileo(gpio_robocol.c>gpio_gal_get)\n");
 		return GPIO_ERROR;
 	}
-	
-	//Se define la ruta del archivo de value
-	char* ruta=malloc(40);
-	sprintf(ruta, "/sys/class/gpio/gpio%d/value", num);
 
-
+	sprintf(ruta,"/sys/class/gpio/gpio%d/value", num);
 	//Dependiendo de el valor especificado, se escribe 
 	//en value
-	
-	if(g_read_file(ruta,buf,1)!=0){
+	printf("Llamada a g_read_file.(gpio_robocol.c> gpio_gal_get)\n");
+	if(g_read_file(ruta,buf,1)){
+		printf("Error en la lectura de archivo en ruta %s\n",ruta );
 		return GPIO_ERROR;
 	}
 	
@@ -218,6 +242,7 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 	
 	//Se extrae el GPIO de sysfs
 	if(gpio_unexport(num_str,len)!=0){
+		printf("Error en el unexport de gpio %d(gpio_robocol.c>gpio_gal_get)\n",num );
 		return GPIO_ERROR;
 	}
 	return GPIO_OK;
@@ -241,7 +266,7 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 gpio_st gpio_muxlock(uint8_t num){
 	uint8_t mux_val;
 	const char* msg="Para el sistema Robocol ERC015 no se permite la modificacion de multiplexores desde esta libreria\n";
-
+	printf("Verificación de muxes(gpio_robocol.c>gpio_muxlock)\n");
 	switch(num){
 		case 40:
 			printf(msg);

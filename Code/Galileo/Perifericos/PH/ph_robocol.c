@@ -27,14 +27,24 @@
 /* ===================================================================*/
 ph_st ph_build(ph_dev* dev){
 	
-	spi_device new_spi;
+	spi_device* new_spi=malloc(sizeof(spi_device));
 	uint8_t addr=0b0111000;
+	printf("Iniciando creación de dispositivo spi para manejo de puenteH\n");
+	if(spi_create_device(new_spi,0,(*dev).pin_cs)){
+		printf("Error en la creación de dispositivo spi para manejo de puente H.(ph_robocol.c)\n");
+		return PH_ERROR;
+	}
+	(*dev).spi=new_spi;
 
-	spi_create_device(&new_spi,0,(*dev).pin_cs);
-	(*dev).spi=&new_spi;
+	if(spi_start("/dev/spidev1.0",100000)){
+		printf("Error en el arranque comunicación spi para manejo de puente H.(ph_robocol.c)\n");
+		return PH_ERROR;
+	}
 
-	spi_start("/dev/spidev1.0",100000);
-	build_expander(addr);
+	if (build_expander(addr)){
+		printf("Error en la creación del expansor para control de puente H\n" );
+	}
+
 
 	return PH_OK;
 }

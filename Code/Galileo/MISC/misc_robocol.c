@@ -15,24 +15,25 @@
 /* ===================================================================*/
 st_misc g_write_file(char* ruta, char* buff, uint8_t len ){
 	//Se abre el archivo para incluir el GPIO en sysfs
-	int fd;
-	fd=open(ruta,O_WRONLY);
 
-	if(fd<0){
-		//En caso de error, se imprime la razón
-		printf("Error al abrir en %s",ruta );
-		perror("Descripción");
+	int fd;
+	if((fd=open(ruta,O_WRONLY))<0){
+		printf("Error en la apertura del file descriptor para escritura en archivo.(misc_robocol.c)\n");
+		perror("Descripción:");
+		close(fd);
 		return MISC_ERROR;
 	}
-
+	printf("Llamada a escritura en archivo para valor de gpio.(misc_robocol.c>g_write_file)\n");
 	//Se escribe en el archivo el número del GPIO a modificar
 	if(write(fd,buff,len)!=len)
 	{
 		//En caso de error, se notifica y se cierra el archivo			
-		printf("Error al escribir en %s",ruta );
-		perror("Descripción");
+		printf("Error al leer en%s\n",ruta );
+		perror("Descripción:\n");
+		close(fd);
 		return MISC_ERROR;
 	}
+	printf("Exitoso\n");
 	// Se cierra el archivo
 	close(fd);
 	return MISC_OK;
@@ -54,25 +55,24 @@ st_misc g_write_file(char* ruta, char* buff, uint8_t len ){
 st_misc g_read_file(char* ruta, char* buff, uint8_t len ){
 	//Se abre el archivo para incluir el GPIO en sysfs
 	int fd;
-	fd=open(ruta,O_WRONLY);
-
-	if(fd<0){
-		//En caso de error, se imprime la razón
-		printf("Error al abrir en %s",ruta );
+	if((fd=open(ruta,O_RDONLY))<0){
+		printf("Error al abrir archivo %s\n",ruta );
 		perror("Descripción");
+		close(fd);
 		return MISC_ERROR;
 	}
-
+	printf("File Descriptor: %d\n",fd );
+	printf("Llamada a lectura en archivo para valor de gpio.(misc_robocol.c>g_read_file)\n");
 	//Se escribe en el archivo el número del GPIO a modificar
 	if(read(fd,buff,len)!=len)
 	{
 		//En caso de error, se notifica y se cierra el archivo			
-		printf("Error al escribir en %s",ruta );
+		printf("Error al leer de %s\n",ruta );
 		perror("Descripción");
+		close(fd);
 		return MISC_ERROR;
 	}
 	// Se cierra el archivo
-
 	close(fd);
 	return MISC_OK;
 }
