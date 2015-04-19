@@ -105,6 +105,7 @@ typedef struct stp_device{
 	uint8_t pin_stndby;
 	uint8_t pin_flag;	
 	uint8_t pin_pwm;
+	uint8_t exp_n;
 	uint32_t period;
 	spi_device* spi;
 }stp_device;
@@ -231,7 +232,7 @@ stp_st stp_getPosition(stp_device* dev, int32_t* pos);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-stp_st stp_getTVAL(stp_device* dev, int8_t* tval);
+stp_st stp_getTVAL(stp_device* dev, uint8_t* tval);
 
 /*
 ** ===================================================================

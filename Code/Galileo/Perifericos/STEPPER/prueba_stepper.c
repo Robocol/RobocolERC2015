@@ -5,7 +5,7 @@ int main(){
 size_t size=40;
 char* line=malloc(size);
 uint32_t position,status,config=0;
-int8_t step,ocd;
+uint8_t step,ocd,tval;
 uint8_t alarm,corr,debug;
 stp_device* devptr;
 int32_t buf;
@@ -13,8 +13,14 @@ int32_t buf;
 debug=0x5A;
 
 printf("----------Prueba Driver Stepper----------\n");
-spi_device spi={0,0,0,0,0};
-stp_device dev1={PIN6,PIN2,0,1,3,5000000,&spi};
+stp_device dev1;
+dev1.pin_cs=PIN7;
+dev1.pin_dir=PIN5;
+dev1.pin_stndby=1;
+dev1.pin_flag=0;
+dev1.exp_n=2;
+dev1.pin_pwm=3;
+dev1.period=5000000;
 
 printf("Pin del stepper_device para chip select de Spi: %d\n",dev1.pin_cs);
 if(stp_build(&dev1)){
@@ -73,8 +79,11 @@ while(1){
 		}else if(!strcmp(line,"get-ocdt\n")){
 			stp_getOCDT(devptr,&ocd);
 			printf("OCD: %d \n",ocd);
+		}else if(!strcmp(line,"get-tval\n")){
+			stp_getTVAL(devptr,&tval);
+			printf("TVAL: %d \n",tval);
 		//Setters
-		}else if(!strcmp(line,"set\n")){
+		}else if(!strcmp(line,"set-step\n")){
 			printf("Ingrese el divisor del paso para paso de 1.8 grados:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
@@ -110,7 +119,6 @@ while(1){
 			buf=atoi(line);
 			printf("Cambiando TVAL a: %d \n",buf);
 			stp_setTVal(devptr,buf);
-
 		}else if(!strcmp(line,"set-tonmin\n")){
 			printf("Ingrese el TONMIN deseado:\n");
 			getline(&line,&size,stdin);
@@ -145,6 +153,11 @@ while(1){
 		}else if(!strcmp(line,"exit\n")){
 			printf("Cerrando el programa. Adiós\n");
 			break;
+		}else if(!strcmp(line,"debug\n")){
+			while(1){
+				stp_getTVAL(devptr,&tval);
+				printf("TVAL: %d \n",tval);
+			}
 		}else{
 		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t enable\t\t\t-Habilita el stepper\n"
