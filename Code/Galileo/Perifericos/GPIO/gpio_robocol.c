@@ -39,9 +39,9 @@ static gpio_st gpio_export(char* str_num, uint8_t len ){
 */
 /*!
 **     @resumen
-**          Exporta el gpio especificado al Sysfs
+**          Desactiva el gpio especificado en el Sysfs
 **     @param
-**          str_num    	   	- String del número del gpio a exportar
+**          str_num    	   	- String del número del gpio a desactivar
 **     @param
 **          len	    	   	- Largo en caracteres del str_num
 **     @return
@@ -49,8 +49,12 @@ static gpio_st gpio_export(char* str_num, uint8_t len ){
 */
 /* ===================================================================*/
 static gpio_st gpio_unexport(char* str_num, uint8_t len ){
-
-	//g_write_file("/sys/class/gpio/unexport",str_num,len);
+	printf("Realizando export de gpio en ruta /sys/class/gpio/unexport para gpio %d(gpio_robocol.c>gpio_unexport)\n",str_num);
+	if(g_write_file("/sys/class/gpio/unexport",str_num,len)){
+		printf("Error en la escritura en archivo: sys/class/gpio/unexport .(gpio_robocol.c>gpio_unexport)\n");
+		perror("Descripción: ");
+		return GPIO_ERROR;
+	}
 	return GPIO_OK;
 }
 
@@ -60,7 +64,7 @@ static gpio_st gpio_unexport(char* str_num, uint8_t len ){
 */
 /*!
 **     @resumen
-**          Define el GPIO especificado como una entreada o salida
+**          Define el GPIO especificado como una entrada o salida
 **			según se especifica por parámetro.
 **     @param
 **          num     	   	- Número del GPIO
@@ -137,11 +141,15 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 	char* ruta=malloc(40);
 	printf("Num gpio%d\n", num);
 	printf("Verificación para el manejo de muxes(gpio_robocol.c>gpio_gal_value)\n" );
+
+/*
 	if (gpio_muxlock(num)!=0){
 		printf("El gpio %d no está habilitado por los multiplexores correspondientes.\n"
 			"Realice la configuración para la habilitacion de multiplexores desde la inicializacion del sistema\n",num);
 		return GPIO_ERROR;
 	}
+*/
+
 	printf("Fin de la Verificación de muxes(gpio_robocol.c>gpio_gal_value)\n" );
 	printf("Num gpio%d\n", num);
 	num_str=u8toa(num);
