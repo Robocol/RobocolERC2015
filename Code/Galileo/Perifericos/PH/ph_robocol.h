@@ -358,4 +358,5 @@ ph_st getEstado(ph_dev* dev,uint8_t* est);
 ph_st getTemperatura(ph_dev* dev,uint8_t* temp);
 
 
+ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize);
 #endif

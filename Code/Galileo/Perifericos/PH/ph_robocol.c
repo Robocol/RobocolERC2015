@@ -36,7 +36,7 @@ ph_st ph_build(ph_dev* dev){
 		return PH_ERROR;
 	}
 	(*dev).spi=new_spi;
-
+	(*dev).pwm=0;
 	if(spi_start("/dev/spidev1.0",100000)){
 		printf("Error en el arranque comunicación spi para manejo de puente H.(ph_robocol.c)\n");
 		return PH_ERROR;
@@ -518,4 +518,48 @@ ph_st getTemperatura(ph_dev* dev,uint8_t* temp){
 		perror("Error while getting TEMPERATURA");
 	}
 	return (ph_st)rx;
+}
+
+ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize){
+	uint8_t curr_pwm;
+	int8_t steps;
+	int8_t step;
+	uint8_t i;
+	printf("PWM in%d\n",pwm);
+	printf("stepsize%d\n",stepsize);
+	curr_pwm=(*devptr).pwm;
+	printf("Current pwm%d\n",curr_pwm);
+	steps=(curr_pwm-pwm)/stepsize;
+	printf("Steps%d\n",steps );
+
+	if(steps<0){
+		steps=(-1*steps);
+		step=(stepsize);
+	}else{
+		step=(-1*stepsize);
+	}
+	printf("Steps%d\n",steps );
+	printf("Step%d\n",step);
+	for (i = 0; i < steps; ++i)
+	{
+		curr_pwm+=step;
+		printf("Current pwm%d\n",curr_pwm );
+		if(ph_setPWM(devptr,curr_pwm)){
+			printf("Error en set de pwm puenteH.(prueba_ph.c)");
+			perror("Descripción:");
+			return PH_ERROR;
+		}
+	}
+
+	if (curr_pwm!=pwm){
+		if(ph_setPWM(devptr,pwm)){
+			printf("Error en set de pwm puenteH.(prueba_ph.c)")	;
+			perror("Descripción:");										
+			return PH_ERROR;
+		}
+		printf("\tPWM cambiado a :%d\n", pwm);					
+	}
+
+	(*devptr).pwm=pwm;
+	return PH_OK;
 }

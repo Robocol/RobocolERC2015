@@ -151,7 +151,7 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 */
 
 	//printf("Fin de la Verificación de muxes(gpio_robocol.c>gpio_gal_value)\n" );
-	printf("Num gpio%d\n", num);
+	//printf("Num gpio%d\n", num);
 	num_str=u8toa(num);
 
 

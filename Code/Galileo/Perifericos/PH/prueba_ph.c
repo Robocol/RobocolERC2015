@@ -105,43 +105,10 @@ while(1){
 			printf("Ingrese el PWM deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
-			curr_pwm=(*devptr).pwm;
-			printf("Current pwm: %d\n",curr_pwm );
-			steps=(curr_pwm-buf)/STEP_SIZE;
-
-			if(steps<0){
-				steps=(-1*steps);
-				step=(STEP_SIZE);
-			}else{
-				step=(-1*STEP_SIZE);
+			if(setPWMSmooth(devptr, (uint8_t)buf, (uint8_t)STEP_SIZE)){
+				printf("Error en set de pwm\n");
 			}
 
-			printf("Steps: %d\n",steps );
-			printf("Step: %d\n",step);
-
-			for (i = 0; i < steps; ++i)
-			{
-				curr_pwm+=step;
-				printf("Current PWM:%d\n",curr_pwm );
-				if(ph_setPWM(devptr,curr_pwm)){
-					printf("Error en set de pwm puenteH.(prueba_ph.c)");
-					perror("Descripción:");
-					return PH_ERROR;
-				}
-				printf("\tPWM cambiado a :%d\n", curr_pwm);
-			}
-
-			if (curr_pwm!=buf){
-				if(ph_setPWM(devptr,buf)){
-					printf("Error en set de pwm puenteH.(prueba_ph.c)")	;
-					perror("Descripción:");										
-					return PH_ERROR;
-				}
-				printf("\tPWM cambiado a :%d\n", buf);					
-			}
-
-			(*devptr).pwm=buf;
- 
 		}else if(!strcmp(line,"dir\n")){
 			printf("Ingrese la direccion deseada ( 1 o 0):\n");
 			getline(&line,&size,stdin);
