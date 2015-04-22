@@ -29,6 +29,7 @@ ph_st ph_build(ph_dev* dev){
 	
 	spi_device* new_spi=malloc(sizeof(spi_device));
 	uint8_t addr=0b0111000;
+	uint8_t i=0;
 	printf("Iniciando creación de dispositivo spi para manejo de puenteH\n");
 	if(spi_create_device(new_spi,0,(*dev).pin_cs)){
 		printf("Error en la creación de dispositivo spi para manejo de puente H.(ph_robocol.c)\n");
@@ -41,9 +42,10 @@ ph_st ph_build(ph_dev* dev){
 		return PH_ERROR;
 	}
 
-	if (build_expander(addr)){
+	if ((i=build_expander(addr))){
 		printf("Error en la creación del expansor para control de puente H\n" );
 	}
+	printf("build_expander result :%d\n",i );
 
 
 	return PH_OK;
@@ -110,14 +112,17 @@ ph_st ph_setPWM(ph_dev* dev,uint8_t pwm){
 
 	tx=CAMBIAR_PWM;
 	rx=0x00;
+
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in PWM_CHANGE");
+		return PH_ERROR;
 	}
 
 	if(spi_rw((*dev).spi,&pwm,&rx,1)){
 		perror("Error while setting PWM");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -177,12 +182,14 @@ ph_st ph_setEstado(ph_dev* dev,uint8_t est){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in CAMBIAR_ESTADO");
+		return PH_ERROR;
 	}
 
 	if(spi_rw((*dev).spi,&est,&rx,1)){
 		perror("Error while setting ESTADO");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*

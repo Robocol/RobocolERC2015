@@ -88,6 +88,7 @@ typedef struct{
 	uint8_t	pin_in_a;
 	uint8_t	pin_in_b;
 	uint8_t	pin_enable;
+	uint8_t pwm;
 	spi_device* spi;    //No es necesario que el usuario instancie este campo.
 }ph_dev;
 
