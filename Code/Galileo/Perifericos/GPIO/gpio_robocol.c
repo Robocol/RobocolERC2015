@@ -23,7 +23,7 @@
 */
 /* ===================================================================*/
 static gpio_st gpio_export(char* str_num, uint8_t len ){
-	printf("Realizando export de gpio en ruta /sys/class/gpio/export para gpio %d(gpio_robocol.c>gpio_export)\n",str_num);
+	//printf("Realizando export de gpio en ruta /sys/class/gpio/export para gpio %d(gpio_robocol.c>gpio_export)\n",str_num);
 	if(g_write_file("/sys/class/gpio/export",str_num,len)){
 		printf("Error en la escritura en archivo: sys/class/gpio/export .(gpio_robocol.c>gpio_export)\n");
 		perror("Descripción: ");
@@ -49,7 +49,7 @@ static gpio_st gpio_export(char* str_num, uint8_t len ){
 */
 /* ===================================================================*/
 static gpio_st gpio_unexport(char* str_num, uint8_t len ){
-	printf("Realizando export de gpio en ruta /sys/class/gpio/unexport para gpio %d(gpio_robocol.c>gpio_unexport)\n",str_num);
+	//printf("Realizando export de gpio en ruta /sys/class/gpio/unexport para gpio %d(gpio_robocol.c>gpio_unexport)\n",str_num);
 	if(g_write_file("/sys/class/gpio/unexport",str_num,len)){
 		printf("Error en la escritura en archivo: sys/class/gpio/unexport .(gpio_robocol.c>gpio_unexport)\n");
 		perror("Descripción: ");
@@ -90,7 +90,7 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada){
 	}else{
 		printf("El número de GPIO especificado, no es válido");
 	}
-	printf("Llamada a gpio_export.(gpio_robocol.c>gpio_set_dir)\n");
+	//printf("Llamada a gpio_export.(gpio_robocol.c>gpio_set_dir)\n");
 	//Se incluye el GPIO en sysfs
 	if(gpio_export(num_str,len)){
 		printf("Error en el export de gpio %d. (gpio_robocol.c>gpio_set_dir)\n",num );
@@ -102,14 +102,14 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada){
 
 	if(!esEntrada){
 		char buf[]="out";
-		printf("Llamada a gpio_writefile.(gpio_robocol.c>gpio_set_dir)\n");
+		//printf("Llamada a gpio_writefile.(gpio_robocol.c>gpio_set_dir)\n");
 		g_write_file(ruta,buf,3);
 	}else{
 		char buf[]="in";
-		printf("Llamada a g_write_file.(gpio_robocol.c>gpio_set_dir)\n");
+		//printf("Llamada a g_write_file.(gpio_robocol.c>gpio_set_dir)\n");
 		g_write_file(ruta,buf,2);		
 	}
-	printf("Llamada a gpio_unexport.(gpio_robocol.c>gpio_set_dir)\n");
+	//printf("Llamada a gpio_unexport.(gpio_robocol.c>gpio_set_dir)\n");
 	//Se extrae el GPIO de sysfs
 	if(gpio_unexport(num_str,len)){
 		printf("Error en el unexport de gpio %d. (gpio_robocol.c>gpio_set_dir)\n",num );
@@ -139,8 +139,8 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 	char* num_str;
 	uint8_t len;
 	char* ruta=malloc(40);
-	printf("Num gpio%d\n", num);
-	printf("Verificación para el manejo de muxes(gpio_robocol.c>gpio_gal_value)\n" );
+	//printf("Num gpio%d\n", num);
+	//printf("Verificación para el manejo de muxes(gpio_robocol.c>gpio_gal_value)\n" );
 
 /*
 	if (gpio_muxlock(num)!=0){
@@ -150,7 +150,7 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 	}
 */
 
-	printf("Fin de la Verificación de muxes(gpio_robocol.c>gpio_gal_value)\n" );
+	//printf("Fin de la Verificación de muxes(gpio_robocol.c>gpio_gal_value)\n" );
 	printf("Num gpio%d\n", num);
 	num_str=u8toa(num);
 
@@ -212,14 +212,14 @@ gpio_st gpio_gal_value(uint8_t num, uint8_t valor){
 /* ===================================================================*/
 gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 	//Se convierte el entero a string
-	printf("Num Gpio %d\n",num );
+	//printf("Num Gpio %d\n",num );
 	char* num_str=u8toa(num);
 	char* buf;
 	uint8_t len;
 	//Se define la ruta del archivo de value
 	char* ruta=malloc(40);
 
-	printf("Obtención de valor de gpio.(gpio_robocol.c>gpio_gal_get)\n");
+	//printf("Obtención de valor de gpio.(gpio_robocol.c>gpio_gal_get)\n");
 
 	//Se determina el tamaño y la validez del número dado
 	if(num<=9){
@@ -230,7 +230,7 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 		printf("El número de GPIO especificado, no es válido");
 	}
 	
-	printf("Llamada a gpio_export.(gpio_robocol.c>gpio_gal_get)\n");
+	//printf("Llamada a gpio_export.(gpio_robocol.c>gpio_gal_get)\n");
 	//Se incluye el GPIO en sysfs
 	if(gpio_export(num_str,len)){
 		printf("Error en el export para obtención de valor de gpio en Galileo(gpio_robocol.c>gpio_gal_get)\n");
@@ -240,7 +240,7 @@ gpio_st gpio_gal_get(uint8_t num, uint8_t* valor){
 	sprintf(ruta,"/sys/class/gpio/gpio%d/value", num);
 	//Dependiendo de el valor especificado, se escribe 
 	//en value
-	printf("Llamada a g_read_file.(gpio_robocol.c> gpio_gal_get)\n");
+	//printf("Llamada a g_read_file.(gpio_robocol.c> gpio_gal_get)\n");
 	if(g_read_file(ruta,buf,1)){
 		printf("Error en la lectura de archivo en ruta %s\n",ruta );
 		return GPIO_ERROR;
@@ -495,7 +495,10 @@ gpio_st gpio_gal_clear(uint8_t num){
 /* ===================================================================*/
 gpio_st build_expander(uint8_t addr){
 	unsigned char i2c_result;
-	i2c_result=i2c_open("/dev/i2c-0",addr);
+	if(i2c_open("/dev/i2c-0",addr)<0){
+		perror("Descripcion:");
+		return GPIO_ERROR;
+	}
 	return i2c_result;
 }
 

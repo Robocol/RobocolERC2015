@@ -4,7 +4,7 @@ int main(int argc, char const *argv[])
 	FILE *fdl;
 	size_t size=40;
 	char* line=malloc(size);
-	uint8_t medicion=0;
+	uint8_t medicion=1;
 	uint8_t motor=1;
 	char* nombref=malloc(13);
 	ph_dev* devptr1;						//puntero a puente h
@@ -12,6 +12,7 @@ int main(int argc, char const *argv[])
 	uint8_t addr=0b0111000;				//Direccion expansor I2C
 	uint8_t* buffmed1;
 	uint8_t* buffmed2;
+	uint32_t counter=0;
 
 	printf("Bienvenido al menu de medicion de corriente y velocidad de puentes H(ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 			"\t motor\n"
@@ -88,6 +89,7 @@ int main(int argc, char const *argv[])
 						return 1;
 					}	
 					printf("Creación exitosa de puenteH 1\n");
+					fprintf(fdl, "//--------PUENTE H MOTOR1--------\\\\\n");			
 					fprintf(fdl, "//--------%s--------\\\\\n",nombref);
 					free(nombref);
 
@@ -96,18 +98,19 @@ int main(int argc, char const *argv[])
 						printf("Dentro del loop de medicion\n");
 						while(1){
 							getCorriente(devptr1,buffmed1);
-							fprintf(fdl, "Motor1: %d \n",*buffmed1);
+							fprintf(fdl, "Corriente%d: %d \n",*buffmed1);
 						}
 					}else{
 						printf("Dentro del loop de medicion\n");
 						while(1){
 							getVelocidad(devptr1,buffmed1);;
-							fprintf(fdl, "Motor1:%d \n",*buffmed1);
+							fprintf(fdl, "Velocidad%d:%d \n",counter,*buffmed1);
+							counter++;
 						}
 					}			
 
 				}else if(motor==2){
-					printf("----Medicion para puente H 2----\n");
+					printf("----Medicion para puenteH 2----\n");
 					ph_dev dev2={PINA1,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
 					devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
 					printf("Iniciando creación de puenteH\n");
@@ -116,7 +119,9 @@ int main(int argc, char const *argv[])
 						return 1;
 					}
 					printf("Creación exitosa de puenteH 2\n");
+					fprintf(fdl, "//--------PUENTE H MOTOR2--------\\\\\n");
 					fprintf(fdl, "//--------%s--------\\\\\n",nombref);
+
 					free(nombref);
 
 					if (medicion==1)
@@ -124,13 +129,15 @@ int main(int argc, char const *argv[])
 						printf("Dentro del loop de medicion\n");
 						while(1){
 							getCorriente(devptr2,buffmed2);
-							fprintf(fdl, "Motor2: %d \n",*buffmed2);
+							fprintf(fdl, "Corriente: %d \n",*buffmed2);
+							counter++;
 						}
 					}else{
 						printf("Dentro del loop de medicion\n");
 						while(1){
 							getVelocidad(devptr2,buffmed2);;
-							fprintf(fdl, "Motor2:%d \n",*buffmed2);
+							fprintf(fdl, "Velocidad%d:%d \n",counter,*buffmed2);
+							counter++;
 						}
 					}				
 				}

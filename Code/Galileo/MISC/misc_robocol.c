@@ -18,24 +18,30 @@ st_misc g_write_file(char* ruta, char* buff, uint8_t len ){
 
 	int fd;
 	if((fd=open(ruta,O_WRONLY))<0){
-		printf("Error en la apertura del file descriptor para escritura en archivo.(misc_robocol.c)\n");
+		//printf("Error en la apertura del file descriptor para escritura en archivo.(misc_robocol.c)\n");
 		perror("Descripción:");
-		close(fd);
+		if(close(fd)<0){
+			printf("Error en close de fd.(g_write_file)\n");
+		}
 		return MISC_ERROR;
 	}
-	printf("Llamada a escritura en archivo para valor de gpio.(misc_robocol.c>g_write_file)\n");
+	//printf("Llamada a escritura en archivo para valor de gpio.(misc_robocol.c>g_write_file)\n");
 	//Se escribe en el archivo el número del GPIO a modificar
 	if(write(fd,buff,len)!=len)
 	{
 		//En caso de error, se notifica y se cierra el archivo			
-		printf("Error al leer en%s\n",ruta );
+		//printf("Error al leer en%s\n",ruta );
 		perror("Descripción:\n");
-		close(fd);
+		if(close(fd)<0){
+			printf("Error en close de fd.(g_write_file)\n");
+		}
 		return MISC_ERROR;
 	}
-	printf("Exitoso\n");
+	//printf("Exitoso\n");
 	// Se cierra el archivo
-	close(fd);
+	if(close(fd)<0){
+		printf("Error en close de fd.(g_write_file)\n");
+	}
 	return MISC_OK;
 }
 
@@ -58,7 +64,9 @@ st_misc g_read_file(char* ruta, char* buff, uint8_t len ){
 	if((fd=open(ruta,O_RDONLY))<0){
 		printf("Error al abrir archivo %s\n",ruta );
 		perror("Descripción");
-		close(fd);
+		if(close(fd)<0){
+			printf("Error en close de fd.(g_read_file)\n");
+		}
 		return MISC_ERROR;
 	}
 	printf("File Descriptor: %d\n",fd );
@@ -69,11 +77,15 @@ st_misc g_read_file(char* ruta, char* buff, uint8_t len ){
 		//En caso de error, se notifica y se cierra el archivo			
 		printf("Error al leer de %s\n",ruta );
 		perror("Descripción");
-		close(fd);
+		if(close(fd)<0){
+			printf("Error en close de fd.(g_read_file)\n");
+		}
 		return MISC_ERROR;
 	}
 	// Se cierra el archivo
-	close(fd);
+	if(close(fd)){
+		printf("Error en close de fd.(g_read_file)\n");
+	}
 	return MISC_OK;
 }
 
