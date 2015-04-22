@@ -804,43 +804,31 @@ stp_st stp_setConfig(stp_device* dev, int32_t config){
 	return STP_OK;
 }
 
+
 /*
 ** ===================================================================
-**     Método      :  stp_enable
+**     Método      :  stp_clk_enable
 */
 /*!
 **     @resumen
-**          Habilita el dispositivo especificado por parámetro
+**          Habilita el clk del dispositivos especificado por parámetro
 **
 **     @param
 **          dev     	   	- Puntero al dispositivo sobre el que recae 
 **							la acción.
 */
 /* ===================================================================*/
-stp_st stp_enable(stp_device* dev){
+stp_st stp_clk_enable(stp_device* dev){
 	
-	uint8_t* u8;
-
-	if (gpio_exp_set((*dev).pin_stndby)){
-		printf("Error en el set del pin_stndby en stp_enable de libreria stepper\n");
-		return STP_ERROR;
-	}
-	printf("Habilitación por stand_by pin exitosa\n");
 	if(pwm_enable((*dev).pin_pwm)){
-		printf("Error habilitando el pwm desde galileo para manejo de stepper\n");
+		printf("Error durante clk Enable de stepper . (stepper_robocol.c>stp_clk_enable)\n");
 		return STP_ERROR;
 	}
 
-	printf("Habilitación del pwm exitosa\n");
+	printf("Realización de clk Enable de stepper exitosa. (stepper_robocol.c>stp_clk_enable)\n");
 	
 
 
-	if(stp_setParam(dev,ENABLE_STEPPER,u8,0)){
-		printf("Error asignando posición\n");
-		return STP_ERROR;
-	}
-
-	printf("Realización de setparam de stepper exitosa.\n");
 
 
 	return STP_OK;
@@ -848,34 +836,192 @@ stp_st stp_enable(stp_device* dev){
 
 /*
 ** ===================================================================
-**     Método      :  stp_disable
+**     Método      :  stp_driver_enable
 */
 /*!
 **     @resumen
-**          Deshabilita el dispositivo especificado por parámetro
+**          Habilita el dispositivo driver del especificado por parámetro.
 **
 **     @param
 **          dev     	   	- Puntero al dispositivo sobre el que recae 
 **							la acción.
 */
 /* ===================================================================*/
-stp_st stp_disable(stp_device* dev){
-	if (gpio_exp_clear((*dev).pin_stndby)){
-		printf("Error en el set del pin_stndby en stp_enable de libreria stepper\n");
+stp_st stp_driver_enable(stp_device* dev){
+	
+	if (gpio_exp_set((*dev).pin_stndby)){
+		printf("Error en el set del pin_stndby en stp_driver_enable de libreria stepper. (stepper_robocol.c>stp_driver_enable)\n");
 		return STP_ERROR;
 	}
-
-	if(pwm_disable((*dev).pin_pwm)){
-		printf("Error Deshabilitando el pwm desde galileo para manejo de sterpper\n");
-		return STP_ERROR;
-	}
-
-	if(stp_setParam(dev,DISABLE_STEPPER,NULL,0)){
-		printf("Error asignando posición\n");
-		return STP_ERROR;
-	}
+	printf("Realización de driver Enable de stepper exitosa. (stepper_robocol.c>stp_driver_enable)\n");
 
 	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_output_enable
+*/
+/*!
+**     @resumen
+**          Habilita las salidas del dispositivo especificado por parámetro.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_output_enable(stp_device* dev){
+
+	uint8_t* u8;
+
+	if(stp_setParam(dev,ENABLE_STEPPER,u8,0)){
+		printf("Error durante output Enable de stepper. (stepper_robocol.c>stp_output_enable)\n");
+		return STP_ERROR;
+	}
+
+	printf("Realización de output Enable de stepper exitosa. (stepper_robocol.c>stp_output_enable)\n");
+
+
+	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_master_enable
+*/
+/*!
+**     @resumen
+**          Habilita el dispositivo especificado por parámetro, tanto
+**			su clk, como las salidas del driver y el driver en si
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_master_enable(stp_device* dev){
+	
+	if(stp_driver_enable(dev)){
+		return STP_ERROR;
+	}
+
+	if(stp_clk_enable(dev)){
+		return STP_ERROR;
+	}
+
+	if(stp_output_enable(dev)){
+		return STP_ERROR;
+	}
+
+
+}		
+
+/*
+** ===================================================================
+**     Método      :  stp_clk_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita el clk del dispositivos especificado por parámetro
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_clk_disable(stp_device* dev){
+	
+	if(pwm_disable((*dev).pin_pwm)){
+		printf("Error durante clk disable de stepper . (stepper_robocol.c>stp_clk_disable)\n");
+		return STP_ERROR;
+	}
+
+	printf("Realización de clk disable de stepper exitosa. (stepper_robocol.c>stp_clk_disable)\n");
+
+	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_driver_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita el driver del dispositivo especificado por parámetro.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+
+stp_st stp_driver_disable(stp_device* dev){
+	
+	if (gpio_exp_clear((*dev).pin_stndby)){
+		printf("Error en el set del pin_stndby en stp_driver_disable de libreria stepper. (stepper_robocol.c>stp_driver_disable)\n");
+		return STP_ERROR;
+	}
+	printf("Realización de driver disable de stepper exitosa. (stepper_robocol.c>stp_driver_disable)\n");
+
+	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_output_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita las salidas del dispositivo especificado por parámetro.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_output_disable(stp_device* dev){
+
+	uint8_t* u8;
+
+	if(stp_setParam(dev,DISABLE_STEPPER,u8,0)){
+		printf("Error durante output disable de stepper. (stepper_robocol.c>stp_output_disable)\n");
+		return STP_ERROR;
+	}
+
+	printf("Realización de output disable de stepper exitosa. (stepper_robocol.c>stp_output_disable)\n");
+
+
+	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_master_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita el dispositivo especificado por parámetro, tanto
+**			su clk, como las salidas del driver y el driver en si
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_master_disable(stp_device* dev){
+	
+	if(stp_driver_disable(dev)){
+		return STP_ERROR;
+	}
+
+	if(stp_clk_disable(dev)){
+		return STP_ERROR;
+	}
+
+	if(stp_output_disable(dev)){
+		return STP_ERROR;
+	}
 }
 
 /*
@@ -928,7 +1074,7 @@ stp_st stp_dir(stp_device* dev, uint32_t dir){
 		}
 		return STP_OK;
 	}else if(dir==COUNTERCLOCKWISE){
-			if(gpio_gal_set((*dev).pin_dir)){
+			if(gpio_gal_clear((*dev).pin_dir)){
 			printf("Error cambiando direccion a COUNTER_CLOCK_WISE\n");
 			return STP_ERROR;
 		}
