@@ -29,6 +29,7 @@ stp_st stp_build(stp_device* dev){
 			"Ingrese 1 o 2 para al selección del expansor deseado.(stp_build>stepper_robocol)\n");
 		return STP_ERROR;
 	}
+
 	addr|=((*dev).exp_n)-1;
 	printf("Expander: %d\n",(*dev).exp_n );
 	printf("Address: %x\n",addr);
@@ -47,6 +48,23 @@ stp_st stp_build(stp_device* dev){
 		printf("Error en la creación del dispositivo pwm para el manejo de stepper.(stepper_robocol.c)\n");
 		return STP_ERROR;
 	}
+
+
+	if(gpio_set_dir((*dev).pin_cs,OUT)){
+		printf("Error asignando dirección de salida a pin %s\n", (*dev).pin_cs);
+		return STP_ERROR;
+	}
+
+	if(gpio_set_dir((*dev).pin_dir,OUT)){
+		printf("Error asignando dirección de salida a pin %s\n", (*dev).pin_cs);
+		return STP_ERROR;
+	}
+
+	if(gpio_set_dir((*dev).pin_flag,IN)){
+		printf("Error asignando dirección de salida a pin %s\n", (*dev).pin_cs);
+		return STP_ERROR;
+	}
+
 	printf("Despues de pwm_build\n");
 	spi_start("/dev/spidev1.0",100000);
 	build_expander(addr);
@@ -76,8 +94,10 @@ stp_st stp_build(stp_device* dev){
 /* ===================================================================*/
 stp_st stp_setParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 	
-	uint8_t tx=param;				//Se agrega el bit que indica escritura
+	uint8_t tx=param;				
 	uint8_t rx=0;
+
+	printf("TX:\t%X\n", tx);
 
 	if(spi_rw((*dev).spi, &tx, &rx,1)){
 		printf("Error en SPI\n");
@@ -86,11 +106,13 @@ stp_st stp_setParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 	int i;
 	for(i=0;i<len;i++){
 		tx=*(buff+(len-i-1));
+		printf("TX:\t%X\n",tx );
 		if(spi_rw((*dev).spi, &tx, &rx,1)){
 			printf("Error en SPI\n");
 			return STP_ERROR;
 		}
 	}
+
 	return STP_OK;
 
 }
@@ -120,8 +142,11 @@ stp_st stp_setParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 /* ===================================================================*/
 stp_st stp_getParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 
-	uint8_t tx=param|(0x01<<5);
+	uint8_t tx=param;
 	uint8_t rx=0;
+	if(param!=STATUS){
+		tx=param|(0x01<<5);
+	}
 
 	if(spi_rw((*dev).spi, &tx, &rx,1)){
 		printf("Error en SPI\n");
@@ -135,7 +160,7 @@ stp_st stp_getParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 			printf("Error en SPI\n");
 			return STP_ERROR;
 		}else{
-			printf("RX:\t%d\n",rx);
+			printf("RX:\t%X\n",rx);
 			*(buff+len-i-1)=rx;		//Little-Endian
 		}
 	}
@@ -794,17 +819,23 @@ stp_st stp_setConfig(stp_device* dev, int32_t config){
 /* ===================================================================*/
 stp_st stp_enable(stp_device* dev){
 	
+	uint8_t* u8;
+
 	if (gpio_exp_set((*dev).pin_stndby)){
 		printf("Error en el set del pin_stndby en stp_enable de libreria stepper\n");
 		return STP_ERROR;
 	}
-
+	printf("Habilitación por stand_by pin exitosa\n");
 	if(pwm_enable((*dev).pin_pwm)){
 		printf("Error habilitando el pwm desde galileo para manejo de stepper\n");
 		return STP_ERROR;
 	}
 
-	if(stp_setParam(dev,ENABLE,NULL,0)){
+	printf("Habilitación del pwm exitosa\n");
+	
+
+
+	if(stp_setParam(dev,ENABLE_STEPPER,u8,0)){
 		printf("Error asignando posición\n");
 		return STP_ERROR;
 	}
@@ -839,7 +870,7 @@ stp_st stp_disable(stp_device* dev){
 		return STP_ERROR;
 	}
 
-	if(stp_setParam(dev,DISABLE,NULL,0)){
+	if(stp_setParam(dev,DISABLE_STEPPER,NULL,0)){
 		printf("Error asignando posición\n");
 		return STP_ERROR;
 	}

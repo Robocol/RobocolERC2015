@@ -81,7 +81,7 @@ while(1){
 			printf("OCD: %d \n",ocd);
 		}else if(!strcmp(line,"get-tval\n")){
 			stp_getTVAL(devptr,&tval);
-			printf("TVAL: %d \n",tval);
+			printf("TVAL: %X \n",tval);
 		//Setters
 		}else if(!strcmp(line,"set-step\n")){
 			printf("Ingrese el divisor del paso para paso de 1.8 grados:\n");
@@ -150,13 +150,20 @@ while(1){
 			
 			stp_disable(devptr);
 	
+		}else if(!strcmp(line,"set_dir\n")){
+			printf("Ingrese el DIR deseado:\n");
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			printf("Cambiando DIR a: %d \n",buf);
+			stp_dir(devptr,buf);
+	
 		}else if(!strcmp(line,"exit\n")){
 			printf("Cerrando el programa. Adiós\n");
 			break;
 		}else if(!strcmp(line,"debug\n")){
 			while(1){
-				stp_getTVAL(devptr,&tval);
-				printf("TVAL: %d \n",tval);
+				stp_enable(devptr);
+				//printf("TVAL: %d \n",tval);
 			}
 		}else{
 		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 

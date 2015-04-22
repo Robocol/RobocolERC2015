@@ -42,9 +42,9 @@
 #define		CONFIG		0x18		//
 #define		STATUS		0xD0		//
 
-#ifndef ENABLE
-	#define		ENABLE		0xA8
-	#define		DISABLE		0xB8
+#ifndef ENABLE_STEPPER
+	#define		ENABLE_STEPPER		0xB8
+	#define		DISABLE_STEPPER		0xA8
  #endif
 
 /*Máscaras de EL_POS*/

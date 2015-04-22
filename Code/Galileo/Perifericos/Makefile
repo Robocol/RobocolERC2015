@@ -122,9 +122,10 @@ $(ODIR)/ph_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_rob
                       -I../../MISC
 
 ################################################################################################
-#	PUENTE H 																			   	   #
+#	ADC																					   	   #
 ################################################################################################
-$(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h  
+
+$(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h  $(ODIR)/misc_robocol$(LEXT)
 	$(CC) -c -o $@ $< -I../../MISC
 
 
@@ -148,7 +149,7 @@ $(ODIR)/pwmg_robocol$(LEXT): ../PWM/pwmg_robocol.c ../PWM/pwmg_robocol.h $(ODIR)
 
 
 ################################################################################################
-#	STEPPER 																			   	   	   #
+#	STEPPER 																			   	   #
 ################################################################################################
 
 $(ODIR)/stepper_robocol$(LEXT): ../STEPPER/stepper_robocol.c ../STEPPER/stepper_robocol.h $(ODIR)/i2c_robocol$(LEXT) \
