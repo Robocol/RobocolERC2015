@@ -25,6 +25,8 @@
  
 #define DEFAULT_IF	"eth0"
 #define BUF_SIZ	1024
+
+const uint8_t STEP_SIZE = 0x0A;
  
 /*------------------------ PUENTE H ------------------------*/
 
@@ -40,8 +42,8 @@ void parser(char dato, char arg){
 	if(dato=='m'){
 
 		printf("Cambiando PWM a: %d \n",arg);
-		ph_setPWMSmooth(devptr1,arg);
-		ph_setPWMSmooth(devptr2,arg);
+		ph_setPWMSmooth(devptr1,arg,STEP_SIZE);
+		ph_setPWMSmooth(devptr2,arg,STEP_SIZE);
 
 	}else if(dato=='w'){
 		printf("Moviendo hacia adelante\n");
@@ -55,13 +57,13 @@ void parser(char dato, char arg){
 
 	}else if(dato=='a'){
 		printf("Girando hacia izquierda\n");
-		ph_setDireccion(devptr1,1);
-		ph_setDireccion(devptr2,1);
+		ph_setDireccion(devptr1,0);
+		ph_setDireccion(devptr2,0);
 
 	}else if(dato=='d'){
 		printf("Girando hacia derecha\n");
-		ph_setDireccion(devptr1,0);
-		ph_setDireccion(devptr2,0);
+		ph_setDireccion(devptr1,1);
+		ph_setDireccion(devptr2,1);
 
 	}else if(dato=='e'){
 		printf("Motores activados\n");

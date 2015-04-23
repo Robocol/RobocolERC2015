@@ -406,7 +406,7 @@ ph_st ph_setCorriente(ph_dev* dev,uint8_t vel){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getCorriente(ph_dev* dev, uint8_t* corr){
+ph_st ph_getCorriente(ph_dev* dev, uint8_t* corr){
 	uint8_t rx,tx;
 
 	tx=MEDIR_CORRIENTE;
@@ -439,7 +439,7 @@ ph_st getCorriente(ph_dev* dev, uint8_t* corr){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getVelocidad(ph_dev* dev,uint8_t* vel){
+ph_st ph_getVelocidad(ph_dev* dev,uint8_t* vel){
 	uint8_t rx,tx;
 
 	tx=MEDIR_VELOCIDAD;
@@ -472,7 +472,7 @@ ph_st getVelocidad(ph_dev* dev,uint8_t* vel){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getEstado(ph_dev* dev,uint8_t* est){
+ph_st ph_getEstado(ph_dev* dev,uint8_t* est){
 	uint8_t rx,tx;
 
 	tx=DAR_ESTADO;
@@ -505,7 +505,7 @@ ph_st getEstado(ph_dev* dev,uint8_t* est){
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getTemperatura(ph_dev* dev,uint8_t* temp){
+ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp){
 	uint8_t rx,tx;
 
 	tx=DAR_TEMPERATURA;
@@ -520,7 +520,7 @@ ph_st getTemperatura(ph_dev* dev,uint8_t* temp){
 	return (ph_st)rx;
 }
 
-ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize){
+ph_st ph_setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize){
 	uint8_t curr_pwm;
 	int8_t steps;
 	int8_t step;

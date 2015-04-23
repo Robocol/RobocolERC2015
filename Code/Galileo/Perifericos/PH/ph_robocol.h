@@ -75,7 +75,7 @@
  */
 
 #define PH_OK 			0x00
-#define PH_ERROR 		0xFF
+#define PH_ERROR 		0x01
 
 /*--------------------------------------------------------------------------*/
 /*
@@ -295,7 +295,7 @@ ph_st ph_setVel(ph_dev* dev,uint8_t vel);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getCorriente(ph_dev* dev, uint8_t* corr);
+ph_st ph_getCorriente(ph_dev* dev, uint8_t* corr);
 
 /*
 ** ===================================================================
@@ -315,7 +315,7 @@ ph_st getCorriente(ph_dev* dev, uint8_t* corr);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getVelocidad(ph_dev* dev,uint8_t* vel);
+ph_st ph_getVelocidad(ph_dev* dev,uint8_t* vel);
 
 /*
 ** ===================================================================
@@ -335,7 +335,7 @@ ph_st getVelocidad(ph_dev* dev,uint8_t* vel);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getEstado(ph_dev* dev,uint8_t* est);
+ph_st ph_getEstado(ph_dev* dev,uint8_t* est);
 
 /*
 ** ===================================================================
@@ -355,8 +355,29 @@ ph_st getEstado(ph_dev* dev,uint8_t* est);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st getTemperatura(ph_dev* dev,uint8_t* temp);
+ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp);
 
-
+/*
+** ===================================================================
+**     Método      :  ph_setPWMSmooth
+*/
+/*!
+**     @resumen
+**          Obtiene el valor de temperatura medido por el puente H
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae la 
+**							acción.
+**     @param
+**          pwm     	   	- Puntero a la posición de memoria donde guardar
+**							la temperatura.
+**								Valor entre 0 y 255.
+**     @param
+**          step     	   	- Puntero a la posición de memoria donde guardar
+**							la temperatura.
+**								Valor entre 0 y 255.
+**     @return
+**                         	- Estado salida del método. 
+*/
+/* ===================================================================*/
 ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize);
 #endif

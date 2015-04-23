@@ -32,31 +32,45 @@ printf("Pin del stepper_device para chip select de Spi: %d\n",(*dev1.spi).pin);
 
 devptr=&dev1;
 
+if(stp_master_disable(devptr)){
+	printf("Error en Master Disable inicial\n");
+}
 
-		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
+
+if(stp_driver_enable(devptr)){
+	printf("Error en driver enable inicial\n" );
+}
+
+
+if(stp_setStepSel(devptr,0)){
+	printf("Error en setStepSel inicial\n" );
+}
+
+printf("------------------Motor de pasos configurado------------------\n");
+		printf("Bienvenido al test de funcionamiento de Stepper(ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t master-enable\t\t\t-Habilita el stepper\n"
-				"\t clk-en\t\t\t\t-Habilita clk del stepper\n"
-				"\t driver-en\t\t\t-Habilita diver del stepper\n"
-				"\t out-en\t\t\t\t-Habilita salidas del stepper\n"
+				"\t en-clk\t\t\t\t-Habilita clk del stepper\n"
+				"\t en-driver\t\t\t-Habilita diver del stepper\n"
+				"\t en-out\t\t\t\t-Habilita salidas del stepper\n"
 				"\t master-disable\t\t\t-Deshabilita el stepper\n"
-				"\t clk-dis\t\t\t-Deshabilita clk del stepper\n"
-				"\t driver-dis\t\t\t-Deshabilita driver del stepper\n"
-				"\t out-dis\t\t\t-Deshabilita salidas del stepper\n"
+				"\t dis-clk\t\t\t-Deshabilita clk del stepper\n"
+				"\t dis-driver\t\t\t-Deshabilita driver del stepper\n"
+				"\t dis-out\t\t\t-Deshabilita salidas del stepper\n"
 				"\t status\t\t\t\t-Imprime el STATUS register\n "
-				"\t get-config\t\t\t-Imprime el CONFIG register\n "
-				"\t get-step\t\t\t-Imprime el estado actual del selector de paso\n"
-				"\t get-alarm\t\t\t-Imprime el registro de alarmas\n"
-				"\t get-posicion\t\t\t-Imprime el registro posición absoluta\n"
-				"\t get-ocdt\t\t\t-Imprime el Overcurrent Detection Threshold actual\n"
-				"\t get-tval\t\t\t-Retorna TVAL\n"
-				"\t periodo\t\t\t-Cambia el periodo del step\n"
+				"\t getconfig\t\t\t-Imprime el CONFIG register\n "
+				"\t getstep\t\t\t-Imprime el estado actual del selector de paso\n"
+				"\t getalarm\t\t\t-Imprime el registro de alarmas\n"
+				"\t getpos\t\t\t-Imprime el registro posición absoluta\n"
+				"\t getocdt\t\t\t-Imprime el Overcurrent Detection Threshold actual\n"
+				"\t gettval\t\t\t-Retorna TVAL\n"
+				"\t period\t\t\t-Cambia el periodo del step\n"
 				"\t dir\t\t\t\t-Cambia la direccion de giro del stepper\n"
-				"\t set-config\t\t\t-Imprime el CONFIG register\n "
-				"\t set-step\t\t\t-Asigna un valor al estado actual del selector de paso\n"
-				"\t set-alarm\t\t\t-Asigna un valor al registro de alarmas\n"
-				"\t set-posicion\t\t\t-Asigna un valor al registro posición absoluta\n"
-				"\t set-ocdt\t\t\t-Asigna un valor al Overcurrent Detection Threshold actual\n"
-				"\t set-tval\t\t\t-Cambia TVAL\n"
+				"\t setconfig\t\t\t-Imprime el CONFIG register\n "
+				"\t setstep\t\t\t-Asigna un valor al estado actual del selector de paso\n"
+				"\t setalarm\t\t\t-Asigna un valor al registro de alarmas\n"
+				"\t setpos\t\t\t-Asigna un valor al registro posición absoluta\n"
+				"\t setocdt\t\t\t-Asigna un valor al Overcurrent Detection Threshold actual\n"
+				"\t settval\t\t\t-Cambia TVAL\n"
 				"\t debug\t\t\t\t-Permite rápido envia de getTVAL útil para econtrar fallas en comunicación SPI\n");
 while(1){
 
@@ -69,30 +83,30 @@ while(1){
 			stp_getStatus(devptr,&status);
 			printf("STATUS: %X \n",status);
 
-		}else if(!strcmp(line,"get-config\n")){
+		}else if(!strcmp(line,"getconfig\n")){
 			stp_getConfig(devptr,&config);
 			printf("Config: %X \n",config);
 
-		}else if(!strcmp(line,"get-alarm\n")){
+		}else if(!strcmp(line,"getalarm\n")){
 			stp_getAlarmEn(devptr,&alarm);
 			printf("Alarm: %X \n",alarm);
 
-		}else if(!strcmp(line,"get-step\n")){
+		}else if(!strcmp(line,"getstep\n")){
 			stp_getStepSel(devptr,&step);
 			printf("Step: %X \n",step);
 
-		}else if(!strcmp(line,"get-posicion\n")){
+		}else if(!strcmp(line,"getpos\n")){
 			stp_getPosition(devptr,&position);
 			printf("Posición: %X \n",position);
 
-		}else if(!strcmp(line,"get-ocdt\n")){
+		}else if(!strcmp(line,"getocdt\n")){
 			stp_getOCDT(devptr,&ocd);
 			printf("OCD: %d \n",ocd);
-		}else if(!strcmp(line,"get-tval\n")){
+		}else if(!strcmp(line,"gettval\n")){
 			stp_getTVAL(devptr,&tval);
 			printf("TVAL: %X \n",tval);
 		//Setters
-		}else if(!strcmp(line,"set-step\n")){
+		}else if(!strcmp(line,"setstep\n")){
 			printf("Ingrese el divisor del paso para paso de 1.8 grados:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
@@ -101,7 +115,7 @@ while(1){
 				printf("Error en el cambio de divisor de paso.\n");
 
 			}
-		}else if(!strcmp(line,"periodo\n")){
+		}else if(!strcmp(line,"period\n")){
 			printf("Ingrese el periodo del paso en ns:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
@@ -115,34 +129,34 @@ while(1){
 			printf("Cambiando direccipon a a: %d \n",buf);
 			stp_dir(devptr,buf);
 	
-		}else if(!strcmp(line,"set-posicion\n")){
+		}else if(!strcmp(line,"setpos\n")){
 			printf("Ingrese el marcador de la posición actual:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando posición a: %d \n",buf);
 			stp_setPosition(devptr,buf);
 
-		}else if(!strcmp(line,"set-tval\n")){
+		}else if(!strcmp(line,"settval\n")){
 			printf("Ingrese el TVAL deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando TVAL a: %d \n",buf);
 			stp_setTVal(devptr,buf);
-		}else if(!strcmp(line,"set-tonmin\n")){
+		}else if(!strcmp(line,"settonmin\n")){
 			printf("Ingrese el TONMIN deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando TONMIN a: %d \n",buf);
 			stp_setTOnMin(devptr,buf);
 
-		}else if(!strcmp(line,"set-toffmin\n")){
+		}else if(!strcmp(line,"settoffmin\n")){
 			printf("Ingrese el TOFFMIN deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando TOFFMIN a: %d \n",buf);
 			stp_setTOffMin(devptr,buf);
 
-		}else if(!strcmp(line,"set-ocdt\n")){
+		}else if(!strcmp(line,"setocdt\n")){
 			printf("Ingrese el OCDT deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
@@ -153,15 +167,15 @@ while(1){
 			printf("Habilitando stepper:\n");
 			stp_master_enable(devptr);
 	
-		}else if(!strcmp(line,"clk-en\n")){
+		}else if(!strcmp(line,"en-clk\n")){
 			printf("Habilitando clk del stepper:\n");
 			stp_clk_enable(devptr);
 	
-		}else if(!strcmp(line,"driver-en\n")){
+		}else if(!strcmp(line,"en-driver\n")){
 			printf("Habilitando driver del stepper:\n");
 			stp_driver_enable(devptr);
 	
-		}else if(!strcmp(line,"out-en\n")){
+		}else if(!strcmp(line,"en-out\n")){
 			printf("Habilitando salidas del stepper:\n");
 			stp_output_enable(devptr);
 	
@@ -169,15 +183,15 @@ while(1){
 			printf("Deshabilitando stepper:\n");
 			stp_master_disable(devptr);
 	
-		}else if(!strcmp(line,"clk-dis\n")){
+		}else if(!strcmp(line,"dis-clk\n")){
 			printf("Deshabilitando clk del stepper:\n");
 			stp_clk_disable(devptr);
 	
-		}else if(!strcmp(line,"driver-dis\n")){
+		}else if(!strcmp(line,"dis-driver\n")){
 			printf("Deshabilitando driver del stepper:\n");
 			stp_driver_disable(devptr);
 	
-		}else if(!strcmp(line,"out-dis\n")){
+		}else if(!strcmp(line,"dis-out\n")){
 			printf("Deshabilitando salidas del stepper:\n");
 			stp_output_disable(devptr);
 	
@@ -190,30 +204,30 @@ while(1){
 				printf("TVAL: %d \n",tval);
 			}
 		}else{
-			printf("El comando ingresado no fue reconocido (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
+		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t master-enable\t\t\t-Habilita el stepper\n"
-				"\t clk-en\t\t\t\t-Habilita clk del stepper\n"
-				"\t driver-en\t\t\t-Habilita diver del stepper\n"
-				"\t out-en\t\t\t\t-Habilita salidas del stepper\n"
+				"\t en-clk\t\t\t\t-Habilita clk del stepper\n"
+				"\t en-driver\t\t\t-Habilita diver del stepper\n"
+				"\t en-out\t\t\t\t-Habilita salidas del stepper\n"
 				"\t master-disable\t\t\t-Deshabilita el stepper\n"
-				"\t clk-dis\t\t\t-Deshabilita clk del stepper\n"
-				"\t driver-dis\t\t\t-Deshabilita driver del stepper\n"
-				"\t out-dis\t\t\t-Deshabilita salidas del stepper\n"
+				"\t dis-clk\t\t\t-Deshabilita clk del stepper\n"
+				"\t dis-driver\t\t\t-Deshabilita driver del stepper\n"
+				"\t dis-out\t\t\t-Deshabilita salidas del stepper\n"
 				"\t status\t\t\t\t-Imprime el STATUS register\n "
-				"\t get-config\t\t\t-Imprime el CONFIG register\n "
-				"\t get-step\t\t\t-Imprime el estado actual del selector de paso\n"
-				"\t get-alarm\t\t\t-Imprime el registro de alarmas\n"
-				"\t get-posicion\t\t\t-Imprime el registro posición absoluta\n"
-				"\t get-ocdt\t\t\t-Imprime el Overcurrent Detection Threshold actual\n"
-				"\t get-tval\t\t\t-Retorna TVAL\n"
-				"\t periodo\t\t\t-Cambia el periodo del step\n"
+				"\t getconfig\t\t\t-Imprime el CONFIG register\n "
+				"\t getstep\t\t\t-Imprime el estado actual del selector de paso\n"
+				"\t getalarm\t\t\t-Imprime el registro de alarmas\n"
+				"\t getpos\t\t\t-Imprime el registro posición absoluta\n"
+				"\t getocdt\t\t\t-Imprime el Overcurrent Detection Threshold actual\n"
+				"\t gettval\t\t\t-Retorna TVAL\n"
+				"\t period\t\t\t-Cambia el periodo del step\n"
 				"\t dir\t\t\t\t-Cambia la direccion de giro del stepper\n"
-				"\t set-config\t\t\t-Imprime el CONFIG register\n "
-				"\t set-step\t\t\t-Asigna un valor al estado actual del selector de paso\n"
-				"\t set-alarm\t\t\t-Asigna un valor al registro de alarmas\n"
-				"\t set-posicion\t\t\t-Asigna un valor al registro posición absoluta\n"
-				"\t set-ocdt\t\t\t-Asigna un valor al Overcurrent Detection Threshold actual\n"
-				"\t set-tval\t\t\t-Cambia TVAL\n"
+				"\t setconfig\t\t\t-Imprime el CONFIG register\n "
+				"\t setstep\t\t\t-Asigna un valor al estado actual del selector de paso\n"
+				"\t setalarm\t\t\t-Asigna un valor al registro de alarmas\n"
+				"\t setpos\t\t\t-Asigna un valor al registro posición absoluta\n"
+				"\t setocdt\t\t\t-Asigna un valor al Overcurrent Detection Threshold actual\n"
+				"\t settval\t\t\t-Cambia TVAL\n"
 				"\t debug\t\t\t\t-Permite rápido envia de getTVAL útil para econtrar fallas en comunicación SPI\n");
 		
 		}
