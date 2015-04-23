@@ -27,14 +27,20 @@
 #define BUF_SIZ	1024
 
 const uint8_t STEP_SIZE = 0x0A;
- 
+const uint8_t DEFAULT_PWM = 30;
+
+const uint8_t FORWARD = 0x01;
+const uint8_t BACKWARD = 0x02;
+const uint8_t STEER = 0x04;
+const uint8_t STOPPED= 0x08;
+
 /*------------------------ PUENTE H ------------------------*/
 
 uint8_t addr=0b0111000;
 ph_dev* devptr1;
 ph_dev* devptr2;
 int salida;
-
+uint8_t state=0;
 
 void parser(char dato, char arg){
 
@@ -42,28 +48,101 @@ void parser(char dato, char arg){
 	if(dato=='m'){
 
 		printf("Cambiando PWM a: %d \n",arg);
-		ph_setPWMSmooth(devptr1,arg,STEP_SIZE);
-		ph_setPWMSmooth(devptr2,arg,STEP_SIZE);
+		if((uint8_t)arg<100){
+			ph_setPWMSmooth(devptr1,arg,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,arg,STEP_SIZE);
+		}else{
+			ph_setPWMSmooth(devptr1,100,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,100,STEP_SIZE);
+		}
 
 	}else if(dato=='w'){
+
 		printf("Moviendo hacia adelante\n");
-		ph_setDireccion(devptr1,1);
-		ph_setDireccion(devptr2,1);
+		if(state&BACKWARD){
+			ph_setPWMSmooth(devptr1,0,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,0,STEP_SIZE);
+
+			ph_setDireccion(devptr1,1);
+			ph_setDireccion(devptr2,1);
+
+			ph_setPWMSmooth(devptr1,DEFAULT_PWM,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,DEFAULT_PWM,STEP_SIZE);
+
+
+		}else if((state&STEER)||(state==0)){
+
+			ph_setDireccion(devptr1,1);
+			ph_setDireccion(devptr2,1);
+
+ 			ph_setPWMSmooth(devptr1,DEFAULT_PWM,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,DEFAULT_PWM,STEP_SIZE);
+
+		}
+
+		state=FORWARD;
+
 
 	}else if(dato=='s'){
 		printf("Moviendo hacia atrás\n");
-		ph_setDireccion(devptr1,0);
-		ph_setDireccion(devptr2,0);
+		if(state&FORWARD){
+			ph_setPWMSmooth(devptr1,0,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,0,STEP_SIZE);
 
+			ph_setDireccion(devptr1,0);
+			ph_setDireccion(devptr2,0);
+
+			ph_setPWMSmooth(devptr1,DEFAULT_PWM,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,DEFAULT_PWM,STEP_SIZE);
+		}else if((state&STEER)||(state==0)){
+			ph_setDireccion(devptr1,0);
+			ph_setDireccion(devptr2,0);
+
+ 			ph_setPWMSmooth(devptr1,DEFAULT_PWM,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,DEFAULT_PWM,STEP_SIZE);
+		}
+		state=BACKWARD;
 	}else if(dato=='a'){
 		printf("Girando hacia izquierda\n");
-		ph_setDireccion(devptr1,0);
-		ph_setDireccion(devptr2,0);
+
+		state|=STEER;
+
 
 	}else if(dato=='d'){
 		printf("Girando hacia derecha\n");
-		ph_setDireccion(devptr1,1);
-		ph_setDireccion(devptr2,1);
+		state|=STEER;
+		ph_setPWMSmooth(devptr1,(*devptr1).pwm+10,STEP_SIZE);
+		ph_setPWMSmooth(devptr2,(*devptr2).pwm+10,STEP_SIZE);
+
+
+	}else if(dato=='x'){
+		printf("PWMs a 0\n");
+		state=STOPPED;
+		ph_setPWMSmooth(devptr1,0,STEP_SIZE);
+		ph_setPWMSmooth(devptr2,0,STEP_SIZE);
+
+
+	}else if(dato=='g'){
+		printf("Acelerando\n");
+		if((*devptr1).pwm<100){
+			ph_setPWMSmooth(devptr1,(*devptr1).pwm+10,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,(*devptr2).pwm+10,STEP_SIZE);
+		}else{
+			ph_setPWMSmooth(devptr1,100,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,100,STEP_SIZE);			
+		}
+
+
+	}else if(dato=='f'){
+		printf("Desacelerando\n");
+		if((*devptr1).pwm>STEP_SIZE){
+			ph_setPWMSmooth(devptr1,(*devptr1).pwm-10,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,(*devptr2).pwm-10,STEP_SIZE);
+		}else{
+			ph_setPWMSmooth(devptr1,0,STEP_SIZE);
+			ph_setPWMSmooth(devptr2,0,STEP_SIZE);			
+		}
+
 
 	}else if(dato=='e'){
 		printf("Motores activados\n");
@@ -75,7 +154,7 @@ void parser(char dato, char arg){
 		ph_disable(devptr1);
 		ph_disable(devptr2);
 
-	}else if(dato=='f'){
+	}else if(dato=='q'){
 		printf("Cerrando el programa. Adiós\n");
 		salida=1;
 	}else if(dato=='c'){
