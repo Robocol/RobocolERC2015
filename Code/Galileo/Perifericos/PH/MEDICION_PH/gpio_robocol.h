@@ -95,7 +95,7 @@ uint8_t init;
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-char* u8toa(uint8_t i);
+static char* u8toa(uint8_t i);
 
 /*
 ** ===================================================================
@@ -110,7 +110,7 @@ char* u8toa(uint8_t i);
 **          				- Apuntador a la primera posición del array.
 */
 /* ===================================================================*/
-void gpio_write_file(char* ruta, char* buff, uint8_t len );
+static void gpio_write_file(char* ruta, char* buff, uint8_t len );
 
 /*
 ** ===================================================================

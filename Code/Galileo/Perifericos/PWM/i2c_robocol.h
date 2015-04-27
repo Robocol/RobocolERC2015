@@ -26,7 +26,7 @@
  *                 CONSTANTES DE LA LIBRERIA
  */
 #define I2C_ERROR 		0x01;
-#define I2C_OK 			0x00;
+#define I2C_OK 			0x10;
 
 /*--------------------------------------------------------------------------*/
 /*

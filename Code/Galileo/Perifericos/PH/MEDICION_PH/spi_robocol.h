@@ -98,6 +98,36 @@
 #define SPI_ERROR	0x01
 #define SPI_OK 		0x00
 
+/* =====================================================================================*/
+/*
+				DEFINICIÓN DE PINES PARA USO COMO CS
+
+Nota: Esta librería no garantiza que el gpio que está asociado al pin se encuentre 
+conectado por los multiplexores de selección. Para configurar adecuadamente estos 
+multiplexores, referirse al esquema de conexión de los GPIO par ala Intel Galileo Gen1.
+ */
+/* =====================================================================================*/
+
+
+#define PIN0		0x32	//Pin 0 corresponde a gpio50
+#define PIN1		0x33	//Pin 1 corresponde a gpio51
+#define PIN2		0x20	//Pin 2 corresponde a gpio32
+#define PIN2FAST	0x20	//Pin 2 fast corresponde a gpio14
+#define PIN3		0x12	//Pin 3 corresponde a gpio18
+#define PIN3FAST	0x20	//Pin 3 fast corresponde a gpio15
+#define PIN4		0x1C	//Pin 4 corresponde a gpio28
+#define PIN5		0x11	//Pin 5 corresponde a gpio17
+#define PIN6		0x18	//Pin 6 corresponde a gpio24
+#define PIN7		0x1B	//Pin 7 corresponde a gpio27
+#define PIN8		0x1A	//Pin 8 corresponde a gpio26
+#define PIN9		0x13	//Pin 9 corresponde a gpio19
+#define PIN10		0x00	//Pin 10 corresponde a gpio42 TODO: Hacer Algo
+#define PINA0		0x2C	//Pin A0 corresponde a gpio44
+#define PINA1		0x2D	//Pin A1 corresponde a gpio45
+#define PINA2		0x2E	//Pin A2 corresponde a gpio46
+#define PINA3		0x2F	//Pin A3 corresponde a gpio47
+#define PINA4		0x30	//Pin A4 corresponde a gpio48
+#define PINA5		0x31	//Pin A5 corresponde a gpio49
 
 /* =====================================================================================*/
 /*
@@ -105,7 +135,7 @@
 
 Nota: Esta librería no garantiza que el gpio que está asociado al pin se encuentre 
 conectado por los multiplexores de selección. Para configurar adecuadamente estos 
-multiplexores, referirse al esquema de conexión de los GPIO para la Intel Galileo Gen1.
+multiplexores, referirse al esquema de conexión de los GPIO par ala Intel Galileo Gen1.
  */
 /* =====================================================================================*/
 

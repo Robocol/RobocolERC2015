@@ -19,6 +19,7 @@ echo -n "30" > /sys/class/gpio/unexport
 
 echo -n "3" > /sys/class/pwm/pwmchip0/export
 echo -n "1" > /sys/class/pwm/pwmchip0/pwm3/enable
-echo -n "1000000" > /sys/class/pwm/pwmchip0/pwm3/period
-echo -n "$2" > /sys/class/pwm/pwmchip0/pwm3/duty_cycle
+echo -n "2000000" > /sys/class/pwm/pwmchip0/pwm3/period
 echo -n "3" > /sys/class/pwm/pwmchip0/unexport
+echo -n "$1" > /sys/class/pwm/pwmchip0/pwm3/duty_cycle
+

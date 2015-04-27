@@ -1,0 +1,65 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%	En este documento se encuentra la lista de TODOs para el codigo de la tarjeta
+%%	intel galileo enfocados en la competencia de URC 2015
+%%
+%%	Se realiza la división de los TODOs en tres categorias:
+%% 		PRIORIDAD 1: Hacerlo ya
+%% 		PRIORIDAD 2: Puede Esperar
+%%		PRIORIDAD 3: Cuando haya mas tiempo (Vanidad)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%PRIORIDAD 1																				  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	%%%PENDIENTES%%%
+	. Terminación y prueba de libreria stepper.
+	. Diagnosticar el estado de los mux en  pwmg_robocol, adc_robocol.
+	. Modificar creacion de ph_dev con inclusion de spi_dev dentro de la libreria ph_robocol
+	. Unificacion de librerias de perifericos con libreria de RAW_SOCKET.
+
+	%%%FINALIZADAS%%%
+	. Implementacion de makefiles con rutas relativas para posibilidad de compilacion desde el
+	  repositorio.(LISTO)
+	. Terminación y prueba de libreria PWM (LISTO)
+	. Dar posibilidad de manejar mas de un(n)expansor de pines desde la libreria gpio_robocol(LISTO)
+	. No dejar crear pwm por defecto frente a un fallo en utilizacion de la libreria.(LISTO)
+	. Revisar declaracion de variables en el comienzo de lo metodos(LISTO)	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%PRIORIDAD 2																				  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	%%%PENDIENTES%%%
+	. Prueba y libreria de GPS en intel Galileo.
+	. Organizar definicion de variables de estado de salida de metodos en las diferentes
+	   librerias.
+	. Trasladar funciones miscelaneas a una libreria que las contenga:
+		a. u8toa
+		b. u32toa
+		c. g_write_file
+	. Actualizar la documentacion.(PWM,UART,GPIO)
+	. Creación de metodo para cerrar el dispositivo spi en la libreria spi_robocol.
+	. Declarar tipos de variables para estados de comunicacion y operacion en libreria puente h.
+	. Cambiar tipo de la variable que indica estado de terminacion de los metodos en libreria
+		puente h.
+	. Cambiar llamadas ligadas a libreria random hacia aquellas implementadas en misc.
+	. Implementar filtro digtal de la libreria ADC.
+	. Modificar la manera en la que se obtienen los datos del ADC.
+	. Ocultar dev definido en i2c_robocol como global para el resto de librerias
+
+	%%%FINALIZADAS%%%
+	. Actualizar la documentacion.(ADC)
+	. Quitar define de los pines de la libreria spi.(LISTO)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%PRIORIDAD 3																				  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	%%%PENDIENTES%%%
+	. Probar el funcs de la libreria i2c_robocol
+	. Quitar el init de libreria gpio_robocol.
+	. Cambiar definicion de constantes de #define a static const ... .
+	. Implementar filtro digtal de la libreria ADC.
+	. Modificar la manera en la que se obtienen los datos del ADC.
+

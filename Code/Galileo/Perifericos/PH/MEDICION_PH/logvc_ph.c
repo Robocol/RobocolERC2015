@@ -9,8 +9,6 @@ int main(int argc, char const *argv[])
 	ph_dev* devptr1;						//puntero a puente h
 	ph_dev* devptr2;						//puntero a puente h
 	uint8_t addr=0b0111000;				//Direccion expansor I2C
-	spi_device com1;					//Canal de comunicación del primer puente h
-	spi_device com2;					//Canal de comunicación del segundo puente h
 	uint8_t* buffmed1;
 	uint8_t* buffmed2;
 
@@ -41,16 +39,15 @@ int main(int argc, char const *argv[])
 		perror("Causa:");
 		exit(1);
 	}
-	ph_dev dev1={&com1,0,1,4};			//Creación de primer puente h con pines ina=0, inb=1, enable=4
-	ph_dev dev2={&com2,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
+	ph_dev dev1={PINA0,0,1,4};			//Creación de primer puente h con pines ina=0, inb=1, enable=4
+	ph_dev dev2={PINA1,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
 
-	build_expander(addr);
-
-	spi_start("/dev/spidev1.0",100000);	//Inicialización de SPI
-	spi_create_device(&com1,0,PINA0);	//Instanciando SPI del primer puente h con CS en el pi A0
-	spi_create_device(&com2,0,PINA1);	//Instanciando SPI del segundo puente h con CS en el pi A1
 	devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
-	devptr2=&dev2;				//Inicialmente el puntero se asigna al primer puente h
+	devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
+
+	ph_build(devptr1);
+	ph_build(devptr2);
+
 	fprintf(fdl, "//--------%s--------\\\\\n",nombref);
 	free(nombref);
 

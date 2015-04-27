@@ -103,25 +103,15 @@ spi_st spi_start(char* ruta, int speed)
 */
 /* ===================================================================*/
 spi_st spi_create_device(spi_device* dev, uint8_t pMode, uint8_t pPin){
-	//Creación de dispositivo SPI virtual
-	spi_device new_device={pMode,pPin,8,8,0};
 
 	// Configuración de pin CS como salida
-	//printf("Llamada a gpio_set_dir.(spi_robocol.c> spi_create_device)\n");
-	if(gpio_set_dir(pPin, OUT)!=0){
-		printf("Error en el set de dirección para pin %d(spi_robocol.c)\n",pPin );
-		return SPI_ERROR;
-	}
+	gpio_set_dir(pPin, OUT);
 	// Valor del CS en 1, dejando desactivado el dispositivo
-	//printf("Llamada a gpio_gal_value.(spi_robocol.c> spi_create_device)\n");
-	if(gpio_gal_value(pPin, 1)!=0){
-		printf("Error en el set del valor para pin %d(spi_robocol.c)\n",pPin );
-		return SPI_ERROR;
-	}
-	printf("Despues de gpio_gal_value\n");
+	gpio_gal_value(pPin, 1);
 
-
-	*dev=new_device;
+	//Creación de dispositivo SPI virtual
+	spi_device new={pMode,pPin,8,8,0};
+	*dev=new;
 
 	return SPI_OK;
 }
@@ -154,11 +144,7 @@ spi_st spi_rw(spi_device* device, uint8_t* data_out, uint8_t* data_in, int lengt
 
 
 	// Habilitando comunicación con el dispositivo
-	if(gpio_gal_value((*device).pin,LOW)){
-		printf("Error en asignación de valor %d para gpio %d.\n\t Función Llamada Desde : spi_robocol.\n",LOW ,(*device).pin);
-		perror("Descripción:");
-		return SPI_ERROR;
-	}
+	gpio_gal_value((*device).pin,LOW);
 
 	// Configura modo de operación según dispositivo
 	if (ioctl(spi_fd, SPI_IOC_WR_MODE, &((*device).mode))== -1)
@@ -187,11 +173,7 @@ spi_st spi_rw(spi_device* device, uint8_t* data_out, uint8_t* data_in, int lengt
 	}
 
 	// Terminando comunicación con el dispositivo
-	if(gpio_gal_value((*device).pin,HIGH)){
-		printf("Error en asignación de valor %d para g %d\n",HIGH ,(*device).pin);
-		perror("Descripción:");
-		return SPI_ERROR;
-	}
+	gpio_gal_value((*device).pin,HIGH);
 
 	return SPI_OK;
 }

@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <fcntl.h>
+#include "misc_robocol.h"
 #include "i2c_robocol.h"
 
 /* =====================================================================================*/
@@ -37,9 +38,9 @@ multiplexores, referirse al esquema de conexión de los GPIO par ala Intel Galil
 #define PIN0		0x32	//Pin 0 corresponde a gpio50
 #define PIN1		0x33	//Pin 1 corresponde a gpio51
 #define PIN2		0x20	//Pin 2 corresponde a gpio32
-#define PIN2FAST	0x20	//Pin 2 fast corresponde a gpio14
+#define PIN2FAST	0x0D	//Pin 2 fast corresponde a gpio14
 #define PIN3		0x12	//Pin 3 corresponde a gpio18
-#define PIN3FAST	0x20	//Pin 3 fast corresponde a gpio15
+#define PIN3FAST	0x0E	//Pin 3 fast corresponde a gpio15
 #define PIN4		0x1C	//Pin 4 corresponde a gpio28
 #define PIN5		0x11	//Pin 5 corresponde a gpio17
 #define PIN6		0x18	//Pin 6 corresponde a gpio24
@@ -72,75 +73,38 @@ typedef uint8_t gpio_st; /* Estado de salida de la función*/
 
 /*--------------------------------------------------------------------------*/
 /*
- *                 	  VARIABLES GLOBALES
- */
-
-uint8_t init;
-
-/*--------------------------------------------------------------------------*/
-/*
  *                 FUNCIONES DE LA LIBRERIA
  */
 
 /*
 ** ===================================================================
-**     Método      :  u8toa
+**     Método      :  gpio_export
 */
 /*!
 **     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
+**          Exporta el gpio especificado al Sysfs
 **     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
+**          str_num    	   	- String del número del gpio a exportar
+**     @return
+**          				- Estado de finalización
 */
 /* ===================================================================*/
-static char* u8toa(uint8_t i);
+static gpio_st gpio_export(char* str_num, uint8_t len );
 
 /*
 ** ===================================================================
-**     Método      :  gpio_write_file
+**     Método      :  gpio_unexport
 */
 /*!
 **     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
+**          Retira el gpio especificado al Sysfs
 **     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
+**          str_num    	   	- String del número del gpio a retira
+**     @return
+**          				- Estado de finalización
 */
 /* ===================================================================*/
-static void gpio_write_file(char* ruta, char* buff, uint8_t len );
-
-/*
-** ===================================================================
-**     Método      :  u8toa
-*/
-/*!
-**     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
-**     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
-*/
-/* ===================================================================*/
-static void gpio_export(char* buff, int8_t len );
-
-/*
-** ===================================================================
-**     Método      :  u8toa
-*/
-/*!
-**     @resumen
-**          Convierte un uint8_t a una cadena de caracteres (string)
-**     @param
-**          i 	    	   	- Número a convertir
-**     @preturn
-**          				- Apuntador a la primera posición del array.
-*/
-/* ===================================================================*/
-static void gpio_unexport(char* buff, int8_t len );
+static gpio_st gpio_unexport(char* buff, uint8_t len );
 
 /*
 ** ===================================================================
@@ -176,7 +140,9 @@ gpio_st gpio_set_dir(uint8_t num,int esEntrada);
 **							requiera isntanciar el GPIO.
 */
 /* ===================================================================*/
-gpio_st gpio_gal_value(uint8_t num,int valor);
+gpio_st gpio_gal_value(uint8_t num,uint8_t valor);
+
+gpio_st gpio_muxlock(uint8_t num);
 
 gpio_st gpio_gal_set(uint8_t num);
 
@@ -196,7 +162,7 @@ gpio_st reg_set(void);
 
 gpio_st reg_set_value(char* value);
 
-gpio_st gpio_get(uint8_t port, uint8_t* buff);
+gpio_st gpio_exp_get(uint8_t port, uint8_t* buff);
 
 gpio_st reg_get(char* buff);
 
