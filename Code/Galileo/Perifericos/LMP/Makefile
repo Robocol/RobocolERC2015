@@ -8,6 +8,7 @@ include ../.config
 #Banderas ara el compilador. Generalmente inclusión de los directorios donde buscar los .h
 CFLAGS=-I../I2C \
        -I../GPIO \
+       -I../SPI \
        -I../../MISC
 
 #Objetos de los cuales depende la compilación de los ejecutables SPI
@@ -22,10 +23,6 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 ################################################################################################
 #	Definición de reglas 																	   #
 ################################################################################################
-
-#Regla de compilación de ejecutable para prueba del driver
-prueba_spi: $(OBJ)
-	$(CC) -o $@$(EEXT) prueba_spi.c $^ $(CFLAGS)
 
 #Regla de compilación de ejecutable para prueba del driver
 lmp_spi: $(OBJ)
