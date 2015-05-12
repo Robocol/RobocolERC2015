@@ -129,28 +129,47 @@ char* u32toa(uint32_t i) {
 
 /*
 ** ===================================================================
-**     Método      :  little_endian_to_u32
+**     Método      array_to_i32
 */
 /*!
 **     @resumen
-**          Convierte un uint32_t a una cadena de caracteres (string)
+**          Convierte un a int32_t un arraglo de bytes
 **     @param
-**          i 	    	   	- Número a convertir
+**          array 	    	   	- Arreglo de bytes a convertir
+**     @param
+**          len 	    	   	- Tamaño del arreglo a convertir
+**     @param
+**          little_endian 	    - Indicador de little_endian o big_endian.
+**
 **     @preturn
-**          				- Apuntador a la primera posición del array.
+**          				- Numero convertido a int32_t.
 */
 /* ===================================================================*/
-int32_t array_to_i32(uint8_t* array, uint8_t len) {
-
+int32_t array_to_i32(uint8_t* array, uint8_t len, uint8_t little_endian) {
+	int32_t res=0;
+	uint8_t iterator;
 	if(len>4){
 		printf("Precaución: El arreglo contiene más de 32bits. Puede haber pérdida de información\n");
 	}
-	
-	int32_t res=0;
-	while (len){
-		len--;
-		res = res * 256 + array[len];
+
+	if (little_endian)
+	{
+		iterator=len;
+		while (iterator){
+			iterator--;
+			res = res * 256 + array[iterator];
+		}
+
+	}else{
+		iterator=0;
+		while(iterator<len){
+			res = res * 256 + array[iterator];
+			iterator++;
+		}
+
 	}
+	
+
 
     return res;
 }

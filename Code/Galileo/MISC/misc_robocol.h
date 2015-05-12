@@ -2,7 +2,7 @@
 #define MISC_ROBOCOL_H
 /*
  * --------------------------------------------------------------------------------------
- * ph_robocol.c (0.9)
+ * misc_robocol.c (0.9)
  *
  *  Created on: Mar 12, 2015
  *
@@ -36,6 +36,14 @@ A continuación se realiza la definición de las constantes globales necesarias 
 funcionamiento de la libreria.
  */
 /* =====================================================================================*/
+#ifndef FALSE
+#define FALSE 0x00
+#endif
+
+#ifndef TRUE
+#define TRUE 0x01
+#endif
+
 #ifndef MISC_OK
 #define MISC_OK 0x00
 #endif
@@ -103,6 +111,27 @@ char* u8toa(uint8_t i);
 */
 /* ===================================================================*/
 char* u32toa(uint32_t i);
+
+
+/*
+** ===================================================================
+**     Método      array_to_i32
+*/
+/*!
+**     @resumen
+**          Convierte un a int32_t un arraglo de bytes
+**     @param
+**          array 	    	   	- Arreglo de bytes a convertir
+**     @param
+**          len 	    	   	- Tamaño del arreglo a convertir
+**     @param
+**          little_endian 	    - Indicador de little_endian o big_endian.
+**
+**     @preturn
+**          				- Numero convertido a int32_t.
+*/
+/* ===================================================================*/
+int32_t array_to_i32(uint8_t* array, uint8_t len, uint8_t little_endian);
 
 
 #endif
