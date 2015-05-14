@@ -324,6 +324,11 @@ int main(){
 			printf("SOBRETEMPERATURA\n");
 		}
 
+		if(temperature<-5 && temperature>125){
+			printf("Error en Medición: Valor Fuera de rango\n");
+			printf("Posible falla en conexión\n");
+		}
+
 		sleep(1);
 	}
 	return 0;
