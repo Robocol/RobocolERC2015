@@ -28,5 +28,9 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 lmp_spi: $(OBJ)
 	$(CC) -o $@$(EEXT) lmp_spi.c $^ $(CFLAGS)
 
+#Regla de compilación de ejecutable para prueba del driver
+afe_multi_in: $(OBJ)
+	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)
+
 include ../Makefile
 

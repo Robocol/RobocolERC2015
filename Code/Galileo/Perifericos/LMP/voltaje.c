@@ -3,7 +3,7 @@
 #include "misc_robocol.h"
 
 const uint32_t 	RESOLUTION=8388608;
-const float		VREF=3.32;
+const float		VREF=1.167;
 const float		THRESHOLD=50;
 
 
@@ -284,7 +284,8 @@ int main(){
 		adc=((float)(array_to_i32(rxADC,4,0))*VREF)/(RESOLUTION);
 		temperature=(adc/0.978-0.101)/(0.0003851);
 		printf("RAW: %d\t",array_to_i32(rxADC,4,0));
-		printf("ADC[Volts]: %.4f\t\n",adc);
+		printf("ADC[Volts]: %.4f\t",adc);
+		printf("Temperature[C]: %.2f\n",temperature);
 		
 
 		if(temperature>THRESHOLD && !overtemp){
