@@ -88,8 +88,8 @@ float KI_V = 0.0340;//Tu=0.00304*14
 int16_t  errorAnterior_V=0;
 float UAnterior_V=0; //Acción de control anterior (sp_corriente)
 uint8_t setPointVelocidad;
-uint8_t velAct=0; //Medición actual de velocidad
-uint8_t countQDEC;
+uint8_t velAct=0; //Medición de posición para el brazo
+
 
 // Contantes Controlador  de Corriente
 float KP_C =0.1040;//Ku=0.26
@@ -185,85 +185,10 @@ bool pwm_init() {
 }
 
 
-/************************************************************************/
-/* Inicializa la funcionalidad de decodificacion de encoder por cuadratura
- @return bool True si la inicialización fue exitosa, false de lo contrario
- */
-/************************************************************************/
-void qdec_init() {
-	cli();
-
-	/////////////////////////////////////////////
-	//			Configuracion del timer
-	////////////////////////////////////////////
-
-	// Habilita las interrupciones por comparacion
-	TIMSK1 |= (1 << OCIE1A);
-
-	// Establece un prescaler de 1024
-	TCCR1B |= (1 << CS12) | (1 << CS10);
-
-	// Establece el valor de comparacion
-	OCR1AL = 100;
-
-	/////////////////////////////////////////////
-	//		Configuracion de interrupcion externa
-	////////////////////////////////////////////
-
-	//Habilita la interrupcion externa
-	DDRB &= ~(1 << DDA1);
-	PORTA |= (1 << PORTA1);
-
-	PCMSK0 |= (1<<PCINT1);
-	GIMSK |= (1<<PCIE0);
-	sei();
-}
-
-unsigned char qdec_getSpeed() {
-	if (countQDEC>255) {
-		countQDEC=255;
-	}
-	return countQDEC;
-}
-
 /************************************************************************
  			CONFIGURACIÓN DE INTERRUPCIONES
 *************************************************************************
-
-
 ************************************************************************ */
-
-/* Configuración de la interrupción INT0*/
-void init_INT0(void){
-	DDRB |=0<<PB2;  // Se configura PB2 como entrada
-
-	MCUCR|=1<<ISC00;  //Se configura el tipo de cambio que hace saltar la interrupción 11->Rising
-	MCUCR|=1<<ISC01;
-
-	GIMSK|=(1<<INT0); //Se cambia la máscara la interrupción del pin INT0
-}
-
-
-ISR(PCINT0_vect)
-{
-	cli();
-
-	// Hace un conteo de un pulso de la senal index
-	countQDEC++;
-	sei();
-}
-
-ISR(TIM1_COMPA_vect)
-{
-	cli();
-	// Calcula la velocidad angular
-	//velAct = countQDEC; // -> countQDEC/25;
-	// Resetea el timer
-	countQDEC = 0;
-	TCNT1L = 0;
-
-	sei();
-}
 
 // Interrupción de recepción por SPI
 ISR(USI_OVF_vect)
@@ -401,7 +326,6 @@ void gpio_init() {
 void control_getActualSpeed(void) {
 	ADMUX=0x01;
 	velAct=adc_get();	
-	//return velAct;
 }
 
 void control_getActualCurrent(void) {
