@@ -15,7 +15,8 @@ CFLAGS=-I../I2C \
 _OBJ = spi_robocol$(LEXT) \
        i2c_robocol$(LEXT) \
        gpio_robocol$(LEXT) \
-       misc_robocol$(LEXT)
+       misc_robocol$(LEXT)\
+       lmp_robocol$(LEXT)
 
 #Concatenación de objetos con ruta de ubicación predeterminada
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -30,6 +31,10 @@ lmp_spi: $(OBJ)
 
 #Regla de compilación de ejecutable para prueba del driver
 afe_multi_in: $(OBJ)
+	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)
+
+#Regla de compilación de ejecutable para prueba del driver
+lmp_cafe: $(OBJ)
 	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)
 
 include ../Makefile
