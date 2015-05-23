@@ -15,9 +15,9 @@ int main(){
 
 	lmp.pin_cs=PIN7;
 
-
+	printf("Construccion lmp\n");
 	build_lmp(&(lmp));
-
+	printf("Despues de Construccion\n");
 
 
 	printf("Bienvenido al programa de prueba de la Libreria lmp_robocol\n");
