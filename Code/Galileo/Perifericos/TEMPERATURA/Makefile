@@ -8,6 +8,7 @@ include ../.config
 #Banderas ara el compilador. Generalmente inclusión de los directorios donde buscar los .h
 CFLAGS=-I../I2C \
        -I../GPIO \
+       -I../SPI \
        -I../../MISC
 
 #Objetos de los cuales depende la compilación de los ejecutables SPI
@@ -26,6 +27,10 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 #Regla de compilación de ejecutable para prueba del driver
 lmp_spi: $(OBJ)
 	$(CC) -o $@$(EEXT) lmp_spi.c $^ $(CFLAGS)
+
+#Regla de compilación de ejecutable para prueba del driver
+afe_multi_in: $(OBJ)
+	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)
 
 include ../Makefile
 

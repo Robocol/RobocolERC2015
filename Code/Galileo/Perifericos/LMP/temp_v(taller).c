@@ -1,8 +1,9 @@
+#include <stdio.h>
 #include "spi_robocol.h"
 #include "misc_robocol.h"
 
 const uint32_t 	RESOLUTION=8388608;
-const float		VREF=3.32;
+const float		VREF=1.167;
 const float		THRESHOLD=50;
 
 
@@ -193,7 +194,7 @@ int main(){
 //Configuración de Channel 0
 	printf("Configuración de Channel 0\n");
 	tx[0]=0x01; //Lower Address
-	tx[1]=0x00; //Gain = 8 - Buffer enabled
+	tx[1]=0x06; //Gain = 8 - Buffer enabled
 	if(spi_rw(&dev,tx,rx,2)){
 		printf("Error en transacción para Configuración de Channel 0.\n");
 		return 1;
@@ -244,7 +245,7 @@ int main(){
 			}
 
 			rxADC[0]=0x00;
-			adc=((float)(array_to_i32(rxADC,4,0))*VREF)/(RESOLUTION);
+			adc=((float)(array_to_i32(rxADC,4,0)-1792)*VREF)/(8*RESOLUTION);
 			temperature=(adc/0.978-0.101)/(0.0003851);
 
 			avrTemp+=temperature/10;
@@ -280,10 +281,11 @@ int main(){
 		}
 
 		rxADC[0]=0x00;
-		adc=((float)(array_to_i32(rxADC,4,0))*VREF)/(RESOLUTION);
+		adc=((float)(array_to_i32(rxADC,4,0))*VREF)/(8*RESOLUTION);
 		temperature=(adc/0.978-0.101)/(0.0003851);
 		printf("RAW: %d\t",array_to_i32(rxADC,4,0));
-		printf("ADC[Volts]: %.4f\t\n",adc);
+		printf("ADC[Volts]: %.4f\t",adc);
+		printf("Temperature[C]: %.2f\n",temperature);
 		
 
 		if(temperature>THRESHOLD && !overtemp){
