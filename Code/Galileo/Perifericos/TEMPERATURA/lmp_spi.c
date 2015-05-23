@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "spi_robocol.h"
 #include "misc_robocol.h"
 

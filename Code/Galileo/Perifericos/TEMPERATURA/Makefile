@@ -24,10 +24,6 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 ################################################################################################
 
 #Regla de compilación de ejecutable para prueba del driver
-prueba_spi: $(OBJ)
-	$(CC) -o $@$(EEXT) prueba_spi.c $^ $(CFLAGS)
-
-#Regla de compilación de ejecutable para prueba del driver
 lmp_spi: $(OBJ)
 	$(CC) -o $@$(EEXT) lmp_spi.c $^ $(CFLAGS)
 
