@@ -2,6 +2,15 @@
 
 st_lmp build_lmp(lmp_dev* dev){
 
+	spi_device* new_spi=malloc(sizeof(spi_device));
+	uint8_t addr=0b0111000;
+
+	if(spi_create_device(new_spi,0,(*dev).pin_cs)){
+		printf("Error en la creación de dispositivo spi para manejo de puente H.(ph_robocol.c)\n");
+		return LMP_ERROR;
+	}
+	(*dev).spi=new_spi;
+
 	if(spi_start("/dev/spidev1.0",100000)){
 		printf("Error en la inicialización interfaz spi.\n");
 		return LMP_ERROR;
