@@ -287,28 +287,45 @@ RTD_CUR_SEL				Selects RTD current
 #define LMP_ESPERA 	0x01U
 #define LMP_ERROR	0x02U
 
+/*Transaction 1-URA Setup*/
+#define WRITE_ADDR 0x10
+#define READ_ADDR  0x90
+#define FILLER_T1  0x0
+/*Transaction 2-Data Access*/
+#define WRITE 0x00
+#define READ  0x10
+#define FILLER_T2 0
+#define LOWADDR_SL 0b00001111
+ /**Size Transaction 2*/
+#define SZ1 0x0 /*1 Byte*/
+#define SZ2 0x1 /*2 Bytes*/
+#define SZ3 0x2 /*3 Bytes*/
+#define SZS 0x3 /**Streaming 3+ Bytes hasta que se desactive CS*/
+
 typedef uint8_t st_lmp;
 
 typedef struct{
 	uint8_t pin_cs;		//
 	uint8_t	pin_interr;
+	uint8_t address;
 	spi_device* spi;    //No es necesario que el usuario instancie este campo.
 }lmp_dev;
 
 st_lmp build_lmp(lmp_dev* dev);
 
-st_lmp write_reg_lmp(uint8_t address,uint8_t* data,uint8_t num);
-
-// st_lmp read_reg_lmp(uint8_t address,uint8_t* data,uint8_t num);
+st_lmp write_reg_lmp(lmp_dev* dev, uint8_t address,uint8_t* data,uint8_t num);
 
 // st_lmp write_io_lmp(uint8_t bit, uint8_t* value);
 
-st_lmp power_lmp(uint8_t mode);
+st_lmp read_reg_lmp(lmp_dev* dev,uint8_t address,uint8_t* data);
 
-st_lmp config_DRYB_lmp(void);
+st_lmp power_lmp(lmp_dev* dev,uint8_t mode);
 
-st_lmp read_ADC_lmp(float* lectura);
+st_lmp config_DRYB_lmp(lmp_dev* dev);
 
+st_lmp read_ADC_lmp(lmp_dev* dev, uint32_t* lectura);
+
+st_lmp parse_byteSize(uint8_t num, uint8_t* sz);
 
 
 #endif /* LMP_H_ */
