@@ -24,10 +24,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 ################################################################################################
 #	Definición de reglas 																	   #
 ################################################################################################
-
-#Regla de compilación de ejecutable para prueba del driver
-lmp_spi: $(OBJ)
-	$(CC) -o $@$(EEXT) lmp_spi.c $^ $(CFLAGS)
+all: afe_multi_in lmp_cafe
 
 #Regla de compilación de ejecutable para prueba del driver
 afe_multi_in: $(OBJ)
@@ -35,6 +32,9 @@ afe_multi_in: $(OBJ)
 
 #Regla de compilación de ejecutable para prueba del driver
 lmp_cafe: $(OBJ)
+	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)
+
+lmp_robocol_test: $(OBJ)
 	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)
 
 include ../Makefile

@@ -317,7 +317,7 @@ st_lmp write_reg_lmp(lmp_dev* dev, uint8_t address,uint8_t* data,uint8_t num);
 
 // st_lmp write_io_lmp(uint8_t bit, uint8_t* value);
 
-st_lmp read_reg_lmp(lmp_dev* dev,uint8_t address,uint8_t* data);
+st_lmp read_reg_lmp(lmp_dev* dev,uint8_t address,uint8_t* data, uint8_t num);
 
 st_lmp power_lmp(lmp_dev* dev,uint8_t mode);
 
