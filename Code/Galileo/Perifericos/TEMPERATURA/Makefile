@@ -32,7 +32,7 @@ afe_multi_in: $(OBJ)
 
 #Regla de compilación de ejecutable para prueba del driver
 lmp_cafe: $(OBJ)
-	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)
+	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS) -lm
 
 lmp_robocol_test: $(OBJ)
 	$(CC) -o $@$(EEXT) $@.c $^ $(CFLAGS)

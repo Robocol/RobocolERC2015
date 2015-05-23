@@ -10,6 +10,7 @@
 #include "spi_robocol.h"
 #include "misc_robocol.h"
 #include "lmp_robocol.h"
+#include "math.h"
 
 const uint32_t 	RESOLUTION=8388608;
 const uint8_t 	NUM_AFE=14;
@@ -22,7 +23,7 @@ const float		THRESHOLD=50;
 
 //Temperatura
 //float TA0[,TA1,TA2,TA3,TB0,TB1,TB2,TB3,TC0,TC1,TC2,TC3,TD0,TD1,TD2,TD3,TE0,TE1,TE2,TE3,TF0,TF1,TF2,TF3,TG0,TG1,TG2,TG3];
-float T[28];
+double T[28];
 
 
 //Turbidez
@@ -41,12 +42,16 @@ lmp_dev lmp[14];
 /*Inicio del programa*/
 	
 
+double adc_to_temp(int32_t raw){
+	float volts; 
+	volts=(((double)raw)*VREF)/(RESOLUTION);
+	return -25.64815*log(volts) + 25.2765;
+}
+
 int main(){
 
-	uint8_t* 	tx=malloc(2*sizeof(uint8_t));
-	uint8_t* 	rx=malloc(2*sizeof(uint8_t));
-	uint8_t* 	txADC=malloc(4*sizeof(uint8_t));
-	uint8_t* 	rxADC=malloc(4*sizeof(uint8_t));
+	uint8_t* 	tx=malloc(sizeof(uint8_t));
+	uint32_t* 	rxADC=malloc(sizeof(int32_t));
 
 
 	/*---------------Inicialización LMPs---------------*/
@@ -66,7 +71,7 @@ int main(){
 	lmp[12].pin_cs=PINA4;
 	lmp[13].pin_cs=PINA5;
 
-	int i=0
+	int i=0;
 	for (i=0;i<14;i++){
 		build_lmp(&(lmp[i]));
 	}
@@ -78,13 +83,16 @@ int main(){
 
 
 	/*Encendiendo Leds (Si es que no se queman)*/
+	*tx=0x41;
 	for (i=0;i<NUM_AFE;i++){
-		if(write_reg_lmp(&(lmp[i]),0x0E, 0x41,1)){
+		if(write_reg_lmp(&(lmp[i]),0x0E, tx,1)){
 			printf("Error configurando dirección de GPIOs de la AFE %d\n",i);
 		}
 	}
+
+	*tx=0x01;
 	for (i=0;i<NUM_AFE;i++){
-		if(write_reg_lmp(&(lmp[i]),0x0F, 0x01,1)){
+		if(write_reg_lmp(&(lmp[i]),0x0F,tx,1)){
 			printf("Error configurando asignando valor de GPIOs de la AFE %d\n",i);
 		}
 	}
@@ -95,18 +103,20 @@ int main(){
 	printf("Configurando mediciones\n\n");
 
 	//Background Calibration
+	*tx=0x02;
 	for (i=0;i<NUM_AFE;i++){
-		 //Modo 2:offset correction/gain correction
-		if(write_reg_lmp(&(lmp[i]),0x10, 0x02,1)){
+		//Modo 2:offset correction/gain correction
+		if(write_reg_lmp(&(lmp[i]),0x10, tx,1)){
 			printf("Error configurando asignando valor de GPIOs de la AFE %d\n",i);
 		}
 	}
 
 	// Detección y Configuración de Clk. Configuración de fuentes de corriente
 	printf("Detección y Configuración de Clk y fuentes de corriente:");
+	*tx=0x3A;
 	for (i=0;i<NUM_AFE;i++){
 		//Deshabilitada detección de CLK - Seleccionado EXCLK -Corriente 1mA
-		if(write_reg_lmp(&(lmp[i]),0x12, 0x3A,1)){
+		if(write_reg_lmp(&(lmp[i]),0x12,tx,1)){
 			printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
 		}
 	}
@@ -116,64 +126,143 @@ int main(){
 	printf("Bienvenido al test de medición de dos canales por medio de LMP90100 (Intrumentación Electrónica 201510).\n Utilice una de los siguientes comandos:\n" 
 	"\t 0\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN0-VIN1)\n"
 	"\t 1\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN2-VIN3)\n"
-	"\t q\t\t-Izquierda\n\n"
+	"\t q\t\t-Quit\n\n"
 	"En caso de comando inválido, se mostrará nuevamente este menu como ayuda al usuario\n");
 	
 
 	/*----------Mediciones iterativas----------*/
 
-	while(){
+	while(getchar()!='q'){
 		for(i=0;i<NUM_AFE;i++){
 
 			printf("Mediciónes de AFE %d.\n",i);
 			if(i<12){
 
 				//Configuración de Channel 0
-				if(write_reg_lmp(&(lmp[i]),0x1F, 0x00,1)){
+				*tx=0x00;
+				if(write_reg_lmp(&(lmp[i]),0x1F,tx,1)){
 					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
 				}
-				if(read_ADC_lmp(lmp[i],rxADC)){
-					printf("Error medición t%d.\n",i);
-				}
-				T[2*i]=rxADC*VREF/RESOLUTION;
-
-				//Configuración de Channel 0
-				if(write_reg_lmp(&(lmp[i]),0x1F, 0x09,1)){
+				//ADC_RESTART
+				*tx=0x01;
+				if(write_reg_lmp(&(lmp[i]),0x0B, tx,1)){
 					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
 				}
-				if(read_ADC_lmp(lmp[i],rxADC)){
+
+				usleep(50000);
+				//Medición
+				if(read_ADC_lmp(&lmp[i],rxADC)){
 					printf("Error medición t%d.\n",i);
 				}
-				T[2*i+1]=rxADC*VREF/RESOLUTION;
+				T[2*i]=adc_to_temp(*rxADC);
+				printf("T%d: %f\n",2*i,T[2*i]);
 
 
-				//Configuración de Channel 0
-				if(write_reg_lmp(&(lmp[i]),0x1F, 0x00,1)){
+
+				//Configuración de Channel 1
+				*tx=0x09;
+				if(write_reg_lmp(&(lmp[i]),0x1F,tx,1)){
 					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
 				}
-				if(read_ADC_lmp(lmp[i],rxADC)){
+				//ADC_RESTART
+				*tx=0x01;
+				if(write_reg_lmp(&(lmp[i]),0x0B, tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
+
+				usleep(50000);
+				//Medición
+				if(read_ADC_lmp(&lmp[i],rxADC)){
 					printf("Error medición t%d.\n",i);
 				}
-				U[i]=rxADC*VREF/RESOLUTION;
+				T[2*i+1]=adc_to_temp(*rxADC);
+				printf("T%d: %f\n",2*i+1,T[2*i+1]);
+
+
+
+				//Configuración de Channel 2
+				*tx=0x12;
+				if(write_reg_lmp(&(lmp[i]),0x1F,tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
+				//ADC_RESTART
+				*tx=0x01;
+				if(write_reg_lmp(&(lmp[i]),0x0B, tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
+
+				usleep(50000);
+				//Medición
+				if(read_ADC_lmp(&lmp[i],rxADC)){
+					printf("Error medición t%d.\n",i);
+				}
+				U[2*i]=((float)(*rxADC)*VREF)/RESOLUTION;
+				printf("U%d: %f\n",i,T[i]);
 
 			}else{
 
-				if(read_ADC_lmp(lmp[i],rxADC)){
-					printf("Error medición t%d.\n",i);
+				//Configuración de Channel 0
+				*tx=0x00;
+				if(write_reg_lmp(&(lmp[i]),0x1F,tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
 				}
-				T[2*i]=rxADC*VREF/RESOLUTION;
+				//ADC_RESTART
+				*tx=0x01;
+				if(write_reg_lmp(&(lmp[i]),0x0B, tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
 
-				if(read_ADC_lmp(lmp[i],rxADC)){
+				usleep(50000);
+				//Medición
+				if(read_ADC_lmp(&lmp[i],rxADC)){
 					printf("Error medición t%d.\n",i);
 				}
-				T[2*i+1]=rxADC*VREF/RESOLUTION;
+				T[2*i]=adc_to_temp(*rxADC);
+				printf("T%d: %f\n",2*i,T[2*i]);
 
-				if(read_ADC_lmp(lmp[i],rxADC)){
+
+
+				//Configuración de Channel 1
+				*tx=0x09;
+				if(write_reg_lmp(&(lmp[i]),0x1F,tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
+				//ADC_RESTART
+				*tx=0x01;
+				if(write_reg_lmp(&(lmp[i]),0x0B, tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
+
+				usleep(50000);
+				//Medición
+				if(read_ADC_lmp(&lmp[i],rxADC)){
 					printf("Error medición t%d.\n",i);
 				}
-				P[i-12]=rxADC*VREF/RESOLUTION;
+				T[2*i+1]=adc_to_temp(*rxADC);
+				printf("T%d: %f\n",2*i+1,T[2*i+1]);
+
+
+
+				//Configuración de Channel 2
+				*tx=0x12;
+				if(write_reg_lmp(&(lmp[i]),0x1F,tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
+				//ADC_RESTART
+				*tx=0x01;
+				if(write_reg_lmp(&(lmp[i]),0x0B, tx,1)){
+					printf("Error configurando detección de clock y fuentes de corriente de la AFE %d\n",i);
+				}
+
+				usleep(50000);
+				//Medición
+				if(read_ADC_lmp(&lmp[i],rxADC)){
+					printf("Error medición t%d.\n",i);
+				}
+				P[i-12]=((float)(*rxADC)*VREF)/RESOLUTION;
+				printf("pH%d: %f\n",i-12,P[i-12]);
 			}
 		}
 	}
-
 }
+
