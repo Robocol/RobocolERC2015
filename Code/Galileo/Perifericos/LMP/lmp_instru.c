@@ -1,17 +1,9 @@
-/*
- * afe_multi_in.c
- *
- *  Created on: 	May  2015
- *  Authors:		Daniel Ochoa
- * 					Germán Giraldo    
- */
-
 #include <stdio.h>
 #include "spi_robocol.h"
 #include "misc_robocol.h"
 
 const uint32_t 	RESOLUTION=8388608;
-const float		VREF=3.32;
+const float		VREF=5;
 const float		THRESHOLD=50;
 
 
@@ -21,10 +13,8 @@ const float		THRESHOLD=50;
 	uint8_t		lowerLimit=10;
 	
 	uint8_t 	overtemp=FALSE;
-	char		entrada='h';
 
 	float		avrTemp;
-	int32_t		raw;
 
 int main(){
 
@@ -54,20 +44,20 @@ int main(){
 
 	printf("Changing upper address\n");
 	tx[0]=0x10;
-	tx[1]=0x00; //Upper Address
+	tx[1]=0x01; //Upper Address
 	if(spi_rw(&dev,tx,rx,2)){
 		printf("Error en set de upper Address para Configuración de Background Calibration\n");
 		return 1;
 	}
 	printf("Requesting static register information\n");
-	tx[0]=0x89;
+	tx[0]=0x8F;
 	tx[1]=0x00; //Upper Address
 	if(spi_rw(&dev,tx,rx,2)){
 		printf("Error en set de upper Address para Configuración de Background Calibration\n");
 		return 1;
 	}
 
-	if(rx[1]==0x1A){
+	if(rx[1]==0x30){
 		printf("Test de Comunicación Exitoso. SPI en funcionamiento \n" );
 	}else{
 		printf("Ocurrió un error al comunicarse con la Tarjeta de Medición. Test de comunicación FALLIDO\n" );
@@ -98,9 +88,10 @@ int main(){
 	if(spi_rw(&dev,tx,rx,2)){
 		printf("Error en set de upper Address para Configuración de Background Calibration\n");
 		return 1;
+
 	}
-	tx[0]=0x8F; //
-	tx[1]=0x00;
+	tx[0]=0x8F;
+	tx[1]=0x00; //Upper Address
 	if(spi_rw(&dev,tx,rx,2)){
 		printf("Error en set de upper Address para Configuración de Background Calibration\n");
 		return 1;
@@ -138,7 +129,7 @@ int main(){
 	}
 
 	if(rx[1]==0x02){
-		printf("Done. LMP90100 Online\n" );
+		printf("Done\n" );
 	}else{
 		printf("Failed\n" );
 	}
@@ -200,9 +191,10 @@ int main(){
 	}
 
 
+//Configuración de Channel 0
 	printf("Configuración de Channel 0\n");
 	tx[0]=0x01; //Lower Address
-	tx[1]=0x30; //Gain = 1 - Buffer enabled
+	tx[1]=0x00; //Gain = 8 - Buffer enabled
 	if(spi_rw(&dev,tx,rx,2)){
 		printf("Error en transacción para Configuración de Channel 0.\n");
 		return 1;
@@ -215,111 +207,34 @@ int main(){
 		printf("Error en transacción de lectura\n");
 		return 1;
 	}
-	if(rx[1]==0x30){
+	if(rx[1]==0x06){
 		printf("Done\n" );
-
 	}else{
 		printf("Failed\n" );
-
-	};
-
-
-//Configuración de Channel 1
-	printf("Configuración de Channel 1\n");
-	tx[0]=0x02; //Lower Address
-	tx[1]=0x1C; //VINP=VIN3; VINN=VIN4;
-	if(spi_rw(&dev,tx,rx,2)){
-		printf("Error en transacción para Configuración de Channel 1.\n");
-		return 1;
-	}
-
-	//Lectura registro escrito
-	tx[0]=0x82;
-	tx[1]=0x00;
-	if(spi_rw(&dev,tx,rx,2)){
-		printf("Error en transacción de lectura\n");
-		return 1;
-	}
-	if(rx[1]==0x1C){
-		printf("Done\n" );
-
-	}else{
-		printf("Failed\n" );
-
-	};
-
-	tx[0]=0x03; //Lower Address
-	tx[1]=0x30; //Gain = 1 - Buffer enabled
-	if(spi_rw(&dev,tx,rx,2)){
-		printf("Error en transacción para Configuración de Channel 1.\n");
-		return 1;
-	}
-
-	//Lectura registro escrito
-	tx[0]=0x83;
-	tx[1]=0x00;
-	if(spi_rw(&dev,tx,rx,2)){
-		printf("Error en transacción de lectura\n");
-		return 1;
-	}
-	if(rx[1]==0x30){
-		printf("Done\n" );
-
-	}else{
-		printf("Failed\n" );
-
 	};
 
 
 	tx[0]=0x10;
-	tx[1]=0x01; //Upper Address
+	tx[1]=0x01;
 	if(spi_rw(&dev,tx,rx,2)){
-		printf("Error en transacción para Configuración de Upper Address\n");
+		printf("Error en el set de Upper Address para lectura ADC\n");
 		return 1;
 	}
 
+	printf("¿Desea iniciar el Test de Mediciones?(y/N)\n");
+	if(getchar()=='y'||getchar()=='Y'){
+	/*Test de Mediciones*/
+		printf("\n--------------------------------------------------------------------------------------\n");
+		printf("Iniciando Test de Mediciones\n\n");
 
+		printf("Por favor esperar\n");
+		sleep(1);
 
+		
+		avrTemp=0;
 
-	printf("Bienvenido al test de medición de dos canales por medio de LMP90100 (Intrumentación Electrónica 201510).\n Utilice una de los siguientes comandos:\n" 
-	"\t 0\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN0-VIN1)\n"
-	"\t 1\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN2-VIN3)\n"
-	"\t q\t\t-Izquierda\n\n"
-	"En caso de comando inválido, se mostrará nuevamente este menu como ayuda al usuario\n");
-	
-	
-	while((entrada=getchar()) != 'q'){
-		if(entrada=='0'){
-
-			printf("Configurando Medición CH0.\n");
-
-
-
-			//Configuración de Channel 0
-			tx[0]=0x0F; //Lower Address
-			tx[1]=0x00; //ScanMode1 - Single Scan CH0
-			if(spi_rw(&dev,tx,rx,2)){
-				printf("Error en transacción para Configuración de Channel 0.\n");
-				return 1;
-			}
-
-			//Lectura registro escrito
-			tx[0]=0x8F;
-			tx[1]=0x00;
-			if(spi_rw(&dev,tx,rx,2)){
-				printf("Error en transacción de lectura\n");
-				return 1;
-			}
-			if(rx[1]==0x00){
-				printf("Done\n" );
-
-			}else{
-				printf("Failed\n" );
-
-			};
-
-			printf("Espere un monento...\n");
-			sleep(3);
+		uint8_t i;
+		for(i=0;i<10;i++){
 
 			txADC[0]=0xCA;
 			txADC[1]=0x00;
@@ -329,79 +244,90 @@ int main(){
 				printf("Error en transacción para lectura de ADC\n");
 			}
 
-
-			//Checking for negatives
-			if((rxADC[1]&0x80)){
-				rxADC[0]=0xFF;
-			}else{
-				rxADC[0]=0x00;
-			}
-
+			rxADC[0]=0x00;
 			adc=((float)(array_to_i32(rxADC,4,0))*VREF)/(RESOLUTION);
-			printf("RAW: %d\t",array_to_i32(rxADC,4,0));
-			printf("ADC[Volts]: %.4f\t\n",adc);
+			temperature=(adc/0.978-0.101)/(0.0003851);
 
+			avrTemp+=temperature/10;
+			printf("Temperature[C]: %f\n",temperature);
+			//printf("ADC[Volts]: %f\n",adc);
+			sleep(1);
 
-		}else if(entrada=='1'){
+		}
 
-
-			printf("Configurando Medición CH1.\n");
-			//Configuración de Channel 1
-			tx[0]=0x0F; //Lower Address
-			tx[1]=0x09; //ScanMode1 - Single Scan CH1
-			if(spi_rw(&dev,tx,rx,2)){
-				printf("Error en transacción para Configuración de Channel 1.\n");
-				return 1;
-			}
-
-			//Lectura registro escrito
-			tx[0]=0x8F;
-			tx[1]=0x0F;
-			if(spi_rw(&dev,tx,rx,2)){
-				printf("Error en transacción de lectura\n");
-				return 1;
-			}
-			if(rx[1]==0x09){
-				printf("Done\n" );
-
-			}else{
-				printf("Failed\n" );
-
-			};
-
-			printf("Espere un monento...\n");
-
-			sleep(3);
-
-			txADC[0]=0xCA;
-			txADC[1]=0x00;
-			txADC[2]=0x00;
-			txADC[3]=0x00;
-			if(spi_rw(&dev,txADC,rxADC,3)){
-				printf("Error en transacción para lectura de ADC\n");
-				abort();
-			}
-
-			//Checking for negatives
-			if((rxADC[1]&0x80)){
-				rxADC[0]=0xFF;
-			}else{
-				rxADC[0]=0x00;
-			}
-
-			raw=array_to_i32(rxADC,4,0);
-
-			adc=((float)raw*VREF)/(RESOLUTION);
+		printf("\nTEMPERATURA: %f\n", temperature);
 	
-			printf("RAW: %d\t",raw);
-			printf("ADC[Volts]: %.4f\t\n",adc);
 
-
-		}else if(entrada!='\n') {
-		printf("Comando inválido.Por favor utilice una de los siguientes comandos:\n" 
-		"\t 0\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN0-VIN1)\n"
-		"\t 1\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN2-VIN3)\n"
-		"\t q\t\t-Izquierda\n\n");
+		if(avrTemp<upperLimit && avrTemp>lowerLimit){
+			printf("Test de Medición Exitoso. Valores de temperatura dentro de rango esperado\n" );
+		}else{
+			printf("Valores obtenidos por fuera del rango esperado. Test de medición FALLIDO\n" );
+			printf("Verifique las conexiones de la RTD y el voltaje de referencia\n");
+			printf("Abortando...\n");
+			abort();
 		}
 	}
+	/*Test de Mediciones*/
+	printf("\n--------------------------------------------------------------------------------------\n");
+	printf("DIAGNOSTICO FINALIZADO. LMP90100 ONLINE\n\n");
+
+	while(1){
+		txADC[0]=0xCA;
+		txADC[1]=0x00;
+		txADC[2]=0x00;
+		txADC[3]=0x00;
+		if(spi_rw(&dev,txADC,rxADC,3)){
+			printf("Error en transacción para lectura de ADC\n");
+		}
+
+		rxADC[0]=0x00;
+		adc=((float)(array_to_i32(rxADC,4,0))*VREF)/(RESOLUTION);
+		temperature=(adc/0.978-0.101)/(0.0003851);
+		printf("RAW: %d\t",array_to_i32(rxADC,4,0));
+		printf("ADC[Volts]: %.4f\t\n",adc);
+		
+
+		if(temperature>THRESHOLD && !overtemp){
+			
+			overtemp=TRUE;
+			gpio_gal_set(PIN7);
+
+			// tx[0]=0x10;
+			// tx[1]=0x00; //Upper Address
+			// if(spi_rw(&dev,tx,rx,2)){
+			// 	printf("Error en set de upper Address para Configuración de Background Calibration\n");
+			// 	return 1;
+
+			// }
+			// tx[0]=0x8F;
+			// tx[1]=0x7F; //Upper Address
+			// if(spi_rw(&dev,tx,rx,2)){
+			// 	printf("Error en set de upper Address para Configuración de Background Calibration\n");
+			// 	return 1;
+
+			// }
+
+			// tx[0]=0x10;
+			// tx[1]=0x01; //Upper Address
+			// if(spi_rw(&dev,tx,rx,2)){
+			// 	printf("Error en set de upper Address para Configuración de Background Calibration\n");
+			// 	return 1;
+
+			// }
+		}else if(temperature<THRESHOLD && overtemp){
+			overtemp=FALSE;
+			gpio_gal_clear(PIN7);
+		}
+
+		if(overtemp){
+			printf("SOBRETEMPERATURA\n");
+		}
+
+		if(temperature<-5 && temperature>125){
+			printf("Error en Medición: Valor Fuera de rango\n");
+			printf("Posible falla en conexión\n");
+		}
+
+	}
+	return 0;
 }

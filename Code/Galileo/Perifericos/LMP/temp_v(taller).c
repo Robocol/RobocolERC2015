@@ -1,3 +1,13 @@
+/*
+ * --------------------------------------------------------------------------------------
+ * temp_v(taller).c (0.9)
+ *
+ *  Created on: May, 2015
+ *
+ *      Authors:	Daniel Ochoa
+ *					Germán Giraldo
+ * -------------------------------------------------------------------------------------
+ */
 #include <stdio.h>
 #include "spi_robocol.h"
 #include "misc_robocol.h"
@@ -324,7 +334,7 @@ int main(){
 			printf("SOBRETEMPERATURA\n");
 		}
 
-		if(temperature<-5 && temperature>125){
+		if(temperature<-5 || temperature>125){
 			printf("Error en Medición: Valor Fuera de rango\n");
 			printf("Posible falla en conexión\n");
 		}
