@@ -29,7 +29,7 @@ ph_st ph_build(ph_dev* dev){
 	
 	spi_device* new_spi=malloc(sizeof(spi_device));
 	uint8_t addr=0b0111000;
-	uint8_t i=0;
+
 	printf("Iniciando creación de dispositivo spi para manejo de puenteH\n");
 	if(spi_create_device(new_spi,0,(*dev).pin_cs)){
 		printf("Error en la creación de dispositivo spi para manejo de puente H.(ph_robocol.c)\n");
@@ -42,10 +42,9 @@ ph_st ph_build(ph_dev* dev){
 		return PH_ERROR;
 	}
 
-	if ((i=build_expander(addr))){
+	if (build_expander(addr)){
 		printf("Error en la creación del expansor para control de puente H\n" );
 	}
-	printf("build_expander result :%d\n",i );
 
 
 	return PH_OK;

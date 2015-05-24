@@ -57,19 +57,14 @@ int main(){
 
 
 
-	printf("Bienvenido al test de medición de dos canales por medio de LMP90100 (Intrumentación Electrónica 201510).\n Utilice una de los siguientes comandos:\n" 
-	"\t 0\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN0-VIN1)\n"
-	"\t 1\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN2-VIN3)\n"
-	"\t q\t\t-Izquierda\n\n"
-	"En caso de comando inválido, se mostrará nuevamente este menu como ayuda al usuario\n");
+	printf("Bienvenido al test de medición de dos canales por medio de LMP90100 (Intrumentación Electrónica 201510)");
 	
 
 	/*----------Mediciones iterativas----------*/
 
 	while(1){
 
-		printf("Mediciónes de AFE \n");
-		*buff=0x00;
+		*buff=0x12;
 		if(write_reg_lmp(&(lmp),0x1F,buff,1)){
 			printf("Error configurando detección de clock y fuentes de corriente de la AFE \n");
 		}
@@ -77,7 +72,7 @@ int main(){
 		if(read_ADC_lmp(&lmp,rxADC)){
 			printf("Error medición de ADC.\n");
 		}
-		printf("Valor ADC Temp 1: ",*rxADC);
+		printf("Temp 1:%x \n ",*rxADC);
 
 		*buff=0x09;
 		if(write_reg_lmp(&lmp,0x1F,buff,1)){
@@ -87,6 +82,6 @@ int main(){
 			printf("Error medición de ADC .\n");
 		}
 
-		printf("Valor ADC Temp 2: ",*rxADC);
+		printf("Temp 2:%x\n ",*rxADC);
 	}
 }
