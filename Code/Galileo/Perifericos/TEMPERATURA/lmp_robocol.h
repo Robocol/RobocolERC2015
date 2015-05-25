@@ -292,8 +292,8 @@ RTD_CUR_SEL				Selects RTD current
 #define READ_ADDR  0x90
 #define FILLER_T1  0x0
 /*Transaction 2-Data Access*/
-#define WRITE 0x00
-#define READ  0x10
+#define WRITE 0
+#define READ  1
 #define FILLER_T2 0
 #define LOWADDR_SL 0b00001111
  /**Size Transaction 2*/
