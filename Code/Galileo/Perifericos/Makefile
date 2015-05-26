@@ -162,6 +162,21 @@ $(ODIR)/stepper_robocol$(LEXT): ../STEPPER/stepper_robocol.c ../STEPPER/stepper_
                       -I../SPI  \
                       -I../../MISC\
                       -I../PWM
+
+################################################################################################
+#	LMP																					   	   #
+################################################################################################
+
+$(ODIR)/lmp_robocol$(LEXT): ../TEMPERATURA/lmp_robocol.c ../TEMPERATURA/lmp_robocol.h $(ODIR)/i2c_robocol$(LEXT) \
+       																						 $(ODIR)/gpio_robocol$(LEXT)\
+       																						 $(ODIR)/spi_robocol$(LEXT) \
+       																						 $(ODIR)/misc_robocol$(LEXT)
+	$(CC) -c -o $@ $< -I../GPIO \
+                      -I../I2C  \
+                      -I../SPI  \
+                      -I../../MISC\
+                      -I../TEMPERATURA
+
 .PHONY: clean
 
 clean:

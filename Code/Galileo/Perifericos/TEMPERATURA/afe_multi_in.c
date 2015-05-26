@@ -36,7 +36,7 @@ int main(){
 	float adc,temperature;
 	spi_start("/dev/spidev1.0",100000);
 	spi_device dev;
-	spi_create_device( &dev,0,PIN9 );
+	spi_create_device( &dev,0,PIN7);
 	gpio_set_dir(PIN7,OUT);
 	gpio_gal_clear(PIN7);
 
@@ -226,27 +226,6 @@ int main(){
 
 //Configuración de Channel 1
 	printf("Configuración de Channel 1\n");
-	tx[0]=0x02; //Lower Address
-	tx[1]=0x1C; //VINP=VIN3; VINN=VIN4;
-	if(spi_rw(&dev,tx,rx,2)){
-		printf("Error en transacción para Configuración de Channel 1.\n");
-		return 1;
-	}
-
-	//Lectura registro escrito
-	tx[0]=0x82;
-	tx[1]=0x00;
-	if(spi_rw(&dev,tx,rx,2)){
-		printf("Error en transacción de lectura\n");
-		return 1;
-	}
-	if(rx[1]==0x1C){
-		printf("Done\n" );
-
-	}else{
-		printf("Failed\n" );
-
-	};
 
 	tx[0]=0x03; //Lower Address
 	tx[1]=0x30; //Gain = 1 - Buffer enabled
@@ -284,6 +263,7 @@ int main(){
 	printf("Bienvenido al test de medición de dos canales por medio de LMP90100 (Intrumentación Electrónica 201510).\n Utilice una de los siguientes comandos:\n" 
 	"\t 0\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN0-VIN1)\n"
 	"\t 1\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN2-VIN3)\n"
+	"\t 2\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN4-VIN5)\n"
 	"\t q\t\t-Izquierda\n\n"
 	"En caso de comando inválido, se mostrará nuevamente este menu como ayuda al usuario\n");
 	
@@ -318,8 +298,31 @@ int main(){
 
 			};
 
+
+			//adc_restart
+			tx[0]=0x10;
+			tx[1]=0x00; //Upper Address
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Upper Address\n");
+				return 1;
+			}
+			tx[0]=0x0B; //Lower Address
+			tx[1]=0x01; //ScanMode1 - Single Scan CH0
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Channel 0.\n");
+				return 1;
+			}
+
+			tx[0]=0x10;
+			tx[1]=0x01; //Upper Address
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Upper Address\n");
+				return 1;
+			}
+
+
 			printf("Espere un monento...\n");
-			sleep(3);
+			sleep(1);
 
 			txADC[0]=0xCA;
 			txADC[1]=0x00;
@@ -369,9 +372,106 @@ int main(){
 
 			};
 
+			//adc_restart
+			tx[0]=0x10;
+			tx[1]=0x00; //Upper Address
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Upper Address\n");
+				return 1;
+			}
+			tx[0]=0x0B; //Lower Address
+			tx[1]=0x01; //ScanMode1 - Single Scan CH0
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Channel 0.\n");
+				return 1;
+			}
+
+			tx[0]=0x10;
+			tx[1]=0x01; //Upper Address
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Upper Address\n");
+				return 1;
+			}
+
 			printf("Espere un monento...\n");
 
-			sleep(3);
+			sleep(1);
+
+			txADC[0]=0xCA;
+			txADC[1]=0x00;
+			txADC[2]=0x00;
+			txADC[3]=0x00;
+			if(spi_rw(&dev,txADC,rxADC,3)){
+				printf("Error en transacción para lectura de ADC\n");
+				abort();
+			}
+
+			//Checking for negatives
+			if((rxADC[1]&0x80)){
+				rxADC[0]=0xFF;
+			}else{
+				rxADC[0]=0x00;
+			}
+
+			raw=array_to_i32(rxADC,4,0);
+
+			adc=((float)raw*VREF)/(RESOLUTION);
+	
+			printf("RAW: %d\t",raw);
+			printf("ADC[Volts]: %.4f\t\n",adc);
+
+
+		}else if(entrada=='2'){
+
+
+			printf("Configurando Medición CH1.\n");
+			//Configuración de Channel 2
+			tx[0]=0x0F; //Lower Address
+			tx[1]=0x12; //ScanMode1 - Single Scan CH2
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Channel 1.\n");
+				return 1;
+			}
+
+			//Lectura registro escrito
+			tx[0]=0x8F;
+			tx[1]=0x0F;
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción de lectura\n");
+				return 1;
+			}
+			if(rx[1]==0x12){
+				printf("Done\n" );
+
+			}else{
+				printf("Failed\n" );
+
+			};
+
+			//adc_restart
+			tx[0]=0x10;
+			tx[1]=0x00; //Upper Address
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Upper Address\n");
+				return 1;
+			}
+			tx[0]=0x0B; //Lower Address
+			tx[1]=0x01; //ScanMode1 - Single Scan CH0
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Channel 0.\n");
+				return 1;
+			}
+
+			tx[0]=0x10;
+			tx[1]=0x01; //Upper Address
+			if(spi_rw(&dev,tx,rx,2)){
+				printf("Error en transacción para Configuración de Upper Address\n");
+				return 1;
+			}
+			
+			printf("Espere un monento...\n");
+
+			sleep(1);
 
 			txADC[0]=0xCA;
 			txADC[1]=0x00;
@@ -401,6 +501,7 @@ int main(){
 		printf("Comando inválido.Por favor utilice una de los siguientes comandos:\n" 
 		"\t 0\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN0-VIN1)\n"
 		"\t 1\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN2-VIN3)\n"
+		"\t 2\t\t-Realiza una única lectura del canal de medición 0 del AFE (VIN4-VIN5)\n"
 		"\t q\t\t-Izquierda\n\n");
 		}
 	}
