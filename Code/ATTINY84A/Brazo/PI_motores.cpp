@@ -40,13 +40,13 @@
 
 #define MEDIR_CORRIENTE 0x01
 #define MEDIR_VELOCIDAD 0x02
-#define CAMBIAR_KP_V	0x03
-#define CAMBIAR_KI_V	0x04
+#define CAMBIAR_KP_P	0x03
+#define CAMBIAR_KI_P	0x04
 #define CAMBIAR_KP_C	0x05
 #define CAMBIAR_KI_C	0x06
 #define CAMBIAR_ESTADO	0x07
 #define SP_CORRIENTE	0x08
-#define SP_VELOCIDAD	0x09
+#define SP_POSICION	0x09
 #define CAMBIAR_PWM	0x0A
 #define DAR_ESTADO	0x0B
 #define MEDIR_TEMP	0x0C
@@ -81,22 +81,28 @@ struct usidriverStatus_t {
 // Instancia de las banderas de estado
 volatile struct usidriverStatus_t spi_status; // The driver status bits.
 
+//Puntos servocontrol y retardo para ajustar el control
+uint8_t servocontrol[20]={100,100,102,103,105,109,113,118,124,130,136,142,147,151,155,157,159,160,160,160};
+uint8_t compensacion_temporal=0;
 
-// ConstantesControlador Velocidad
-float KP_V = 1.08;//Ku=2.7
-float KI_V = 0.0340;//Tu=0.00304*14
-int16_t  errorAnterior_V=0;
-float UAnterior_V=0; //Acción de control anterior (sp_corriente)
-uint8_t setPointVelocidad;
-uint8_t velAct=0; //Medición de posición para el brazo
+
+// Constantes Controlador Posición
+float KP_P = 0.2;//Ku=2.7 0.2*Ku
+float KI_P = 1;//0.0340;//Tu=0.00304*14 "2Kp/Tu
+float KD_P = 0.0266;//KpTu/3
+int16_t  errorAnterior_P=0;
+int16_t  errorAnteriorAnterior_P=0;
+float UAnterior_P=0; //Acción de control anterior (sp_corriente)
+uint8_t setPointPosicion=155;
+uint8_t PosAct=0; //Medición de posición para el brazo
 
 
 // Contantes Controlador  de Corriente
-float KP_C =0.1040;//Ku=0.26
-float KI_C =0.0067;//Tu=0.0083
+float KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+float KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
 int16_t  errorAnterior_C=0;
 float  UAnterior_C=0; //Acción de control anterior (PWM)
-uint8_t setPointCorriente=15;
+uint8_t setPointCorriente=0;
 uint8_t curAct=0;
 
 // Temperatura interna del microcontrolador
@@ -323,9 +329,9 @@ void gpio_init() {
 	DDRA&=~((1<<Sense_PIN)|(1<<INA_PIN)|(1<<VEL_PIN)|(1<<FAULT_PIN)); //Entradas
 }
 
-void control_getActualSpeed(void) {
+void control_getActualPosition(void) {
 	ADMUX=0x01;
-	velAct=adc_get();	
+	PosAct=adc_get();	
 }
 
 void control_getActualCurrent(void) {
@@ -339,35 +345,51 @@ void control_getTemp(void){
 }
 
 /*********************************************************************************************************
-** Function name: bloquePi0
-** Descriptions: ejecuta el controlador PI
-** input parameters:error Es el error actual, error1 el error anterior, y lectura ADC sensor
-** Returned value: setPointPWM
+** Function name: bloquePidPosicion
+** Descriptions: ejecuta el controlador PI de posicion
+** input parameters: error - Es el error actual de posicion
+** Returned value: setPointCorriente
 *********************************************************************************************************/
-uint8_t bloquePiVelocidad(int16_t error){
+uint8_t bloquePidPosicion(int16_t error){
 	int16_t setPointCorriente;
-	float deltaU_V,k1,k2;	
+	float deltaU_P,k1,k2,k3;	
 
-	k1 = KP_V+KI_V;
-	k2 = -KP_V;
-
-
-	deltaU_V = k1*error +k2*errorAnterior_V;
+	k1 = KP_P + KI_P + KD_P;
+	k2 = -KP_P - 2*KD_P;
+	k3 = KD_P;
 	
-	UAnterior_V= UAnterior_V+deltaU_V;
-	setPointCorriente= UAnterior_V;
+	deltaU_P = k1*error +k2*errorAnterior_P +k3*errorAnteriorAnterior_P;
 	
-	if(setPointCorriente>255){
-		setPointCorriente=255;
-		UAnterior_V=255;
+	UAnterior_P= UAnterior_P+deltaU_P;
+	setPointCorriente= UAnterior_P;
+
+
+	
+	if(setPointCorriente>60){
+		setPointCorriente=60;
+		UAnterior_P=60;
 	}	
 	else if(setPointCorriente<0){
 		setPointCorriente=0;
-		UAnterior_V=0;
+		UAnterior_P=0;
+	}
+
+	if(setPointCorriente<30){
+		KP_C =0.45;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =1.5;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+	}else if(setPointCorriente<40){
+		KP_C =0.00375;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =0.0125;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+	}else if(setPointCorriente<60){
+		KP_C =0.00075;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =0.0027;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+	}else if(setPointCorriente<100){
+		KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
 	}
 	
-	
-	errorAnterior_V=error;
+	errorAnteriorAnterior_P=errorAnterior_P;
+	errorAnterior_P=error;
 	
 	
 	
@@ -375,10 +397,11 @@ uint8_t bloquePiVelocidad(int16_t error){
 }
 
 /*********************************************************************************************************
-** Function name: bloquePi1
+** Function name: bloquePiCorriente
 ** Descriptions: ejecuta el controlador PI
-** input parameters:error Es el error actual, error1 el error anterior
+** input parameters: error - Es el error actual de corriente
 ** Returned value: cicloUtil para el PWM
+** Se demora 3.24 ms
 *********************************************************************************************************/
 uint8_t bloquePiCorriente(int16_t error){
 	int8_t cicloUtil;	
@@ -393,9 +416,9 @@ uint8_t bloquePiCorriente(int16_t error){
 	UAnterior_C=UAnterior_C+deltaU_C;
 	cicloUtil=UAnterior_C;
 	
-	if(cicloUtil>255){
-		cicloUtil=255;
-		UAnterior_C=255;
+	if(cicloUtil>127){
+		cicloUtil=127;
+		UAnterior_C=127;
 	}	
 	else if(cicloUtil<1){
 		cicloUtil=1;
@@ -419,6 +442,35 @@ void pwm_set(uint8_t PWM) {
 	OCR0B = PWM;
 }
 
+/*********************************************************************************************************
+** Function name: bloqueServoControl
+
+** Descriptions: ejecuta un servocontrol con 20 puntos utilizando el control de posición
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
+void bloqueServoControl(){
+	uint8_t n,j;
+	int16_t error_posicion,error_corriente;
+	for(n=0;n<20;n++){
+		control_getActualPosition();
+		error_posicion = servocontrol[n] - PosAct;
+		setPointCorriente=bloquePidPosicion(error_posicion);
+		
+		//Se ejecuta el control de corriente durante 90 ms (6 ciclos)
+		for(j=0;j<6;j++){
+			control_getActualCurrent();
+			error_corriente=setPointCorriente-curAct;
+			PWM=bloquePiCorriente(error_corriente);
+			pwm_set(PWM);
+			_delay_ms(12);
+		}
+	}
+	
+}
+
+
+
 
 unsigned char debug(unsigned char msg) {
 	spi_put(msg);
@@ -434,8 +486,8 @@ void control_parser(){
 			spi_put(curAct);
 			break;
 			case MEDIR_VELOCIDAD:
-			control_getActualSpeed();
-			spi_put(velAct);
+			//control_getActualPosition();
+			spi_put(PosAct);
 			break;
 			case MEDIR_TEMP:
 			control_getTemp();
@@ -447,14 +499,14 @@ void control_parser(){
 			case SP_CORRIENTE:
 			setPointCorriente=argumento;
 			break;
-			case SP_VELOCIDAD:
-			setPointVelocidad=argumento;
+			case SP_POSICION:
+			setPointPosicion=argumento;
 			break;
-			case CAMBIAR_KP_V:
-			KP_V=argumento;
+			case CAMBIAR_KP_P:
+			KP_P=argumento;
 			break;
-			case CAMBIAR_KI_V:
-			KI_V=argumento;
+			case CAMBIAR_KI_P:
+			KI_P=argumento;
 			break;
 			case CAMBIAR_KP_C:
 			KP_C=argumento;
@@ -474,7 +526,9 @@ void control_parser(){
 }
 
 int main(void) {
-	int16_t error=0;
+	int16_t error_posicion=0;
+	int16_t error_corriente=0;
+	uint8_t i;
 	gpio_init();
 	adc_init();
 	pwm_init();
@@ -486,10 +540,16 @@ int main(void) {
 		control_parser();
 		switch (ESTADO) {
 		case AUTO_EST:
-			control_getActualCurrent();
-			error=setPointCorriente-curAct;
-			PWM=bloquePiCorriente(error);
-			pwm_set(PWM);
+			control_getActualPosition();
+			error_posicion=setPointPosicion-PosAct;
+			setPointCorriente=bloquePidPosicion(error_posicion);
+			for(i=0;i<6;i++){			
+				control_getActualCurrent();
+				error_corriente=setPointCorriente-curAct;
+				PWM=bloquePiCorriente(error_corriente);
+				pwm_set(PWM);
+				_delay_ms(12);
+			}
 			break;
 		case MANUAL_EST:
 			gpio_put(LED_PIN,1);
@@ -498,7 +558,7 @@ int main(void) {
 		case FAIL_EST:
 			pwm_set(0);
 			errorAnterior_C=0;
-			errorAnterior_V=0;
+			errorAnterior_P=0;
 			spi_put(ERROR_tiny);
 			storedUSIDR=0x00;
 			break;
