@@ -56,7 +56,7 @@ stp_st stp_build(stp_device* dev){
 	}
 
 	if(gpio_set_dir((*dev).pin_dir,OUT)){
-		printf("Error asignando dirección de salida a pin %s\n", (*dev).pin_cs);
+		printf("Error asignando dirección de salida a pin %s\n", (*dev).pin_dir);
 		return STP_ERROR;
 	}
 
@@ -145,7 +145,7 @@ stp_st stp_getParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 	uint8_t tx=param;
 	uint8_t rx=0;
 	if(param!=STATUS){
-		tx=param|(0x01<<5);
+		tx|=(0x01<<5);
 	}
 
 	if(spi_rw((*dev).spi, &tx, &rx,1)){
@@ -155,6 +155,7 @@ stp_st stp_getParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 	int i;
 	printf("PARAM:\t%d\n",param);
 	printf("TX:\t%d\n",tx );
+	tx=0x00;
 	for(i=0;i<len;i++){
 		if(spi_rw((*dev).spi, &tx, &rx,1)){
 			printf("Error en SPI\n");
@@ -189,14 +190,19 @@ stp_st stp_getParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 /* ===================================================================*/
 stp_st stp_getPosition(stp_device* dev, int32_t* pos){
 
-	uint8_t buff[2];
+	uint8_t buff[4]={0,0,0,0};
 
 	if(stp_getParam(dev,ABS_POS,buff,3)){
 		printf("Error obteniendo posición\n");
 		return STP_ERROR;
 	}
 
-	*pos = array_to_i32(buff,3);
+	printf("Pos RAW: %.2X%.2X%.2X%.2X\n",buff[0],buff[1],buff[2],buff[3] );
+	if(buff[2]&0x20){
+		buff[2]|=0xC0;
+		buff[3]|=0xFF;
+	}
+	*pos = array_to_i32(buff,4, TRUE);
 
 	return STP_OK;
 }
@@ -498,7 +504,7 @@ stp_st stp_getConfig(stp_device* dev, int32_t* osc_sel){
 		return STP_ERROR;
 	}
 
-	*osc_sel=array_to_i32(buff);
+	*osc_sel=array_to_i32(buff,2,TRUE);
 
 	return STP_OK;
 }
@@ -530,7 +536,7 @@ stp_st stp_getStatus(stp_device* dev, int32_t* stats){
 		return STP_ERROR;
 	}
 
-	*stats=array_to_i32(buff);
+	*stats=array_to_i32(buff,2,TRUE);
 
 	return STP_OK;
 }
@@ -827,10 +833,6 @@ stp_st stp_clk_enable(stp_device* dev){
 
 	printf("Realización de clk Enable de stepper exitosa. (stepper_robocol.c>stp_clk_enable)\n");
 	
-
-
-
-
 	return STP_OK;
 }
 
@@ -1011,17 +1013,16 @@ stp_st stp_output_disable(stp_device* dev){
 /* ===================================================================*/
 stp_st stp_master_disable(stp_device* dev){
 	
+	if(stp_output_disable(dev)){
+		return STP_ERROR;
+	}
+	if(stp_clk_disable(dev)){
+		return STP_ERROR;
+	}
 	if(stp_driver_disable(dev)){
 		return STP_ERROR;
 	}
 
-	if(stp_clk_disable(dev)){
-		return STP_ERROR;
-	}
-
-	if(stp_output_disable(dev)){
-		return STP_ERROR;
-	}
 }
 
 /*

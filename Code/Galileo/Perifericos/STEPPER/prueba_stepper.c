@@ -4,7 +4,7 @@
 int main(){
 size_t size=40;
 char* line=malloc(size);
-uint32_t position,status,config=0;
+int32_t position,status,config=0;
 uint8_t step,ocd,tval;
 uint8_t alarm,corr,debug;
 stp_device* devptr;
@@ -97,7 +97,7 @@ while(1){
 
 		}else if(!strcmp(line,"getpos\n")){
 			stp_getPosition(devptr,&position);
-			printf("Posición: %X \n",position);
+			printf("Posición: %d \n",position);
 
 		}else if(!strcmp(line,"getocdt\n")){
 			stp_getOCDT(devptr,&ocd);
