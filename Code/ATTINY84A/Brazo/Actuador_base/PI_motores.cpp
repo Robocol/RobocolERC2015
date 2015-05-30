@@ -571,10 +571,8 @@ void control_parser(){
 			spi_put(PosAct);
 			break;
 			case MEDIR_TEMP:
-			error=errorAnterior_P;
-//			control_getTemp();
-//			spi_put(tempAct);
-			spi_put(error);
+			control_getTemp();
+			spi_put(tempAct);
 			break;
 			case DAR_ESTADO:
 			spi_put(ESTADO);
