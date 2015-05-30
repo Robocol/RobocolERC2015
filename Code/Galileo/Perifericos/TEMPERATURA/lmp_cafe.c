@@ -26,8 +26,8 @@ char nombref[13];
 FILE *fdl;
 
 int32_t		raw;
-double		init;
-double		elapsed;
+float		init;
+float	elapsed;
 
 struct tms *ts;
 
@@ -38,7 +38,7 @@ struct tms *ts;
 
 //Temperatura
 //float TA0[,TA1,TA2,TA3,TB0,TB1,TB2,TB3,TC0,TC1,TC2,TC3,TD0,TD1,TD2,TD3,TE0,TE1,TE2,TE3,TF0,TF1,TF2,TF3,TG0,TG1,TG2,TG3];
-double T[28];
+float T[28];
 
 
 //Turbidez
@@ -54,7 +54,7 @@ spi_device lmp[14];
 
 
 double adc_to_temp(int32_t raw){
-	float volts; 
+	double volts; 
 	volts=(((double)raw)*VREF)/(RESOLUTION);
 	return -25.64815*log(volts) + 25.2765;
 }
@@ -299,7 +299,7 @@ int main(){
 
 
 			printf("Espere un monento...\n");
-			usleep(50000);
+			usleep(500000);
 
 			txADC[0]=0xCA;
 			txADC[1]=0x00;
@@ -317,9 +317,10 @@ int main(){
 				rxADC[0]=0x00;
 			}
 
-			T[2*i]=adc_to_temp(*rxADC);
+			
 			printf("T%d: %f\n",2*i,T[2*i]);
 			adc=((float)(array_to_i32(rxADC,4,0))*VREF)/(RESOLUTION);
+			T[2*i]=adc;
 			printf("RAW: %d\t",array_to_i32(rxADC,4,0));
 			printf("ADC[Volts]: %.4f\t\n",adc);
 
@@ -359,7 +360,7 @@ int main(){
 
 			printf("Espere un monento...\n");
 
-			usleep(50000);
+			usleep(500000);
 
 			txADC[0]=0xCA;
 			txADC[1]=0x00;
@@ -380,7 +381,7 @@ int main(){
 			raw=array_to_i32(rxADC,4,0);
 
 			adc=((float)raw*VREF)/(RESOLUTION);
-			T[2*i+1]=adc_to_temp(*rxADC);
+			T[2*i+1]=adc;
 			printf("T%d: %f\n",2*i+1,T[2*i+1]);
 			printf("RAW: %d\t",raw);
 			printf("ADC[Volts]: %.4f\t\n",adc);
@@ -421,7 +422,7 @@ int main(){
 			
 			printf("Espere un monento...\n");
 
-			usleep(50000);
+			usleep(500000);
 
 			txADC[0]=0xCA;
 			txADC[1]=0x00;
@@ -442,8 +443,8 @@ int main(){
 			raw=array_to_i32(rxADC,4,0);
 
 			adc=((float)raw*VREF)/(RESOLUTION);
-			U[i]=adc_to_temp(*rxADC);
-			printf("U%d: %f\n",i,T[i]);
+			U[i]=adc;
+			printf("U%d: %f\n",i,U[i]);
 			printf("RAW: %d\t",raw);
 			printf("ADC[Volts]: %.4f\t\n",adc);
 

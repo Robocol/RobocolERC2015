@@ -147,13 +147,14 @@ pwm_st pwm_set_period(uint8_t pwm_n, uint32_t period){
 	uint8_t duty_len;
 	uint8_t period_len;
 	int8_t pwm;
+	uint32_t per=period*1000;
 	if(pwm_n>7 || pwm_n==2 || pwm_n<1 ){
 		printf("El número de pwm ingresado no es valido.\nRealice revisión de documentación de Galileo Gen 1 para observar los valores válidos\n");
 		return PWM_ERROR;
 	}
 	str_pwm=u8toa(pwm_n);
-	if(period<100000 || period>7999999){
-		printf("El número de periodo ingresado no es valido.\nIngrese un valor entre 100000 y 799999\n");
+	if(period<100 || per>7999){
+		printf("El número de periodo ingresado no es valido.\nIngrese un valor entre 100 y 7999\n");
 		return PWM_ERROR;
 	}
 
@@ -172,8 +173,8 @@ pwm_st pwm_set_period(uint8_t pwm_n, uint32_t period){
 	duty_len=getu32_len(duty_ns);
 
 	sprintf(routep,"/sys/class/pwm/pwmchip0/pwm%d/period",pwm_n);
-	str_period=u32toa(period);
-	period_len=getu32_len(period);
+	str_period=u32toa(per);
+	period_len=getu32_len(per);
 
 	pwm_export(str_pwm);
 	if (period>periods[pwm]){

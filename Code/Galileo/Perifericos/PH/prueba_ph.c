@@ -2,7 +2,6 @@
 #include "ph_robocol.h"
 
 int main(){
-const uint8_t STEP_SIZE=10;
 size_t size=40;
 char* line=malloc(size);
 uint8_t temp, vel,corr,est,debug;
@@ -67,13 +66,13 @@ printf("Test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n Utilice una de 
 		"\t pwm\t\t-Cambia ciclo útil del PWM. Valor de entrada entre 0 y 255\n"
 		"\t dir\t-Cambia la dirección de giro del motor. Valor de entrada 1 o 0\n"
 		"\t setvel\t-Cambia la velocidad objetivo del controlador. Valor de entrada entre ------\n"
-		"\t setstate\t \t-Cambia el estado de operación del puente H. VAlor de entrada entre 16 o 32 TODO: Parser\n"
+		"\t setstate\t \t-Cambia el estado de operación del puente H. Valor de entrada entre 16 o 32 TODO: Parser\n"
 		"\t kic\t\t-Cambia el valor de KIC. Valor de entrada entre 0 y 255\n"
 		"\t kpc\t\t-Cambia el valor de KPC. Valor de entrada entre 0 y 255\n"
 		"\t kiv\t\t-Cambia el valor de KIV. Valor de entrada entre 0 y 255\n"
 		"\t kpv\t\t-Cambia el valor de KPV. Valor de entrada entre 0 y 255\n"
 		"\t sp_vel\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
-		"\t sp_cor\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
+		"\t sp_cor\t\t\t-Cambia el valor de SP_CORRIENTE. Valor de entrada entre 0 y 255\n"
 		"\t motor\t\t\t-Cambia el motor. Valor de entrada 1 o 2\n"
 		"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
 
@@ -85,19 +84,19 @@ while(1){
 
 		//Mediciones
 		if(!strcmp(line,"gettemp\n")){
-			getTemperatura(devptr,&temp);
+			ph_getTemperatura(devptr,&temp);
 			printf("Temperatura: %d \n",temp);
 
 		}else if(!strcmp(line,"getvel\n")){
-			getVelocidad(devptr,&vel);
+			ph_getVelocidad(devptr,&vel);
 			printf("Velocidad: %d \n",vel);
 
 		}else if(!strcmp(line,"getcorr\n")){
-			getCorriente(devptr,&corr);
+			ph_getCorriente(devptr,&corr);
 			printf("Corriente: %d \n",corr);
 
 		}else if(!strcmp(line,"getstate\n")){
-			getEstado(devptr,&est);
+			ph_getEstado(devptr,&est);
 			printf("Estado: %d \n",est);
 		
 		//Setters
@@ -105,7 +104,7 @@ while(1){
 			printf("Ingrese el PWM deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
-			if(setPWMSmooth(devptr, (uint8_t)buf, (uint8_t)STEP_SIZE)){
+			if(ph_setPWM(devptr,(uint8_t)buf)){
 				printf("Error en set de pwm\n");
 			}
 
@@ -163,14 +162,14 @@ while(1){
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando SP_VELOCIDAD a: %d \n",buf);
-			ph_setKIC(devptr,buf);
+			ph_setVel(devptr,buf);
 
 		}else  if(!strcmp(line,"sp_cor\n")){
 			printf("Ingrese el SP_CORRIENTE deseado:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando SP_CORRIENTE a: %d \n",buf);
-			ph_setKIC(devptr,buf);
+			ph_setCorriente(devptr,buf);
 
 		}else  if(!strcmp(line,"enable\n")){
 			printf("Ingrese 1 para activar, 0 para desactivar:\n");
