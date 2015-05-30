@@ -287,21 +287,25 @@ unsigned char spi_get() {
 	return storedUSIDR;
 }
 
-/************************************************************************/
-/* Espera una transferencia completa
- Este metodo se asegura que la ejecucion del programa este ocupada hasta
- que ocurra la interrupcion de transferencia completa
- */
-/************************************************************************/
+/*********************************************************************************************************
+** Function name: spi_wait
+** Descriptions: Espera a que la transmisión por SPI esté completa, evitando que se acceda al registro del
+** puerto cuando una transmisión está en proceso.
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 void spi_wait() {
 	do {
 	} while (spi_status.transferComplete == 0);
 }
 
-/************************************************************************/
-/* Configura ADC.
- */
-/************************************************************************/
+/*********************************************************************************************************
+** Function name: adc_init
+** Descriptions: Inicializa el ADC: Canal, tiempo de carga del condensador de S&H, Alineación de la 
+** respuesta
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 void adc_init() {
 	//PA0
 	PRR&=~(1<<PRADC);
@@ -309,6 +313,13 @@ void adc_init() {
 	ADCSRB=0x10;//Configura la lectura de ADC alineada a la izquierda (8bits de precision)
 }
 
+/*********************************************************************************************************
+** Function name: gpio_init
+** Descriptions: Inicializa los pines a utilizar en la operación del uC. El LED que indica el estado es
+** una salida, los pines de ADC, Falla e INA (Dirección) son entradas
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 unsigned char adc_get() {
 	unsigned char lectura=0;
 	ADCSRA|=(1<<ADSC);
@@ -319,26 +330,52 @@ unsigned char adc_get() {
 	return lectura;
 }
 
-/************************************************************************/
-/* Configura los pines GPIO
- //TODO*/
-/************************************************************************/
+/*********************************************************************************************************
+** Function name: gpio_init
+** Descriptions: Inicializa los pines a utilizar en la operación del uC. El LED que indica el estado es
+** una salida, los pines de ADC, Falla e INA (Dirección) son entradas
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 void gpio_init() {
-
 	DDRA|=(1<<LED_PIN); //Salidas
-	DDRA&=~((1<<Sense_PIN)|(1<<INA_PIN)|(1<<VEL_PIN)|(1<<FAULT_PIN)); //Entradas
+	DDRA&=~(1<<DDA2);
+	DDRA&=~(1<<Sense_PIN);
+	DDRA&=~(1<<VEL_PIN);
+	DDRA&=~(1<<FAULT_PIN);
+	
+//	DDRA&=~((1<<Sense_PIN)|(1<<INA_PIN)|(1<<VEL_PIN)|(1<<FAULT_PIN)); //Entradas
 }
 
+/*********************************************************************************************************
+** Function name: control_getActualPosition
+** Descriptions: Actualiza la variable global PosAct que contiene la posición del actuador
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 void control_getActualPosition(void) {
 	ADMUX=0x01;
 	PosAct=adc_get();	
 }
 
+/*********************************************************************************************************
+** Function name: control_getActualCurrent
+** Descriptions: Actualiza la variable global curAct que contiene la corriente consumida por el actuador
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 void control_getActualCurrent(void) {
 	ADMUX=0;
 	curAct=adc_get();
 }
 
+/*********************************************************************************************************
+** Function name: gpio_init
+** Descriptions: Inicializa los pines a utilizar en la operación del uC. El LED que indica el estado es
+** una salida, los pines de ADC, Falla e INA (Dirección) son entradas
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 void control_getTemp(void){
 	ADMUX=0b00100010;
 	tempAct= adc_get();
@@ -346,48 +383,78 @@ void control_getTemp(void){
 
 /*********************************************************************************************************
 ** Function name: bloquePidPosicion
-** Descriptions: ejecuta el controlador PI de posicion
+** Descriptions: ejecuta un controlador PID de posicion, las ganancias y algunos errores son variables 
+** globales
 ** input parameters: error - Es el error actual de posicion
+**		     direccion - Es la direccion del actuador
 ** Returned value: setPointCorriente
 *********************************************************************************************************/
-uint8_t bloquePidPosicion(int16_t error){
+uint8_t bloquePidPosicion(int16_t error, char direccion){
 	int16_t setPointCorriente;
-	float deltaU_P,k1,k2,k3;	
+	float deltaU_P,k1,k2,k3;
 
+	if(direccion==1){
+		KP_P = 0.2;//Ku=2.7 0.2*Ku
+		KI_P = 1;//0.0340;//Tu=0.00304*14 "2Kp/Tu
+		KD_P = 0.0266;//KpTu/3	
+	}else{
+		KP_P = 0.2;//Ku=2.7 0.2*Ku
+		KI_P = 0.01;//0.0340;//Tu=0.00304*14 "2Kp/Tu
+		KD_P = 0.0266;//KpTu/3	
+	}	
+	//Cálculo de constantes para utilizar la fórmula de Euler
 	k1 = KP_P + KI_P + KD_P;
 	k2 = -KP_P - 2*KD_P;
 	k3 = KD_P;
 	
+	//Cálculo de la variación en la acción de control
 	deltaU_P = k1*error +k2*errorAnterior_P +k3*errorAnteriorAnterior_P;
 	
+	//Cálculo de la nueva acción de control
 	UAnterior_P= UAnterior_P+deltaU_P;
 	setPointCorriente= UAnterior_P;
 
+	if(direccion==1){
+		//Límites para la subida sin carga
+		if(setPointCorriente>60){
+			setPointCorriente=60;
+			UAnterior_P=60;
+		}
 
+		//Cálculo de las ganancias adaptativas
+		if(setPointCorriente<30){
+			KP_C =0.45;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+			KI_C =1.5;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+		}else if(setPointCorriente<40){
+			KP_C =0.00375;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+			KI_C =0.0125;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+		}else if(setPointCorriente<60){
+			KP_C =0.00075;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+			KI_C =0.0027;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+		}else if(setPointCorriente<100){
+			KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+			KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+		}
 	
-	if(setPointCorriente>60){
-		setPointCorriente=60;
-		UAnterior_P=60;
-	}	
-	else if(setPointCorriente<0){
+	}else{
+		//Límites para la bajada sin carga
+		if(setPointCorriente>20){
+			setPointCorriente=20;
+			UAnterior_P=20;
+		}
+
+		KP_C =0.00375;
+		KI_C =0.0125;
+
+	}
+	 
+	//Límite inferior del setpoint
+	if(setPointCorriente<0){
 		setPointCorriente=0;
 		UAnterior_P=0;
 	}
 
-	if(setPointCorriente<30){
-		KP_C =0.45;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-		KI_C =1.5;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-	}else if(setPointCorriente<40){
-		KP_C =0.00375;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-		KI_C =0.0125;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-	}else if(setPointCorriente<60){
-		KP_C =0.00075;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-		KI_C =0.0027;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-	}else if(setPointCorriente<100){
-		KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-		KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-	}
-	
+	//Almacenamiento de datos del error para la siguiente iteración del control
 	errorAnteriorAnterior_P=errorAnterior_P;
 	errorAnterior_P=error;
 	
@@ -406,16 +473,19 @@ uint8_t bloquePidPosicion(int16_t error){
 uint8_t bloquePiCorriente(int16_t error){
 	int8_t cicloUtil;	
 	float k1,k2,deltaU_C;	
-		
+	
+	//Cálculo de constantes para utilizar la fórmula de Euler	
 	k1 = KP_C+KI_C; 
 	k2 = -KP_C;
-	
+
+	//Cálculo de la variación en la acción de control	
 	deltaU_C = k1*error +k2*errorAnterior_C;
 	
-	
+	//Cálculo de la nueva acción de control
 	UAnterior_C=UAnterior_C+deltaU_C;
 	cicloUtil=UAnterior_C;
 	
+	//Límites de la acción de control considerando el Voltaje del actuador
 	if(cicloUtil>127){
 		cicloUtil=127;
 		UAnterior_C=127;
@@ -425,37 +495,36 @@ uint8_t bloquePiCorriente(int16_t error){
 		UAnterior_C=1;
 	}	
 	
+	//Almacenamiento de datos del error para la siguiente iteración del control
 	errorAnterior_C=error;
 	
 	
 	return cicloUtil;
 }
 
-//!-------------------------------------------------------------------------------
-//!	@brief Modifica el ciclo util del PWM
-//!
-//!	@param Ciclo util en escala de 0 - 255
-//!
-//!	@return nothing
-//!-------------------------------------------------------------------------------
+/*********************************************************************************************************
+** Function name: pwm_set
+** Descriptions: Cambia el ciclo útil del PWM que se genera por OCR0B
+** input parameters: PWM deseado (0-255)
+** Returned value: NA
+*********************************************************************************************************/
 void pwm_set(uint8_t PWM) {
 	OCR0B = PWM;
 }
 
 /*********************************************************************************************************
 ** Function name: bloqueServoControl
-
 ** Descriptions: ejecuta un servocontrol con 20 puntos utilizando el control de posición
 ** input parameters: NA
 ** Returned value: NA
 *********************************************************************************************************/
-void bloqueServoControl(){
+void bloqueServoControl(char direccion){
 	uint8_t n,j;
 	int16_t error_posicion,error_corriente;
 	for(n=0;n<20;n++){
 		control_getActualPosition();
 		error_posicion = servocontrol[n] - PosAct;
-		setPointCorriente=bloquePidPosicion(error_posicion);
+		setPointCorriente=bloquePidPosicion(error_posicion,direccion);
 		
 		//Se ejecuta el control de corriente durante 90 ms (6 ciclos)
 		for(j=0;j<6;j++){
@@ -471,14 +540,26 @@ void bloqueServoControl(){
 
 
 
-
+/*********************************************************************************************************
+** Function name: debug
+** Descriptions: Prueba la comunicación por SPI esperando un eco cuando envía un mensaje al maestro
+** input parameters: Mensaje de 1 byte a enviar
+** Returned value: Mensaje recibido por SPI
+*********************************************************************************************************/
 unsigned char debug(unsigned char msg) {
 	spi_put(msg);
 	spi_wait();
 	return spi_get();
 }
 
+/*********************************************************************************************************
+** Function name: control_parser
+** Descriptions: Determina la acción que se debe tomar dependiendo de la orden que recibió el uC por SPI
+** input parameters: NA
+** Returned value: NA
+*********************************************************************************************************/
 void control_parser(){
+	int8_t error;
 	if(parsear){
 		switch (encabezado){
 			case MEDIR_CORRIENTE:
@@ -490,8 +571,10 @@ void control_parser(){
 			spi_put(PosAct);
 			break;
 			case MEDIR_TEMP:
-			control_getTemp();
-			spi_put(tempAct);
+			error=errorAnterior_P;
+//			control_getTemp();
+//			spi_put(tempAct);
+			spi_put(error);
 			break;
 			case DAR_ESTADO:
 			spi_put(ESTADO);
@@ -529,30 +612,56 @@ int main(void) {
 	int16_t error_posicion=0;
 	int16_t error_corriente=0;
 	uint8_t i;
+	char direccion=0x00;
 	gpio_init();
 	adc_init();
 	pwm_init();
 	spi_initslave(0);
 	pwm_set(0);
 	ESTADO=MANUAL_EST;
+
 	sei();
 	while (1) {
 		control_parser();
 		switch (ESTADO) {
 		case AUTO_EST:
 			control_getActualPosition();
-			error_posicion=setPointPosicion-PosAct;
-			setPointCorriente=bloquePidPosicion(error_posicion);
-			for(i=0;i<6;i++){			
-				control_getActualCurrent();
-				error_corriente=setPointCorriente-curAct;
-				PWM=bloquePiCorriente(error_corriente);
-				pwm_set(PWM);
-				_delay_ms(12);
+			if((0x04 & PINA)==0){//El actuador baja: ON/OFF en cascada con corriente (lazo interno)
+				gpio_put(LED_PIN,0);
+				direccion=0;
+				error_posicion=PosAct-setPointPosicion;
+				setPointCorriente=20;
+				KP_C =0.00375;
+				KI_C =0.0125;
+
+				if (error_posicion>2){
+					for(i=0;i<6;i++){			
+						control_getActualCurrent();
+						error_corriente=setPointCorriente-curAct;
+						PWM=bloquePiCorriente(error_corriente);
+						pwm_set(PWM);
+						_delay_ms(12);
+					}
+				}else{
+					pwm_set(0);
+				}
+			}else{//El actuador sube: PID en cascada con corriente (lazo interno)
+				gpio_put(LED_PIN,1);	
+				direccion=1;
+				error_posicion=setPointPosicion-PosAct;		
+				setPointCorriente=bloquePidPosicion(error_posicion,direccion);
+				for(i=0;i<6;i++){			
+					control_getActualCurrent();
+					error_corriente=setPointCorriente-curAct;
+					PWM=bloquePiCorriente(error_corriente);
+					pwm_set(PWM);
+					_delay_ms(12);
+				}	
 			}
+			
+
 			break;
 		case MANUAL_EST:
-			gpio_put(LED_PIN,1);
 			pwm_set(PWM);
 			break;
 		case FAIL_EST:
