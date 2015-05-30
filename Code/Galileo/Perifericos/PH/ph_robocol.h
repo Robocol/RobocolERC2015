@@ -81,7 +81,7 @@
 /*
  *                  	DEFINICIÓN DE TYPES
  */
-typedef int ph_st;
+typedef uint8_t ph_st;
 
 typedef struct{
 	uint8_t pin_cs;		//
@@ -112,6 +112,7 @@ typedef struct{
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
+ph_st ph_build(ph_dev* dev);
 ph_st ph_enable(ph_dev* dev);
 ph_st ph_disable(ph_dev* dev);
 
