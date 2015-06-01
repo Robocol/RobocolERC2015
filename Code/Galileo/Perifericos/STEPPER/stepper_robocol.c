@@ -1103,13 +1103,13 @@ stp_st stp_period(stp_device* dev, uint32_t period){
 /* ===================================================================*/
 stp_st stp_dir(stp_device* dev, uint32_t dir){
 	if(dir==CLOCKWISE){
-		if(gpio_gal_set((*dev).pin_dir)){
+		if(gpio_gal_clear((*dev).pin_dir)){
 			printf("Error cambiando dirección CLOCK_WISE\n");
 			return STP_ERROR;
 		}
 		return STP_OK;
 	}else if(dir==COUNTERCLOCKWISE){
-			if(gpio_gal_clear((*dev).pin_dir)){
+			if(gpio_gal_set((*dev).pin_dir)){
 			printf("Error cambiando direccion a COUNTER_CLOCK_WISE\n");
 			return STP_ERROR;
 		}
@@ -1138,10 +1138,36 @@ stp_st stp_dir(stp_device* dev, uint32_t dir){
 **							son: CLOCKWISE o COUNTERCLOCKWISE
 */
 /* ===================================================================*/
+// stp_st stp_relative_displacement(stp_device* dev, uint32_t degrees, int32_t dir){
+// 	int32_t 	init_pos,curr_pos;
+// 	int32_t	rel_pos=0;
+// 	uint8_t step=((*dev).step>4)? 4 : (*dev).step; 
+// 	uint32_t	goal_pos=(int)(degrees*pow(2,step)*((*dev).gear_ratio)/1.8);
+
+// 	printf("Goal Pos: %d\n",goal_pos);
+// 	stp_dir(dev,dir);
+
+// 	if(stp_getPosition(dev,&init_pos)){
+// 		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+// 	}
+// 	stp_output_enable(dev);
+// 	stp_clk_enable(dev);
+
+// 	while(rel_pos<goal_pos){
+// 		if(stp_getPosition(dev,&curr_pos)){
+// 			printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+// 		}
+// 		rel_pos=abs(init_pos-curr_pos);
+// 		//printf("Relative Position: %d\n",rel_pos );
+// 	}
+// 	stp_clk_disable(dev);
+// 	stp_output_disable(dev);
+// }
+
 stp_st stp_relative_displacement(stp_device* dev, uint32_t degrees, int32_t dir){
 	int32_t 	init_pos,curr_pos;
-	int32_t	rel_pos=0;
-	uint8_t step=((*dev).step>4)? 4 : (*dev).step; 
+	int32_t		rel_pos=0,t;
+	uint8_t 	step=((*dev).step>4)? 4 : (*dev).step; 
 	uint32_t	goal_pos=(int)(degrees*pow(2,step)*((*dev).gear_ratio)/1.8);
 
 	printf("Goal Pos: %d\n",goal_pos);
@@ -1151,15 +1177,56 @@ stp_st stp_relative_displacement(stp_device* dev, uint32_t degrees, int32_t dir)
 		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
 	}
 
+	t=goal_pos*(*dev).period;
+
 	stp_output_enable(dev);
+	stp_clk_enable(dev);
 
-	while(rel_pos<goal_pos){
-		if(stp_getPosition(dev,&curr_pos)){
-			printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
-		}
-		rel_pos=abs(init_pos-curr_pos);
-		//printf("Relative Position: %d\n",rel_pos );
-	}
+	usleep(t);
 
+	stp_clk_disable(dev);
 	stp_output_disable(dev);
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_relative_displacement
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posicipon actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          degrees     	- Grados hexadecimales de giro
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+stp_st stp_return_to_cero(stp_device* dev){
+	int32_t 	init_pos,curr_degrees;
+	int32_t		rel_pos=0;
+	uint8_t 	step=((*dev).step>4)? 4 : (*dev).step; 
+
+	if(stp_getPosition(dev,&init_pos)){
+		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+	}
+	curr_degrees=(int)((init_pos*(1.8))/(pow(2,step)));
+	printf("curr_degrees: %d\n",curr_degrees);
+
+	if(curr_degrees>0){
+		if(stp_relative_displacement(dev,abs(curr_degrees),CLOCKWISE)){
+			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+		}
+	}else{
+		if(stp_relative_displacement(dev,abs(curr_degrees),COUNTERCLOCKWISE)){
+			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+		}
+	}
 }

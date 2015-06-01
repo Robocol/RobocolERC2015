@@ -28,7 +28,7 @@ dev1.exp_n=2;
 dev1.pin_pwm=3;
 dev1.gear_ratio=1;
 dev1.step=7;
-dev1.period=7900;
+dev1.period=5000;
 
 printf("Pin del stepper_device para chip select de Spi: %d\n",dev1.pin_cs);
 if(stp_build(&dev1)){
@@ -227,6 +227,9 @@ while(1){
 			printf("Deshabilitando stepper:\n");
 			stp_master_disable(devptr);
 	
+		}else if(!strcmp(line,"cero\n")){
+			printf("Volviendo a casa:\n");
+			stp_return_to_cero(devptr);
 		}else{
 		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t master-enable\t\t\t-Habilita el stepper\n"

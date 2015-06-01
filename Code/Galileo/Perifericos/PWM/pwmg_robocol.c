@@ -153,7 +153,7 @@ pwm_st pwm_set_period(uint8_t pwm_n, uint32_t period){
 		return PWM_ERROR;
 	}
 	str_pwm=u8toa(pwm_n);
-	if(period<100 || per>7999){
+	if(period<100 || period>7999){
 		printf("El número de periodo ingresado no es valido.\nIngrese un valor entre 100 y 7999\n");
 		return PWM_ERROR;
 	}
@@ -168,7 +168,7 @@ pwm_st pwm_set_period(uint8_t pwm_n, uint32_t period){
 	}
 
 	sprintf(routed,"/sys/class/pwm/pwmchip0/pwm%d/duty_cycle",pwm_n);
-	duty_ns=(uint32_t)(period*duties[pwm]/100);
+	duty_ns=(uint32_t)(per*duties[pwm]/100);
 	str_duty=u32toa(duty_ns);
 	duty_len=getu32_len(duty_ns);
 
@@ -177,7 +177,7 @@ pwm_st pwm_set_period(uint8_t pwm_n, uint32_t period){
 	period_len=getu32_len(per);
 
 	pwm_export(str_pwm);
-	if (period>periods[pwm]){
+	if (per>periods[pwm]){
 		if(g_write_file(routep,str_period,period_len)!=0){
 			printf("Error en la escritura del periodo\n");
 			pwm_unexport(str_pwm);
@@ -204,7 +204,7 @@ pwm_st pwm_set_period(uint8_t pwm_n, uint32_t period){
 		}
 	}
 
-	periods[pwm]=period;
+	periods[pwm]=per;
 	free(str_period);
 	free(routed);
 	free(routep);
