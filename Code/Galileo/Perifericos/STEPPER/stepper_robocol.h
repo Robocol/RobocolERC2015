@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <math.h>
 #include <linux/types.h>
 #include "gpio_robocol.h"
 #include "spi_robocol.h"
@@ -107,6 +108,8 @@ typedef struct stp_device{
 	uint8_t pin_pwm;
 	uint8_t exp_n;
 	uint32_t period;
+	uint8_t	step;
+	uint8_t gear_ratio;
 	spi_device* spi;
 }stp_device;
 
@@ -635,18 +638,65 @@ stp_st stp_setConfig(stp_device* dev, int32_t config);
 
 /*
 ** ===================================================================
-**     Método      :  stp_enable
+**     Método      :  stp_master_disable
 */
 /*!
 **     @resumen
-**          Habilita el dispositivo especificado por parámetro
+**          Deshabilita el dispositivo especificado por parámetro, tanto
+**			su clk, como las salidas del driver y el driver en si
 **
 **     @param
 **          dev     	   	- Puntero al dispositivo sobre el que recae 
 **							la acción.
 */
 /* ===================================================================*/
-stp_st stp_enable(stp_device* dev);
+stp_st stp_master_disable(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_clk_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita el clk del dispositivos especificado por parámetro
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_clk_disable(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_driver_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita el driver del dispositivo especificado por parámetro.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+
+stp_st stp_driver_disable(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_output_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita las salidas del dispositivo especificado por parámetro.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_output_disable(stp_device* dev);
 
 /*
 ** ===================================================================

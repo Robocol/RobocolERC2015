@@ -30,7 +30,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 #Regla de compilación de ejecutable para prueba del driver
 prueba_stepper: $(OBJ)
-	$(CC) -o $@$(EEXT) prueba_stepper.c $^ $(CFLAGS)
+	$(CC) -o $@$(EEXT) prueba_stepper.c $^ $(CFLAGS) -lm
 
 include ../Makefile
 
