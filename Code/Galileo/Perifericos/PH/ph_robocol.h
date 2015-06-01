@@ -77,6 +77,10 @@
 #define PH_OK 			0x00
 #define PH_ERROR 		0x01
 
+
+#define DIR0			0x00
+#define DIR1			0x01
+
 /*--------------------------------------------------------------------------*/
 /*
  *                  	DEFINICIÓN DE TYPES
@@ -380,5 +384,9 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize);
+//ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize);
+
+
+ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir);
+
 #endif

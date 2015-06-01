@@ -8,6 +8,7 @@
  *					Germán Giraldo
  * -------------------------------------------------------------------------------------
  */
+
 #include "ph_robocol.h"
 
 /*
@@ -519,6 +520,49 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp){
 	return (ph_st)rx;
 }
 
+
+ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir){
+	uint8_t pwm=(uint8_t)(256.0*duty/100.0);
+
+	if(ph_setEstado(dev,MANUAL_EST)){
+		printf("Error en la modificación de estado hacia estado manual.\n");
+		return PH_ERROR;
+	}
+
+	if(ph_disable(dev){
+		printf("Error en la habilitación del puente H con el puntero pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	if (ph_setDireccion(dev,dir)){
+		printf("Error en el set de dirección del puente H pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	if (ph_setPWM(dev,pwm)){
+		printf("No fue posible establecer el pwm para el puente H en ph_step\n");
+		return PH_ERROR;
+	}
+
+	if (ph_enable(dev)){
+		printf("Error en la habilitación del puente H pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	sleep(1);
+
+	if (ph_setPWM(dev,0)){
+		printf("No fue posible establecer el pwm en 0 para el puente H en ph_step\n");
+		return PH_ERROR;
+	}
+
+	if (ph_disable(dev)){
+		printf("Error en la deshabilitación del puente H pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	return PH_OK;
+}
 // ph_st ph_setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize){
 // 	uint8_t curr_pwm;
 // 	int8_t steps;

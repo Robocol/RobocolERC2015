@@ -21,6 +21,11 @@ typedef struct
 
 arm_st arm_build(arm_dev* dev);
 
+arm_st arm_ph_step(arm_dev* dev, uint8_t ph_num);
+
+arm_st validate_ph(uint8_t ph_num);
+
+
 // arm_st arm_ph();
 
 // arm_st arm_st();
