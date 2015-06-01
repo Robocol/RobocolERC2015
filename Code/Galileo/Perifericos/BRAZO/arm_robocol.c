@@ -73,3 +73,10 @@ arm_st arm_ph_step(arm_dev* dev, uint8_t ph_num,  uint8_t dir){
 	}
 	return ARM_OK;
 }
+
+arm_st validate_ph(uint8_t ph_num){
+	if (ph_num!=1 && ph_num!=2 && ph_num!=3 ){
+		return ARM_ERROR;
+	}
+	return ARM_OK;
+}
