@@ -97,13 +97,13 @@ int main(int argc, char const *argv[])
 					{
 						printf("Dentro del loop de medicion\n");
 						while(1){
-							getCorriente(devptr1,buffmed1);
+							ph_getCorriente(devptr1,buffmed1);
 							fprintf(fdl, "Corriente%d: %d \n",*buffmed1);
 						}
 					}else{
 						printf("Dentro del loop de medicion\n");
 						while(1){
-							getVelocidad(devptr1,buffmed1);;
+							ph_getVelocidad(devptr1,buffmed1);;
 							fprintf(fdl, "Velocidad%d:%d \n",counter,*buffmed1);
 							counter++;
 						}
@@ -112,7 +112,7 @@ int main(int argc, char const *argv[])
 				}else if(motor==2){
 					printf("----Medicion para puenteH 2----\n");
 					ph_dev dev2={PINA1,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
-					devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
+					devptr2=&dev2;						//Inicialmente el puntero se asigna al segundo puente h
 					printf("Iniciando creación de puenteH\n");
 					if(ph_build(devptr2)){
 						printf("Error en la creación de puenteH 2 \n");
@@ -128,14 +128,14 @@ int main(int argc, char const *argv[])
 					{
 						printf("Dentro del loop de medicion\n");
 						while(1){
-							getCorriente(devptr2,buffmed2);
+							ph_getCorriente(devptr2,buffmed2);
 							fprintf(fdl, "Corriente: %d \n",*buffmed2);
 							counter++;
 						}
 					}else{
 						printf("Dentro del loop de medicion\n");
 						while(1){
-							getVelocidad(devptr2,buffmed2);;
+							ph_getVelocidad(devptr2,buffmed2);;
 							fprintf(fdl, "Velocidad%d:%d \n",counter,*buffmed2);
 							counter++;
 						}
