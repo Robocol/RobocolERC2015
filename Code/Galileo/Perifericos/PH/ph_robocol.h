@@ -93,6 +93,7 @@ typedef struct{
 	uint8_t	pin_in_b;
 	uint8_t	pin_enable;
 	uint8_t pwm;
+	uint8_t addr;
 	spi_device* spi;    //No es necesario que el usuario instancie este campo.
 }ph_dev;
 
@@ -116,7 +117,7 @@ typedef struct{
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st ph_build(ph_dev* dev);
+ph_st ph_build(ph_dev* dev,uint8_t addr);
 ph_st ph_enable(ph_dev* dev);
 ph_st ph_disable(ph_dev* dev);
 

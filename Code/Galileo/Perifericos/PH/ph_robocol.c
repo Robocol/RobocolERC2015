@@ -26,10 +26,10 @@
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st ph_build(ph_dev* dev){
+ph_st ph_build(ph_dev* dev,uint8_t addr){
 	
 	spi_device* new_spi=malloc(sizeof(spi_device));
-	uint8_t addr=0b0111000;
+
 
 	printf("Iniciando creación de dispositivo spi para manejo de puenteH\n");
 	if(spi_create_device(new_spi,0,(*dev).pin_cs)){
