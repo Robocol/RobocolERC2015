@@ -1119,7 +1119,7 @@ stp_st stp_dir(stp_device* dev, uint32_t dir){
 
 /*
 ** ===================================================================
-**     Método      :  stp_relative_displacement
+**     Método      :  stp_move_degrees
 */
 /*!
 **     @resumen
@@ -1138,39 +1138,16 @@ stp_st stp_dir(stp_device* dev, uint32_t dir){
 **							son: CLOCKWISE o COUNTERCLOCKWISE
 */
 /* ===================================================================*/
-// stp_st stp_relative_displacement(stp_device* dev, uint32_t degrees, int32_t dir){
-// 	int32_t 	init_pos,curr_pos;
-// 	int32_t	rel_pos=0;
-// 	uint8_t step=((*dev).step>4)? 4 : (*dev).step; 
-// 	uint32_t	goal_pos=(int)(degrees*pow(2,step)*((*dev).gear_ratio)/1.8);
 
-// 	printf("Goal Pos: %d\n",goal_pos);
-// 	stp_dir(dev,dir);
 
-// 	if(stp_getPosition(dev,&init_pos)){
-// 		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
-// 	}
-// 	stp_output_enable(dev);
-// 	stp_clk_enable(dev);
-
-// 	while(rel_pos<goal_pos){
-// 		if(stp_getPosition(dev,&curr_pos)){
-// 			printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
-// 		}
-// 		rel_pos=abs(init_pos-curr_pos);
-// 		//printf("Relative Position: %d\n",rel_pos );
-// 	}
-// 	stp_clk_disable(dev);
-// 	stp_output_disable(dev);
-// }
-
-stp_st stp_relative_displacement(stp_device* dev, uint32_t degrees, int32_t dir){
+stp_st stp_move_degrees(stp_device* dev, uint32_t degrees, int32_t dir){
 	int32_t 	init_pos,curr_pos;
-	int32_t		rel_pos=0,t;
+	int32_t		t;
 	uint8_t 	step=((*dev).step>4)? 4 : (*dev).step; 
 	uint32_t	goal_pos=(int)(degrees*pow(2,step)*((*dev).gear_ratio)/1.8);
 
 	printf("Goal Pos: %d\n",goal_pos);
+	stp_clk_disable(dev);
 	stp_dir(dev,dir);
 
 	if(stp_getPosition(dev,&init_pos)){
@@ -1190,7 +1167,7 @@ stp_st stp_relative_displacement(stp_device* dev, uint32_t degrees, int32_t dir)
 
 /*
 ** ===================================================================
-**     Método      :  stp_relative_displacement
+**     Método      :  stp_return_to_cero
 */
 /*!
 **     @resumen
@@ -1210,23 +1187,60 @@ stp_st stp_relative_displacement(stp_device* dev, uint32_t degrees, int32_t dir)
 */
 /* ===================================================================*/
 stp_st stp_return_to_cero(stp_device* dev){
-	int32_t 	init_pos,curr_degrees;
+	int32_t 	pos,curr_degrees;
 	int32_t		rel_pos=0;
 	uint8_t 	step=((*dev).step>4)? 4 : (*dev).step; 
 
-	if(stp_getPosition(dev,&init_pos)){
+	if(stp_getPosition(dev,&pos)){
 		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
 	}
-	curr_degrees=(int)((init_pos*(1.8))/(pow(2,step)));
-	printf("curr_degrees: %d\n",curr_degrees);
 
-	if(curr_degrees>0){
-		if(stp_relative_displacement(dev,abs(curr_degrees),CLOCKWISE)){
-			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+	while(pos<(-5)||pos>5){
+		curr_degrees=(int)((pos*(1.8))/(pow(2,step)));
+		printf("curr_degrees: %d\n",curr_degrees);
+
+		if(curr_degrees>0){
+			if(stp_move_degrees(dev,abs(curr_degrees),CLOCKWISE)){
+				printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+			}
+		}else{
+			if(stp_move_degrees(dev,abs(curr_degrees),COUNTERCLOCKWISE)){
+				printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+			}
 		}
-	}else{
-		if(stp_relative_displacement(dev,abs(curr_degrees),COUNTERCLOCKWISE)){
-			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+		if(stp_getPosition(dev,&pos)){
+			printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
 		}
 	}
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_move_time
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posicipon actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          degrees     	- Grados hexadecimales de giro
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+stp_st stp_move_time(stp_device* dev, int32_t t){
+	stp_output_enable(dev);
+	stp_clk_enable(dev);
+
+	usleep(t);
+
+	stp_clk_disable(dev);
+	stp_output_disable(dev);
 }

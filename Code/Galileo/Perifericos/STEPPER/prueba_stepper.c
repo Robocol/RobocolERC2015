@@ -3,7 +3,7 @@
 #include "stepper_robocol.h"
 stp_device* devptr;
 
-void emergency_disble(int sig){
+void emergency_disable(int sig){
 	stp_master_disable(devptr);
 	abort();
 }
@@ -38,7 +38,7 @@ printf("Tras construccion de stepper\n");
 printf("Pin del stepper_device para chip select de Spi: %d\n",(*dev1.spi).pin);
 
 
-(void) signal(SIGINT, emergency_disble);
+(void) signal(SIGINT, emergency_disable);
 
 
 
@@ -183,7 +183,7 @@ while(1){
 			getline(&line,&size,stdin);
 			buf2=atoi(line);
 			printf("Cambiando posición a: %d \n",buf);
-			stp_relative_displacement(devptr,buf2,buf);
+			stp_move_degrees(devptr,buf2,buf);
 
 		}else if(!strcmp(line,"master-enable\n")){
 			printf("Habilitando stepper:\n");
@@ -217,6 +217,8 @@ while(1){
 	
 		}else if(!strcmp(line,"exit\n")){
 			printf("Cerrando el programa. Adiós\n");
+			stp_return_to_cero(devptr);
+			stp_master_disable(devptr);
 			break;
 		}else if(!strcmp(line,"debug\n")){
 			while(getchar()!='q'){
