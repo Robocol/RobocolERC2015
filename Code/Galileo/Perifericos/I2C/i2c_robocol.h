@@ -28,6 +28,15 @@
 #define I2C_ERROR 		0x01;
 #define I2C_OK 			0x00;
 
+#define PINE0 			0x00;
+#define PINE1			0x01;
+#define PINE2			0x02;
+#define PINE3			0x03;
+#define PINE4			0x04;
+#define PINE5			0x05;
+#define PINE6			0x06;
+#define PINE7			0x07;
+
 /*--------------------------------------------------------------------------*/
 /*
  *                 VARIABLES DE LA LIBRERIA

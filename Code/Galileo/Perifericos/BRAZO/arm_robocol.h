@@ -19,11 +19,12 @@ typedef struct
 	
 }arm_dev;
 
-arm_st arm_build(arm_dev* dev);
+struct arm_dev* dev=malloc(sizeof(arm_dev));
 
-arm_st arm_ph_step(arm_dev* dev, uint8_t ph_num);
+arm_st arm_build(void);
 
-arm_st validate_ph(uint8_t ph_num);
+arm_st arm_ph_step(uint8_t ph_num,uint8_t dir);
+
 
 
 // arm_st arm_ph();
