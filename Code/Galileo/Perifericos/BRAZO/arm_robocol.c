@@ -44,10 +44,6 @@ arm_st arm_build(arm_dev* dev){
 }
 
 arm_st arm_ph_step(arm_dev* dev, uint8_t ph_num,  uint8_t dir){
-	if(validate_ph(ph_num)){
-		printf("El número de puente h ingresado por parámetro no es válido.\n");
-		return ARM_ERROR;
-	}
 
 	switch(ph_num){
 		case 1:
@@ -70,13 +66,6 @@ arm_st arm_ph_step(arm_dev* dev, uint8_t ph_num,  uint8_t dir){
 		default:
 			printf("El número de puente h ingresado por parámetro no es válido.\n");
 			return ARM_ERROR;
-	}
-	return ARM_OK;
-}
-
-arm_st validate_ph(uint8_t ph_num){
-	if (ph_num!=1 && ph_num!=2 && ph_num!=3 ){
-		return ARM_ERROR;
 	}
 	return ARM_OK;
 }
