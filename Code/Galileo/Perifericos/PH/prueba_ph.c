@@ -20,8 +20,9 @@ printf("----------Prueba Driver Puente H----------\n");
 
 
 ph_dev dev1={PINA0,0,1,4,0};
+dev1.addr=EXP1;
 ph_dev dev2={PINA1,2,3,4,0};
-
+dev2.addr=EXP1;
 ph_build(&dev1);
 ph_build(&dev2);
 

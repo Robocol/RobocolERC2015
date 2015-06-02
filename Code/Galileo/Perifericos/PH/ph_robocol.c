@@ -26,7 +26,7 @@
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st ph_build(ph_dev* dev,uint8_t addr){
+ph_st ph_build(ph_dev* dev){
 	
 	spi_device* new_spi=malloc(sizeof(spi_device));
 
@@ -43,7 +43,7 @@ ph_st ph_build(ph_dev* dev,uint8_t addr){
 		return PH_ERROR;
 	}
 
-	if (build_expander(addr)){
+	if (build_expander((*dev).addr)){
 		printf("Error en la creación del expansor para control de puente H\n" );
 	}
 
@@ -529,7 +529,7 @@ ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir){
 		return PH_ERROR;
 	}
 
-	if(ph_disable(dev){
+	if(ph_disable(dev)){
 		printf("Error en la habilitación del puente H con el puntero pasado por parámetro\n");
 		return PH_ERROR;
 	}
