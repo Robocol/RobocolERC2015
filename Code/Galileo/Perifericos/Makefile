@@ -174,7 +174,7 @@ $(ODIR)/lmp_robocol$(LEXT): ../TEMPERATURA/lmp_robocol.c ../TEMPERATURA/lmp_robo
 	$(CC) -c -o $@ $< -I../GPIO \
                       -I../I2C  \
                       -I../SPI  \
-                      -I../../MISC\
+                      -I../../MISC \
                       -I../TEMPERATURA
 
 $(ODIR)/arm_robocol$(LEXT): ../BRAZO/arm_robocol.c ../BRAZO/arm_robocol.h  $(ODIR)/i2c_robocol$(LEXT)  \
@@ -185,13 +185,13 @@ $(ODIR)/arm_robocol$(LEXT): ../BRAZO/arm_robocol.c ../BRAZO/arm_robocol.h  $(ODI
        																			$(ODIR)/ph_robocol$(LEXT) \
        																			$(ODIR)/stepper_robocol$(LEXT)
 	$(CC) -c -o $@ $< -I../GPIO \
-                      -I../I2C  \
-                      -I../SPI  \
-                      -I../../MISC \
-                      -I../PH \   
-                      -I../PWM\
-                      -I../STEPPER\                                         
-                      -I../BRAZO 
+						-I../I2C  \
+						-I../SPI  \
+						-I../../MISC \
+						-I../PH \   
+						-I../PWM \
+						-I../STEPPER \                                         
+						-I../BRAZO 
 
 
 .PHONY: clean
