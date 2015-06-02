@@ -113,3 +113,50 @@ arm_st arm_ph_step(uint8_t ph_num,  uint8_t dir){
 	}
 	return ARM_OK;
 }
+
+
+arm_st validate_stepper(uint8_t stp_num){
+	if (stp_num!=1 && stp_num!=2 && stp_num!=3 ){
+		return ARM_ERROR;
+	}
+	return ARM_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  arm_hand_step
+*/
+/*!
+**     @resumen
+**          Mueve uno de los motores de pasos durante un corto periodo
+**		 	de tiempo.
+**
+**     @param
+**          stepper    	   	- Constante numérica que representa el
+**							stepper a mover. Las constantes definidas
+**							son SUP, WRIST y CLAW.
+*/
+/* ===================================================================*/
+arm_st arm_hand_step(uint8_t stepper){
+	switch(stepper){
+		case 1:
+			if(stp_move_time(dev.sup,TIME_STEP*1000){
+				return ARM_ERROR;
+				break;
+			}
+		case 2:
+			if(stp_move_time(dev.sup,TIME_STEP*1000){
+				return ARM_ERROR;
+				break;
+			}
+		case 3:
+			if(stp_move_time(dev.sup,TIME_STEP*1000){
+				return ARM_ERROR;
+				break;
+			}
+		default:
+			printf("El número de puente h ingresado por parámetro no es válido.\n");
+			return ARM_ERROR;
+	}
+	return ARM_OK;
+}
