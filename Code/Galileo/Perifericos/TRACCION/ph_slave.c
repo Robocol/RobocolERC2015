@@ -191,8 +191,8 @@ int main(int argc, char *argv[]){
 	ph_dev dev1={PINA0,0,1,4,0};
 	ph_dev dev2={PINA1,2,3,4,0};
 
-	ph_build(&dev1);
-	ph_build(&dev2);
+	ph_build(&dev1,EXP1);
+	ph_build(&dev2,EXP1);
 
 	devptr1=&dev1;
 	devptr2=&dev2;

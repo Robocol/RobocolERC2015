@@ -84,7 +84,7 @@ int main(int argc, char const *argv[])
 					ph_dev dev1={PINA0,0,1,4};			//Creación de primer puente h con pines ina=0, inb=1, enable=4
 					devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
 					printf("Iniciando creación de puenteH\n");
-					if(ph_build(devptr1)){
+					if(ph_build(devptr1,EXP1)){
 						printf("Error en la creación de puenteH 1 \n");
 						return 1;
 					}	
@@ -114,7 +114,7 @@ int main(int argc, char const *argv[])
 					ph_dev dev2={PINA1,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
 					devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
 					printf("Iniciando creación de puenteH\n");
-					if(ph_build(devptr2)){
+					if(ph_build(devptr2,EXP1)){
 						printf("Error en la creación de puenteH 2 \n");
 						return 1;
 					}

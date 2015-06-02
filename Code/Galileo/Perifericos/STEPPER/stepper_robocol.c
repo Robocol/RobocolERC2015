@@ -21,7 +21,7 @@
 */
 /* ===================================================================*/
 stp_st stp_build(stp_device* dev){
-	uint8_t addr=0b0111000;
+	uint8_t addr=(*dev).exp;
 	spi_device* new_spi=malloc(sizeof(spi_device));
 
 	if ((*dev).exp_n<1 && (*dev).exp_n>2 ){
@@ -30,8 +30,7 @@ stp_st stp_build(stp_device* dev){
 		return STP_ERROR;
 	}
 
-	addr|=((*dev).exp_n)-1;
-	printf("Expander: %d\n",(*dev).exp_n );
+	printf("Expander: %d\n",(*dev).exp );
 	printf("Address: %x\n",addr);
 
 	printf("Pin_cs en el stp_dev durante stp_build:\t\t%d\n", (*dev).pin_cs);

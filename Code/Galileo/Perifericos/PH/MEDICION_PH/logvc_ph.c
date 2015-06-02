@@ -45,8 +45,8 @@ int main(int argc, char const *argv[])
 	devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
 	devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
 
-	ph_build(devptr1);
-	ph_build(devptr2);
+	ph_build(devptr1,EXP1);
+	ph_build(devptr2,EXP1);
 
 	fprintf(fdl, "//--------%s--------\\\\\n",nombref);
 	free(nombref);
