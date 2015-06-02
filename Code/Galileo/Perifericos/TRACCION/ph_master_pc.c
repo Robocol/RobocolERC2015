@@ -107,7 +107,9 @@ int main(int argc, char *argv[])
 
 	ph_dev dev1={PINA0,0,1,4,0};			//Creación de primer puente h con pines ina=0, inb=1, enable=4, pwm=0
 	ph_dev dev2={PINA1,2,3,4,0};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4, pwm=0
-
+	
+	ph_build(devptr1);
+	ph_build(devptr2);
 
 	//Instrucciones de uso para el usuario
 		printf("Bienvenido al test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 

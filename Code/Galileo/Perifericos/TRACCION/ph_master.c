@@ -117,8 +117,8 @@ int main(int argc, char *argv[])
 
 	ph_dev dev1={PINA0,0,1,4,0};			//Creación de primer puente h con pines ina=0, inb=1, enable=4, pwm=0
 	ph_dev dev2={PINA1,2,3,4,0};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4, pwm=0
-	ph_build(&dev1,EXP1);
-	ph_build(&dev2,EXP1);
+	ph_build(&dev1);
+	ph_build(&dev2);
 	devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
 	devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
 	if(ph_setEstado(devptr1,32)){

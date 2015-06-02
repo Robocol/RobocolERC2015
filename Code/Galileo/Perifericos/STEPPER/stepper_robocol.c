@@ -24,12 +24,6 @@ stp_st stp_build(stp_device* dev){
 	uint8_t addr=(*dev).exp;
 	spi_device* new_spi=malloc(sizeof(spi_device));
 
-	if ((*dev).exp_n<1 && (*dev).exp_n>2 ){
-		printf("El número de expansor ingresado en el stp_device pasado por parámetro no es válido.\n"
-			"Ingrese 1 o 2 para al selección del expansor deseado.(stp_build>stepper_robocol)\n");
-		return STP_ERROR;
-	}
-
 	printf("Expander: %d\n",(*dev).exp );
 	printf("Address: %x\n",addr);
 
