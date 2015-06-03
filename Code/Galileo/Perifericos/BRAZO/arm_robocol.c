@@ -77,12 +77,12 @@ arm_st arm_build(void){
 		return ARM_ERROR
 	}
 
-	(*dev).b_motor=b_motor;
-	(*dev).b_actuator=b_actuator;
-	(*dev).u_actuator=u_actuator;
-	(*dev).sup=sup;
-	(*dev).wrist=wrist;
-	(*dev).claw=claw;
+	(*armdev).b_motor=b_motor;
+	(*armdev).b_actuator=b_actuator;
+	(*armdev).u_actuator=u_actuator;
+	(*armdev).sup=sup;
+	(*armdev).wrist=wrist;
+	(*armdev).claw=claw;
 
 	return ARM_OK;
 }
@@ -92,20 +92,20 @@ arm_st arm_ph_step(uint8_t ph_num,  uint8_t dir){
 	switch(ph_num){
 		case 1:
 			if (dir){
-				ph_step((*dev).b_actuator,64,dir);
+				ph_step((*armdev).b_actuator,64,dir);
 			}else{
-				ph_step((*dev).b_actuator,32,dir);
+				ph_step((*armdev).b_actuator,32,dir);
 			}
 			break;
 		case 2:
 			if (dir){
-				ph_step((*dev).u_actuator,64,dir);
+				ph_step((*armdev).u_actuator,64,dir);
 			}else{
-				ph_step((*dev).u_actuator,32,dir);
+				ph_step((*armdev).u_actuator,32,dir);
 			}
 			break;
 		case 3:
-			ph_step((*dev).b_motor,64,dir);
+			ph_step((*armdev).b_motor,64,dir);
 			break;
 		default:
 			printf("El número de puente h ingresado por parámetro no es válido.\n");
@@ -159,4 +159,57 @@ arm_st arm_hand_step(uint8_t stepper){
 			return ARM_ERROR;
 	}
 	return ARM_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  arm_hand_step
+*/
+/*!
+**     @resumen
+**          Mueve uno de los motores de pasos durante un corto periodo
+**		 	de tiempo.
+**
+**     @param
+**          stepper    	   	- Constante numérica que representa el
+**							stepper a mover. Las constantes definidas
+**							son SUP, WRIST y CLAW.
+*/
+/* ===================================================================*/
+
+arm_st arm_get_ph(uint8_t ph_num,ph_dev* dev){
+	switch(ph_num){
+		case BMOTOR:
+			dev=armdev.b_motor;
+			return ARM_OK;
+		case BACTUATOR;
+			dev=armdev.b_actuator;
+			return ARM_OK;
+		case UACTUATOR;
+			dev=armdev.u_actuator;
+			return ARM_OK;
+		default:
+			printf("El número de dispositivo puente h ingresado por parámetro no es válido.\n");
+			return ARM_ERROR;
+	}
+}
+
+
+arm_st arm_get_stp(uint8_t stp_num,stp_device* dev){
+
+		switch(stp_num){
+		case SUP:
+			dev=armdev.b_motor;
+			return ARM_OK;
+		case WRIST;
+			dev=armdev.b_actuator;
+			return ARM_OK;
+		case CLAW;
+			dev=armdev.u_actuator;
+			return ARM_OK;
+		default:
+			printf("El número de dispositivo stepper ingresado por parámetro no es válido.\n");
+			return ARM_ERROR;
+	}
+
 }
