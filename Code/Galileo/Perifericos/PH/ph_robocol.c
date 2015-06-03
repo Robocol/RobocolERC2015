@@ -355,7 +355,7 @@ ph_st ph_setVel(ph_dev* dev,uint8_t vel){
 	if(spi_rw((*dev).spi,&vel,&rx,1)){
 		perror("Error while setting VELOCIDAD");
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -613,3 +613,32 @@ ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir){
 // 	(*devptr).pwm=pwm;
 // 	return PH_OK;
 // }
+ph_st ph_moveToAngle(ph_dev* dev, int8_t goal_pos){
+	uint8_t curr_pos;
+	if(ph_getVelocidad(dev, &curr_pos)){
+		printf("Error al obtener posición. (ph_robocol.c -> ph_move_to_angle)\n");
+		return PH_ERROR;
+	}
+
+	// goal_pos=(int)(degrees/0.84236 + (134.62112/0.84236));
+
+	if((curr_pos-goal_pos)<0){
+		if(ph_setDireccion(dev, 0x00)){
+			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
+			return PH_ERROR;
+		}
+	}else{
+		if(ph_setDireccion(dev, 0x01)){
+			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
+			return PH_ERROR;
+		}
+	}
+
+	if(ph_setVel(dev, goal_pos)){
+		printf("Error al definir posición objetivo (ph_robocol.c -> ph_move_to_angle)\n");
+		perror("Descripción:");
+		return PH_ERROR;
+	}
+
+	return PH_OK;
+}

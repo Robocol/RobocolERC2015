@@ -365,7 +365,7 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp);
 
 /*
 ** ===================================================================
-**     Método      :  ph_setPWMSmooth
+**     Método      :  ph_step
 */
 /*!
 **     @resumen
@@ -386,8 +386,27 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp);
 */
 /* ===================================================================*/
 //ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize);
-
-
 ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir);
+
+/*
+** ===================================================================
+**     Método      :  ph_move_to_angle
+*/
+/*!
+**     @resumen
+**          Obtiene el valor de temperatura medido por el puente H
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae la 
+**							acción.
+**     @param
+**          degrees    	   	- Puntero a la posición de memoria donde guardar
+**							la temperatura.
+**								Valor entre 0 y 255.
+**     @return
+**                         	- Estado salida del método. 
+*/
+/* ===================================================================*/
+ph_st ph_move_to_angle(ph_dev* dev, uint8_t degrees);
+
 
 #endif

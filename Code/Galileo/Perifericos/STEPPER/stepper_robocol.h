@@ -746,4 +746,105 @@ stp_st stp_period(stp_device* dev, uint32_t period);
 /* ===================================================================*/
 stp_st stp_dir(stp_device* dev, uint32_t dir);
 
+/*
+** ===================================================================
+**     Método      :  stp_getAngularPosition
+*/
+/*!
+**     @resumen
+**          Obtiene la posición angular actual del dispositivo teniendo
+**			en cuenta la relación de reducción del mismo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**          dev     	   	- Puntero a la posición de memoria donde se 
+**							almacenará el dato obtenido.
+*/
+/* ===================================================================*/
+stp_st stp_getAngularPosition(stp_device* dev, int32_t *curr_angle);
+
+/*
+** ===================================================================
+**     Método      :  stp_moveTime
+*/
+/*!
+**     @resumen
+**          Gira el stepper durante un tiempo ingresado por parámetro
+**			en la dirección de giro actual.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          t 		    	- Tiempo de giro en milisegundos
+*/
+/* ===================================================================*/
+stp_st stp_moveTime(stp_device* dev, uint32_t t);
+
+/*
+** ===================================================================
+**     Método      :  stp_returnToZero
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posicipon actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_returnToZero(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_moveRelAngle
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posicipon actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          degrees     	- Grados hexadecimales de giro
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+stp_st stp_moveRelAngle(stp_device* dev, uint32_t degrees, int32_t dir);
+
+/*
+** ===================================================================
+**     Método      :  stp_moveRelPos
+*/
+/*!
+**     @resumen
+**          Gira el stepper una cantidad de pasos (o micropasos) dada por parámetro, 
+**			en  la dirección indicada. Este giro tiene en cuenta la 
+**			relación especificada en el campo gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          rel_pos     	- Pasos a girar
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+
+
+stp_st stp_moveRelPos(stp_device* dev, uint32_t rel_pos, int32_t dir);
+
 #endif

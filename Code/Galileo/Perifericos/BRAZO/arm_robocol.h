@@ -1,5 +1,5 @@
-#ifndef ARM_ROBOCOL
-#define ARM_ROBOCOL
+#ifndef ARM_ROBOCOL_H
+#define ARM_ROBOCOL_H
 #include "ph_robocol.h"
 #include "stepper_robocol.h"
 
@@ -11,6 +11,8 @@
 #define SUP 			0x01
 #define WRIST 			0x02
 #define CLAW 			0x03
+
+#define TIME_STEP 			0x03FF
 
 
 typedef uint8_t arm_st;
@@ -26,7 +28,7 @@ typedef struct
 	
 }arm_dev;
 
-struct arm_dev* armdev=malloc(sizeof(arm_dev));
+arm_dev* armdev;
 
 /*
 ** ===================================================================
@@ -85,6 +87,21 @@ arm_st arm_get_ph(uint8_t ph_num,ph_dev* dev);
 
 
 arm_st arm_get_stp(uint8_t stp_num,stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  arm_moveBActToAngle
+*/
+/*!
+**     @resumen
+**          Mueve el actuador inferior a un ángulo absoluto ingresado 
+**			por parámetro
+**
+**     @param
+**          angle    	   	- Ángulo objetivo.
+*/
+/* ===================================================================*/
+arm_st arm_moveBActToAngle( int8_t angle);
 
 
 #endif

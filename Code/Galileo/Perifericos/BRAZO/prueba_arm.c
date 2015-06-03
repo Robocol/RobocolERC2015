@@ -33,17 +33,17 @@ printf("Test de funcionamiento de Brazo (URC 2015-ROBOCOL).\n Utilice una de los
 			getline(&line,&size,stdin);
 
 			if (!strcmp(line,"1\n")){
-				if(arm_get_st(SUP,stepper)){
+				if(arm_get_stp(SUP,stepper)){
 					printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 				}
 				prueba_st(stepper);
 			}else if(!strcmp(line,"2\n")){
-				if(arm_get_st(WRIST,stepper)){
+				if(arm_get_stp(WRIST,stepper)){
 					printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 				}
 				prueba_st(stepper);
 			}else if(!strcmp(line,"3\n")){
-				if(arm_get_st(CLAW,stepper)){
+				if(arm_get_stp(CLAW,stepper)){
 					printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 				}
 				prueba_st(stepper);
@@ -66,17 +66,17 @@ printf("Test de funcionamiento de Brazo (URC 2015-ROBOCOL).\n Utilice una de los
 			getline(&line,&size,stdin);
 
 			if (!strcmp(line,"1\n")){
-				if(arm_get_st(BACTUATOR,ph)){
+				if(arm_get_stp(BACTUATOR,stepper)){
 					printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 				}
 				prueba_ph(ph);
 			}else if(!strcmp(line,"2\n")){
-				if(arm_get_st(UACTUATOR,ph)){
+				if(arm_get_stp(UACTUATOR,stepper)){
 					printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 				}
 				prueba_ph(ph);
 			}else if(!strcmp(line,"3\n")){
-				if(arm_get_st(BMOTOR,ph)){
+				if(arm_get_stp(BMOTOR,stepper)){
 					printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 				}
 				prueba_ph(ph);

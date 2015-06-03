@@ -21,6 +21,7 @@ _OBJ = stepper_robocol$(LEXT)\
        gpio_robocol$(LEXT)\
        misc_robocol$(LEXT)\
        pwmg_robocol$(LEXT)\
+       arm_robocol$(LEXT)\
        ph_robocol$(LEXT)
 
 #Concatenación de objetos con ruta de ubicación predeterminada
@@ -31,8 +32,8 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 ################################################################################################
 
 #Regla de compilación de ejecutable para prueba del driver
-arm_robocol: $(OBJ)
-	$(CC) -o $@$(EEXT) arm_robocol.c $^ $(CFLAGS)
+prueba_arm: $(OBJ)
+	$(CC) -o $@$(EEXT) prueba_arm.c $^ $(CFLAGS) -lm
 
 include ../Makefile
 

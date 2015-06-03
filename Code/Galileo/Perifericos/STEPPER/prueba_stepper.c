@@ -55,7 +55,7 @@ if(stp_driver_enable(devptr)){
 }
 
 
-if(stp_setStepSel(devptr,7)){
+if(stp_setStepSel(devptr,2)){
 	printf("Error en setStepSel inicial\n" );
 }
 
@@ -191,7 +191,7 @@ while(1){
 			getline(&line,&size,stdin);
 			buf2=atoi(line);
 			printf("Cambiando posición a: %d \n",buf);
-			stp_move_degrees(devptr,buf2,buf);
+			stp_moveRelAngle(devptr,buf2,buf);
 
 		}else if(!strcmp(line,"master-enable\n")){
 			printf("Habilitando stepper:\n");
@@ -225,7 +225,7 @@ while(1){
 	
 		}else if(!strcmp(line,"exit\n")){
 			printf("Cerrando el programa. Adiós\n");
-			stp_return_to_cero(devptr);
+			stp_returnToZero(devptr);
 			stp_master_disable(devptr);
 			break;
 		}else if(!strcmp(line,"debug\n")){
@@ -239,7 +239,7 @@ while(1){
 	
 		}else if(!strcmp(line,"cero\n")){
 			printf("Volviendo a casa:\n");
-			stp_return_to_cero(devptr);
+			stp_returnToZero(devptr);
 		}else{
 		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t master-enable\t\t\t-Habilita el stepper\n"
