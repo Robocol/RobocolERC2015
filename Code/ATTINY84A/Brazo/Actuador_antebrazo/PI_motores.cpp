@@ -87,22 +87,23 @@ uint8_t compensacion_temporal=0;
 
 
 // Constantes Controlador Posición
-float KP_P = 0.2;//Ku=2.7 0.2*Ku
-float KI_P = 1;//0.0340;//Tu=0.00304*14 "2Kp/Tu
-float KD_P = 0.0266;//KpTu/3
+float KP_P = 0.002;//Ku=2.7 0.2*Ku
+float KI_P = 0.01;//0.0340;//Tu=0.00304*14 "2Kp/Tu
+float KD_P = 0.000266;//KpTu/3
 int16_t  errorAnterior_P=0;
 int16_t  errorAnteriorAnterior_P=0;
 float UAnterior_P=0; //Acción de control anterior (sp_corriente)
-uint8_t setPointPosicion=155;
+uint8_t setPointPosicion=150;
 uint8_t PosAct=0; //Medición de posición para el brazo
+uint8_t Impulso=6;
 
 
 // Contantes Controlador  de Corriente
-float KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-float KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+float KP_C =0.0025;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+float KI_C =0.010919;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
 int16_t  errorAnterior_C=0;
 float  UAnterior_C=0; //Acción de control anterior (PWM)
-uint8_t setPointCorriente=0;
+uint8_t setPointCorriente=20;
 uint8_t curAct=0;
 
 // Temperatura interna del microcontrolador
@@ -196,33 +197,7 @@ bool pwm_init() {
 *************************************************************************
 ************************************************************************ */
 
-// Interrupción de recepción por SPI
-ISR(USI_OVF_vect)
-{
-	cli();
-	// Update flags and clear USI counter
-	USISR = (1<<USIOIF);
-	spi_status.transferComplete = 1;
-	// Copy USIDR to buffer to prevent overwrite on next transfer.
-	storedUSIDR = USIDR;
-	
-	if(primero){
-		encabezado =storedUSIDR;
-		if(encabezado == MEDIR_CORRIENTE || encabezado == MEDIR_TEMP || encabezado==MEDIR_VELOCIDAD || encabezado==DAR_ESTADO){
-			parsear = true;
-		}
-		primero=false;
-	}
-	else{
-		argumento=storedUSIDR;
-		parsear=true;
-		primero=true;
-	}
-	
-	USIDR = ACK_tiny;
-	
-	sei();
-}
+
 
 /************************************************************************/
 /* Inicializa la USI como un esclavo SPI.
@@ -393,15 +368,7 @@ uint8_t bloquePidPosicion(int16_t error, char direccion){
 	int16_t setPointCorriente;
 	float deltaU_P,k1,k2,k3;
 
-	if(direccion==1){
-		KP_P = 0.2;//Ku=2.7 0.2*Ku
-		KI_P = 1;//0.0340;//Tu=0.00304*14 "2Kp/Tu
-		KD_P = 0.0266;//KpTu/3	
-	}else{
-		KP_P = 0.2;//Ku=2.7 0.2*Ku
-		KI_P = 0.01;//0.0340;//Tu=0.00304*14 "2Kp/Tu
-		KD_P = 0.0266;//KpTu/3	
-	}	
+	
 	//Cálculo de constantes para utilizar la fórmula de Euler
 	k1 = KP_P + KI_P + KD_P;
 	k2 = -KP_P - 2*KD_P;
@@ -414,37 +381,20 @@ uint8_t bloquePidPosicion(int16_t error, char direccion){
 	UAnterior_P= UAnterior_P+deltaU_P;
 	setPointCorriente= UAnterior_P;
 
-	if(direccion==1){
+	if(direccion==0){
 		//Límites para la subida sin carga
-		if(setPointCorriente>60){
-			setPointCorriente=60;
-			UAnterior_P=60;
+		if(setPointCorriente>25){
+			setPointCorriente=25;
+			UAnterior_P=25;
 		}
 
-		//Cálculo de las ganancias adaptativas
-		if(setPointCorriente<30){
-			KP_C =0.45;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =1.5;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}else if(setPointCorriente<40){
-			KP_C =0.00375;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =0.0125;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}else if(setPointCorriente<60){
-			KP_C =0.00075;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =0.0027;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}else if(setPointCorriente<100){
-			KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}
 	
 	}else{
 		//Límites para la bajada sin carga
-		if(setPointCorriente>20){
-			setPointCorriente=20;
-			UAnterior_P=20;
+		if(setPointCorriente>25){
+			setPointCorriente=25;
+			UAnterior_P=25;
 		}
-
-		KP_C =0.00375;
-		KI_C =0.0125;
 
 	}
 	 
@@ -567,7 +517,7 @@ void control_parser(){
 			spi_put(curAct);
 			break;
 			case MEDIR_VELOCIDAD:
-			//control_getActualPosition();
+			control_getActualPosition();
 			spi_put(PosAct);
 			break;
 			case MEDIR_TEMP:
@@ -608,7 +558,37 @@ void control_parser(){
 	}		
 }
 
+// Interrupción de recepción por SPI
+ISR(USI_OVF_vect)
+{
+	cli();
+	// Update flags and clear USI counter
+	USISR = (1<<USIOIF);
+	spi_status.transferComplete = 1;
+	// Copy USIDR to buffer to prevent overwrite on next transfer.
+	storedUSIDR = USIDR;
+	
+	if(primero){
+		encabezado =storedUSIDR;
+		if(encabezado == MEDIR_CORRIENTE || encabezado == MEDIR_TEMP || encabezado==MEDIR_VELOCIDAD || encabezado==DAR_ESTADO){
+			parsear = true;
+			control_parser();
+		}
+		primero=false;
+	}
+	else{
+		argumento=storedUSIDR;
+		parsear=true;
+		control_parser();
+		primero=true;
+	}
+	
+	
+	sei();
+}
+
 int main(void) {
+	char activacion=1;
 	int16_t error_posicion=0;
 	int16_t error_corriente=0;
 	uint8_t i;
@@ -622,17 +602,31 @@ int main(void) {
 
 	sei();
 	while (1) {
-		control_parser();
+		
 		switch (ESTADO) {
 		case AUTO_EST:
 			control_getActualPosition();
-			if((0x04 & PINA)==0){//El actuador baja: ON/OFF en cascada con corriente (lazo interno)
+
+			//Impulso para el arranque en bajada
+			if (((0x04 & PINA)!=0)&&(PosAct>159)){
+				PWM=127;
+				pwm_set(PWM);				
+			}
+			
+			//Impulso para el arranque en subida
+			if(((0x04 & PINA)==0)&&(Impulso>0)){
+				PWM=127;
+				pwm_set(PWM);
+				Impulso--;	
+				_delay_ms(20);			
+			}
+
+			if((0x04 & PINA)!=0){//El actuador baja: ON/OFF en cascada con corriente (lazo interno)
+				Impulso=6;
 				gpio_put(LED_PIN,0);
 				direccion=0;
 				error_posicion=PosAct-setPointPosicion;
-				setPointCorriente=15;
-				KP_C =0.00375;
-				KI_C =0.0125;
+				setPointCorriente=20;
 
 				if (error_posicion>2){
 					for(i=0;i<6;i++){			

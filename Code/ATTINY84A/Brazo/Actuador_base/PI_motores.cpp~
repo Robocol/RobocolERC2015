@@ -539,7 +539,7 @@ void control_parser(){
 			spi_put(curAct);
 			break;
 			case MEDIR_VELOCIDAD:
-			control_getActualPosition();
+			//control_getActualPosition();
 			spi_put(PosAct);
 			break;
 			case MEDIR_TEMP:
