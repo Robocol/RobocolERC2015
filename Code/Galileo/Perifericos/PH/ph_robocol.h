@@ -77,6 +77,10 @@
 #define PH_OK 			0x00
 #define PH_ERROR 		0x01
 
+
+#define DIR0			0x00
+#define DIR1			0x01
+
 /*--------------------------------------------------------------------------*/
 /*
  *                  	DEFINICIÓN DE TYPES
@@ -89,6 +93,7 @@ typedef struct{
 	uint8_t	pin_in_b;
 	uint8_t	pin_enable;
 	uint8_t pwm;
+	uint8_t addr;
 	spi_device* spi;    //No es necesario que el usuario instancie este campo.
 }ph_dev;
 
@@ -360,7 +365,7 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp);
 
 /*
 ** ===================================================================
-**     Método      :  ph_setPWMSmooth
+**     Método      :  ph_step
 */
 /*!
 **     @resumen
@@ -380,5 +385,28 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp);
 **                         	- Estado salida del método. 
 */
 /* ===================================================================*/
-ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize);
+//ph_st setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize);
+ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir);
+
+/*
+** ===================================================================
+**     Método      :  ph_move_to_angle
+*/
+/*!
+**     @resumen
+**          Obtiene el valor de temperatura medido por el puente H
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae la 
+**							acción.
+**     @param
+**          degrees    	   	- Puntero a la posición de memoria donde guardar
+**							la temperatura.
+**								Valor entre 0 y 255.
+**     @return
+**                         	- Estado salida del método. 
+*/
+/* ===================================================================*/
+ph_st ph_move_to_angle(ph_dev* dev, uint8_t degrees);
+
+
 #endif

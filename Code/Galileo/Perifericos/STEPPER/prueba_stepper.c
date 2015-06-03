@@ -1,5 +1,12 @@
+#include <signal.h>
 #include <string.h>
 #include "stepper_robocol.h"
+stp_device* devptr;
+
+void emergency_disable(int sig){
+	stp_master_disable(devptr);
+	abort();
+}
 
 int main(){
 size_t size=40;
@@ -7,8 +14,8 @@ char* line=malloc(size);
 int32_t position,status,config=0;
 uint8_t step,ocd,tval;
 uint8_t alarm,corr,debug;
-stp_device* devptr;
-int32_t buf;
+int32_t buf,buf2;
+double fbuf;
 
 debug=0x5A;
 
@@ -18,9 +25,11 @@ dev1.pin_cs=PIN7;
 dev1.pin_dir=PIN5;
 dev1.pin_stndby=1;
 dev1.pin_flag=0;
-dev1.exp_n=2;
+dev1.exp=EXP2;
 dev1.pin_pwm=3;
-dev1.period=5000000;
+dev1.gear_ratio=15;
+dev1.step=7;
+dev1.period=5000;
 
 printf("Pin del stepper_device para chip select de Spi: %d\n",dev1.pin_cs);
 if(stp_build(&dev1)){
@@ -28,6 +37,10 @@ if(stp_build(&dev1)){
 }
 printf("Tras construccion de stepper\n");
 printf("Pin del stepper_device para chip select de Spi: %d\n",(*dev1.spi).pin);
+
+
+(void) signal(SIGINT, emergency_disable);
+
 
 
 devptr=&dev1;
@@ -42,7 +55,7 @@ if(stp_driver_enable(devptr)){
 }
 
 
-if(stp_setStepSel(devptr,0)){
+if(stp_setStepSel(devptr,2)){
 	printf("Error en setStepSel inicial\n" );
 }
 
@@ -52,7 +65,7 @@ printf("------------------Motor de pasos configurado------------------\n");
 				"\t en-clk\t\t\t\t-Habilita clk del stepper\n"
 				"\t en-driver\t\t\t-Habilita diver del stepper\n"
 				"\t en-out\t\t\t\t-Habilita salidas del stepper\n"
-				"\t master-disable\t\t\t-Deshabilita el stepper\n"
+				"\t s\t\t\t\t-Deshabilita el stepper\n"
 				"\t dis-clk\t\t\t-Deshabilita clk del stepper\n"
 				"\t dis-driver\t\t\t-Deshabilita driver del stepper\n"
 				"\t dis-out\t\t\t-Deshabilita salidas del stepper\n"
@@ -123,7 +136,7 @@ while(1){
 			stp_period(devptr,buf);
  
 		}else if(!strcmp(line,"dir\n")){
-			printf("Ingresela dirección: 0 - clockwise; 1 - counterclockwise:\n");
+			printf("Ingresela dirección: 0 - counterclockwise; 1 - clockwise:\n");
 			getline(&line,&size,stdin);
 			buf=atoi(line);
 			printf("Cambiando direccipon a a: %d \n",buf);
@@ -163,10 +176,26 @@ while(1){
 			printf("Cambiando OCDT a: %d \n",buf);
 			stp_setOCDT(devptr,buf);
 
+		}else if(!strcmp(line,"ratio\n")){
+			printf("Ingrese la nueva relación:\n");
+			getline(&line,&size,stdin);
+			fbuf=atof(line);
+			printf("Cambiando relación a: %f \n",fbuf);
+			(*devptr).gear_ratio=fbuf;
+
+		}else if(!strcmp(line,"rel\n")){
+			printf("Ingrese dirección:\n");
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			printf("Ingrese grados hexadecimales:\n");
+			getline(&line,&size,stdin);
+			buf2=atoi(line);
+			printf("Cambiando posición a: %d \n",buf);
+			stp_moveRelAngle(devptr,buf2,buf);
+
 		}else if(!strcmp(line,"master-enable\n")){
 			printf("Habilitando stepper:\n");
 			stp_master_enable(devptr);
-	
 		}else if(!strcmp(line,"en-clk\n")){
 			printf("Habilitando clk del stepper:\n");
 			stp_clk_enable(devptr);
@@ -174,7 +203,6 @@ while(1){
 		}else if(!strcmp(line,"en-driver\n")){
 			printf("Habilitando driver del stepper:\n");
 			stp_driver_enable(devptr);
-	
 		}else if(!strcmp(line,"en-out\n")){
 			printf("Habilitando salidas del stepper:\n");
 			stp_output_enable(devptr);
@@ -197,12 +225,21 @@ while(1){
 	
 		}else if(!strcmp(line,"exit\n")){
 			printf("Cerrando el programa. Adiós\n");
+			stp_returnToZero(devptr);
+			stp_master_disable(devptr);
 			break;
 		}else if(!strcmp(line,"debug\n")){
 			while(getchar()!='q'){
 				stp_getTVAL(devptr,&tval);
 				printf("TVAL: %d \n",tval);
 			}
+		}else if(!strcmp(line,"s\n")){
+			printf("Deshabilitando stepper:\n");
+			stp_master_disable(devptr);
+	
+		}else if(!strcmp(line,"cero\n")){
+			printf("Volviendo a casa:\n");
+			stp_returnToZero(devptr);
 		}else{
 		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t master-enable\t\t\t-Habilita el stepper\n"

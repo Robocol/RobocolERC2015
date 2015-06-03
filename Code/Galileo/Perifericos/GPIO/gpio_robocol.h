@@ -69,6 +69,14 @@ multiplexores, referirse al esquema de conexión de los GPIO par ala Intel Galil
 #define HIGH	1
 #define LOW 	0
 
+
+/*--------------------------------------------------------------------------*/
+/*
+ *                 DIRECCIONES DE LOS EXPANSORES DE PINES
+ */
+#define EXP1 0b0111000;
+#define EXP2 0b0111001;
+
 typedef uint8_t gpio_st; /* Estado de salida de la función*/
 
 /*--------------------------------------------------------------------------*/

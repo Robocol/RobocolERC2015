@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <math.h>
 #include <linux/types.h>
 #include "gpio_robocol.h"
 #include "spi_robocol.h"
@@ -105,8 +106,10 @@ typedef struct stp_device{
 	uint8_t pin_stndby;
 	uint8_t pin_flag;	
 	uint8_t pin_pwm;
-	uint8_t exp_n;
+	uint8_t exp;
 	uint32_t period;
+	uint8_t	step;
+	double gear_ratio;
 	spi_device* spi;
 }stp_device;
 
@@ -635,18 +638,65 @@ stp_st stp_setConfig(stp_device* dev, int32_t config);
 
 /*
 ** ===================================================================
-**     Método      :  stp_enable
+**     Método      :  stp_master_disable
 */
 /*!
 **     @resumen
-**          Habilita el dispositivo especificado por parámetro
+**          Deshabilita el dispositivo especificado por parámetro, tanto
+**			su clk, como las salidas del driver y el driver en si
 **
 **     @param
 **          dev     	   	- Puntero al dispositivo sobre el que recae 
 **							la acción.
 */
 /* ===================================================================*/
-stp_st stp_enable(stp_device* dev);
+stp_st stp_master_disable(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_clk_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita el clk del dispositivos especificado por parámetro
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_clk_disable(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_driver_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita el driver del dispositivo especificado por parámetro.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+
+stp_st stp_driver_disable(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_output_disable
+*/
+/*!
+**     @resumen
+**          Deshabilita las salidas del dispositivo especificado por parámetro.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_output_disable(stp_device* dev);
 
 /*
 ** ===================================================================
@@ -695,5 +745,106 @@ stp_st stp_period(stp_device* dev, uint32_t period);
 */
 /* ===================================================================*/
 stp_st stp_dir(stp_device* dev, uint32_t dir);
+
+/*
+** ===================================================================
+**     Método      :  stp_getAngularPosition
+*/
+/*!
+**     @resumen
+**          Obtiene la posición angular actual del dispositivo teniendo
+**			en cuenta la relación de reducción del mismo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**          dev     	   	- Puntero a la posición de memoria donde se 
+**							almacenará el dato obtenido.
+*/
+/* ===================================================================*/
+stp_st stp_getAngularPosition(stp_device* dev, int32_t *curr_angle);
+
+/*
+** ===================================================================
+**     Método      :  stp_moveTime
+*/
+/*!
+**     @resumen
+**          Gira el stepper durante un tiempo ingresado por parámetro
+**			en la dirección de giro actual.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          t 		    	- Tiempo de giro en milisegundos
+*/
+/* ===================================================================*/
+stp_st stp_moveTime(stp_device* dev, uint32_t t);
+
+/*
+** ===================================================================
+**     Método      :  stp_returnToZero
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posicipon actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_returnToZero(stp_device* dev);
+
+/*
+** ===================================================================
+**     Método      :  stp_moveRelAngle
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posicipon actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          degrees     	- Grados hexadecimales de giro
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+stp_st stp_moveRelAngle(stp_device* dev, uint32_t degrees, int32_t dir);
+
+/*
+** ===================================================================
+**     Método      :  stp_moveRelPos
+*/
+/*!
+**     @resumen
+**          Gira el stepper una cantidad de pasos (o micropasos) dada por parámetro, 
+**			en  la dirección indicada. Este giro tiene en cuenta la 
+**			relación especificada en el campo gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          rel_pos     	- Pasos a girar
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+
+
+stp_st stp_moveRelPos(stp_device* dev, uint32_t rel_pos, int32_t dir);
 
 #endif

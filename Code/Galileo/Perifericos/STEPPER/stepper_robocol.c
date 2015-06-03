@@ -21,17 +21,10 @@
 */
 /* ===================================================================*/
 stp_st stp_build(stp_device* dev){
-	uint8_t addr=0b0111000;
+	uint8_t addr=(*dev).exp;
 	spi_device* new_spi=malloc(sizeof(spi_device));
 
-	if ((*dev).exp_n<1 && (*dev).exp_n>2 ){
-		printf("El número de expansor ingresado en el stp_device pasado por parámetro no es válido.\n"
-			"Ingrese 1 o 2 para al selección del expansor deseado.(stp_build>stepper_robocol)\n");
-		return STP_ERROR;
-	}
-
-	addr|=((*dev).exp_n)-1;
-	printf("Expander: %d\n",(*dev).exp_n );
+	printf("Expander: %d\n",(*dev).exp );
 	printf("Address: %x\n",addr);
 
 	printf("Pin_cs en el stp_dev durante stp_build:\t\t%d\n", (*dev).pin_cs);
@@ -43,8 +36,9 @@ stp_st stp_build(stp_device* dev){
 	printf("Pin en new_spi despues de spi_create_device:\t\t%d\n", (*new_spi).pin);
 
 	(*dev).spi=new_spi;
-		printf("Pin en spi de stp_dev:\t\t%d\n", (*(*dev).spi).pin);
-	if(pwm_build((*dev).pin_pwm, (*dev).period , DUTY_CYCLE)!=0){
+	printf("Pin en spi de stp_dev:\t\t%d\n", (*(*dev).spi).pin);
+
+	if(pwm_build((*dev).pin_pwm, 5000 , DUTY_CYCLE)!=0){
 		printf("Error en la creación del dispositivo pwm para el manejo de stepper.(stepper_robocol.c)\n");
 		return STP_ERROR;
 	}
@@ -161,7 +155,6 @@ stp_st stp_getParam(stp_device* dev, uint8_t param, uint8_t* buff,uint8_t len){
 			printf("Error en SPI\n");
 			return STP_ERROR;
 		}else{
-			printf("RX:\t%X\n",rx);
 			*(buff+len-i-1)=rx;		//Little-Endian
 		}
 	}
@@ -197,7 +190,6 @@ stp_st stp_getPosition(stp_device* dev, int32_t* pos){
 		return STP_ERROR;
 	}
 
-	printf("Pos RAW: %.2X%.2X%.2X%.2X\n",buff[0],buff[1],buff[2],buff[3] );
 	if(buff[2]&0x20){
 		buff[2]|=0xC0;
 		buff[3]|=0xFF;
@@ -738,10 +730,41 @@ stp_st stp_setOCDT(stp_device* dev, int8_t ocdt){
 /* ===================================================================*/
 stp_st stp_setStepSel(stp_device* dev, int8_t step_sel){
 
+	(*dev).step=step_sel;
+
 	step_sel &= 0x07;
 	step_sel |= 0x88;
 
 	if(stp_setParam(dev,STEP_MODE,&step_sel,1)){
+		printf("Error asignando STEP_SEL\n");
+		return STP_ERROR;
+	}
+
+	return STP_OK;
+}
+/*
+** ===================================================================
+**     Método      :  stp_setStepSel
+*/
+/*!
+**     @resumen
+**          Asigna el valor del selector de paso según aquél almacenado en el dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @return
+**                         	- Estado salida del método. 
+*/
+/* ===================================================================*/
+stp_st stp_setDevStep(stp_device* dev){
+
+	uint8_t step_sel=(*dev).step;
+	
+	step_sel &= 0x07;
+	step_sel |= 0x88;
+
+	if(stp_setParam(dev,STEP_MODE,&(*dev).step,1)){
 		printf("Error asignando STEP_SEL\n");
 		return STP_ERROR;
 	}
@@ -876,6 +899,11 @@ stp_st stp_driver_enable(stp_device* dev){
 stp_st stp_output_enable(stp_device* dev){
 
 	uint8_t* u8;
+	
+	if(stp_setDevStep(dev)){
+		printf("Error seleccionando step durante output Enable de stepper. (stepper_robocol.c>stp_output_enable)\n");
+		return STP_ERROR;
+	}	
 
 	if(stp_setParam(dev,ENABLE_STEPPER,u8,0)){
 		printf("Error durante output Enable de stepper. (stepper_robocol.c>stp_output_enable)\n");
@@ -1067,19 +1095,233 @@ stp_st stp_period(stp_device* dev, uint32_t period){
 */
 /* ===================================================================*/
 stp_st stp_dir(stp_device* dev, uint32_t dir){
-
 	if(dir==CLOCKWISE){
-		if(gpio_gal_set((*dev).pin_dir)){
+		if(gpio_gal_clear((*dev).pin_dir)){
 			printf("Error cambiando dirección CLOCK_WISE\n");
 			return STP_ERROR;
 		}
 		return STP_OK;
 	}else if(dir==COUNTERCLOCKWISE){
-			if(gpio_gal_clear((*dev).pin_dir)){
+			if(gpio_gal_set((*dev).pin_dir)){
 			printf("Error cambiando direccion a COUNTER_CLOCK_WISE\n");
 			return STP_ERROR;
 		}
 		return STP_OK;	
 	}
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_moveRelPos
+*/
+/*!
+**     @resumen
+**          Gira el stepper una cantidad de pasos (o micropasos) dada por parámetro, 
+**			en  la dirección indicada. Este giro tiene en cuenta la 
+**			relación especificada en el campo gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          rel_pos     	- Pasos a girar
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+
+
+stp_st stp_moveRelPos(stp_device* dev, uint32_t rel_pos, int32_t dir){
+
+	int32_t		t;
+
+	stp_clk_disable(dev);
+	stp_dir(dev,dir);
+
+
+	t=rel_pos*(*dev).period;
+
+	stp_output_enable(dev);
+	stp_clk_enable(dev);
+
+	usleep(t);
+
+	stp_clk_disable(dev);
+
+	// usleep(400000);	
+	// stp_output_disable(dev);
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_moveRelAngle
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posicipon actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          degrees     	- Grados hexadecimales de giro
+**     @param
+**          dir     	   	- Dirección a asignar. Los posibles valores 
+**							son: CLOCKWISE o COUNTERCLOCKWISE
+*/
+/* ===================================================================*/
+stp_st stp_moveRelAngle(stp_device* dev, uint32_t degrees, int32_t dir){
+	int32_t		t;
+	uint8_t 	step=((*dev).step>4)? 4 : (*dev).step;
+	uint32_t	goal_pos=(int)(degrees*pow(2,step)*((*dev).gear_ratio)/1.8);
+
+
+	if(stp_moveRelPos(dev,goal_pos,dir)){
+		printf("Error moving tourrent position. (stepper_robocol.c>stp_moveToRelAngle)\n");
+	}
+
+	// usleep(400000);	
+	// stp_output_disable(dev);
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_returnToZero
+*/
+/*!
+**     @resumen
+**          Gira el stepper un angulo determinado respecto a su 
+**			posición actual, en  la dirección indicada. Este giro 
+**			tiene en cuenta la relación especificada en el campo 
+**			gear ratio del dispositivo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+*/
+/* ===================================================================*/
+stp_st stp_returnToZero(stp_device* dev){
+	int32_t 	pos;
+
+	if(stp_getPosition(dev,&pos)){
+		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+	}
+
+	//curr_degrees=(int)((pos*(1.8))/(pow(2,step)*(*dev).gear_ratio));
+
+	if(pos>0){
+		if(stp_moveRelPos(dev,abs(pos),CLOCKWISE)){
+			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+			return STP_ERROR;
+		}
+	}else{
+		if(stp_moveRelPos(dev,abs(pos),COUNTERCLOCKWISE)){
+			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
+			return STP_ERROR;
+		}
+	}
+
+	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_getAngularPosition
+*/
+/*!
+**     @resumen
+**          Obtiene la posición angular actual del dispositivo teniendo
+**			en cuenta la relación de reducción del mismo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**          dev     	   	- Puntero a la posición de memoria donde se 
+**							almacenará el dato obtenido.
+*/
+/* ===================================================================*/
+stp_st stp_getAngularPosition(stp_device* dev, int32_t *curr_angle){
+	int32_t 	pos;
+	uint8_t 	step=((*dev).step>4)? 4 : (*dev).step;
+
+	if(stp_getPosition(dev,&pos)){
+		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+		return STP_ERROR;
+	}
+
+	*curr_angle=(int)((pos*(1.8))/(pow(2,step)*(*dev).gear_ratio));
+
+	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_moveTime
+*/
+/*!
+**     @resumen
+**          Gira el stepper durante un tiempo ingresado por parámetro
+**			en la dirección de giro actual.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**     @param
+**          t 		    	- Tiempo de giro en milisegundos
+*/
+/* ===================================================================*/
+stp_st stp_moveTime(stp_device* dev, uint32_t t){
+	stp_output_enable(dev);
+	stp_clk_enable(dev);
+
+	usleep(t*1000);
+
+	stp_clk_disable(dev);
+	stp_output_disable(dev);
+	return STP_OK;
+}
+
+/*
+** ===================================================================
+**     Método      :  stp_moveToAngle
+*/
+/*!
+**     @resumen
+**          Obtiene la posición angular actual del dispositivo teniendo
+**			en cuenta la relación de reducción del mismo.
+**
+**     @param
+**          dev     	   	- Puntero al dispositivo sobre el que recae 
+**							la acción.
+**          dev     	   	- Puntero a la posición de memoria donde se 
+**							almacenará el dato obtenido.
+*/
+/* ===================================================================*/
+stp_st stp_moveToAngle(stp_device* dev, int32_t angle){
+	int32_t 	curr_ang,rel_ang;
+
+	if(stp_getAngularPosition(dev,&curr_ang)){
+		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+		return STP_ERROR;
+	}
 	
+	rel_ang=angle-curr_ang;
+
+	if(rel_ang<0){
+		if(stp_moveRelAngle(dev,abs(rel_ang),0)){
+			printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+			return STP_ERROR;
+		}
+	}else{
+		if(stp_moveRelAngle(dev,abs(rel_ang),1)){
+			printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+			return STP_ERROR;
+		}
+	}
+
+	return STP_OK;
 }

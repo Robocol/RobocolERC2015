@@ -9,10 +9,39 @@ int main(int argc, char const *argv[])
 	char* nombref=malloc(13);
 	ph_dev* devptr1;						//puntero a puente h
 	ph_dev* devptr2;						//puntero a puente h
-	uint8_t addr=0b0111000;				//Direccion expansor I2C
+	ph_dev dev1;
+	ph_dev dev2;
+
 	uint8_t* buffmed1;
-	uint8_t* buffmed2;
 	uint32_t counter=0;
+
+	dev1.pin_cs=PINA0;		
+	dev1.pin_in_a=0;
+	dev1.pin_in_b=1;
+	dev1.pin_enable=4;
+	dev1.pwm=0;
+	dev1.addr=0b0111000;				//Creación de segundo puente h con pines ina=2, inb=3, enable=4
+	devptr1=&dev1;						//Inicialmente el puntero se asigna al segundo puente h
+
+
+	dev2.pin_cs=PINA1;		
+	dev2.pin_in_a=2;
+	dev2.pin_in_b=3;
+	dev2.pin_enable=4;
+	dev2.pwm=0;
+	dev2.addr=0b0111000;				//Creación de segundo puente h con pines ina=2, inb=3, enable=4
+	devptr2=&dev2;						//Inicialmente el puntero se asigna al segundo puente h
+
+	printf("Iniciando creación de puenteH\n");
+
+	if(ph_build(devptr1)){
+		printf("Error en la creación de puenteH 2 \n");
+		return 1;
+	}
+	if(ph_build(devptr2)){
+		printf("Error en la creación de puenteH 2 \n");
+		return 1;
+	}
 
 	printf("Bienvenido al menu de medicion de corriente y velocidad de puentes H(ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 			"\t motor\n"
@@ -79,16 +108,19 @@ int main(int argc, char const *argv[])
 				}
 				printf("Creación de archivo exitosa\n");
 
-				if (motor==1){
+				if(motor==1){
+
 					printf("----Medicion para puente H 1----\n");
-					ph_dev dev1={PINA0,0,1,4};			//Creación de primer puente h con pines ina=0, inb=1, enable=4
-					devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
-					printf("Iniciando creación de puenteH\n");
-					if(ph_build(devptr1)){
-						printf("Error en la creación de puenteH 1 \n");
-						return 1;
-					}	
-					printf("Creación exitosa de puenteH 1\n");
+					
+					// ph_dev dev1={PINA0,0,1,4};			//Creación de primer puente h con pines ina=0, inb=1, enable=4
+					// dev1.addr=0b0111000;
+					// devptr1=&dev1;				//Inicialmente el puntero se asigna al primer puente h
+					// printf("Iniciando creación de puenteH\n");
+					
+					// if(ph_build(devptr1)){
+					// 	printf("Error en la creación de puenteH 1 \n");
+					// 	return 1;
+					// }	
 					fprintf(fdl, "//--------PUENTE H MOTOR1--------\\\\\n");			
 					fprintf(fdl, "//--------%s--------\\\\\n",nombref);
 					free(nombref);
@@ -97,28 +129,24 @@ int main(int argc, char const *argv[])
 					{
 						printf("Dentro del loop de medicion\n");
 						while(1){
-							getCorriente(devptr1,buffmed1);
-							fprintf(fdl, "Corriente%d: %d \n",*buffmed1);
+							ph_getCorriente(devptr1,buffmed1);
+							fprintf(fdl, "Corriente%d: %d \n",counter,*buffmed1);
+							counter++;
 						}
 					}else{
 						printf("Dentro del loop de medicion\n");
 						while(1){
-							getVelocidad(devptr1,buffmed1);;
+							ph_getVelocidad(devptr1,buffmed1);
 							fprintf(fdl, "Velocidad%d:%d \n",counter,*buffmed1);
 							counter++;
 						}
 					}			
 
 				}else if(motor==2){
+
 					printf("----Medicion para puenteH 2----\n");
-					ph_dev dev2={PINA1,2,3,4};			//Creación de segundo puente h con pines ina=2, inb=3, enable=4
-					devptr2=&dev2;				//Inicialmente el puntero se asigna al segundo puente h
-					printf("Iniciando creación de puenteH\n");
-					if(ph_build(devptr2)){
-						printf("Error en la creación de puenteH 2 \n");
-						return 1;
-					}
-					printf("Creación exitosa de puenteH 2\n");
+
+
 					fprintf(fdl, "//--------PUENTE H MOTOR2--------\\\\\n");
 					fprintf(fdl, "//--------%s--------\\\\\n",nombref);
 
@@ -126,17 +154,17 @@ int main(int argc, char const *argv[])
 
 					if (medicion==1)
 					{
-						printf("Dentro del loop de medicion\n");
+						printf("Dentro del loop de medición\n");
 						while(1){
-							getCorriente(devptr2,buffmed2);
-							fprintf(fdl, "Corriente: %d \n",*buffmed2);
+							ph_getCorriente(devptr2,buffmed1);
+							fprintf(fdl, "Corriente: %d \n",counter,*buffmed1);
 							counter++;
 						}
 					}else{
-						printf("Dentro del loop de medicion\n");
+						printf("Dentro del loop de medición\n");
 						while(1){
-							getVelocidad(devptr2,buffmed2);;
-							fprintf(fdl, "Velocidad%d:%d \n",counter,*buffmed2);
+							ph_getVelocidad(devptr2,buffmed1);
+							fprintf(fdl, "Velocidad%d:%d \n",counter,*buffmed1);
 							counter++;
 						}
 					}				

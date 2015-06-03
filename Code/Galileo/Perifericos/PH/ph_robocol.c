@@ -8,6 +8,7 @@
  *					Germán Giraldo
  * -------------------------------------------------------------------------------------
  */
+
 #include "ph_robocol.h"
 
 /*
@@ -28,7 +29,7 @@
 ph_st ph_build(ph_dev* dev){
 	
 	spi_device* new_spi=malloc(sizeof(spi_device));
-	uint8_t addr=0b0111000;
+
 
 	printf("Iniciando creación de dispositivo spi para manejo de puenteH\n");
 	if(spi_create_device(new_spi,0,(*dev).pin_cs)){
@@ -42,7 +43,8 @@ ph_st ph_build(ph_dev* dev){
 		return PH_ERROR;
 	}
 
-	if (build_expander(addr)){
+	printf("Addr: %x\n",(*dev).addr);
+	if (build_expander((*dev).addr)){
 		printf("Error en la creación del expansor para control de puente H\n" );
 	}
 
@@ -353,7 +355,7 @@ ph_st ph_setVel(ph_dev* dev,uint8_t vel){
 	if(spi_rw((*dev).spi,&vel,&rx,1)){
 		perror("Error while setting VELOCIDAD");
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -412,12 +414,14 @@ ph_st ph_getCorriente(ph_dev* dev, uint8_t* corr){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in MEDIR_CORRIENTE");
+		return PH_ERROR;
 	}
 
 	if(spi_rw((*dev).spi,&tx,corr,1)){
 		perror("Error while getting CORRIENTE");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -445,12 +449,14 @@ ph_st ph_getVelocidad(ph_dev* dev,uint8_t* vel){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in MEDIR_VELOCIDAD");
+		return PH_ERROR;
 	}
 
 	if(spi_rw((*dev).spi,&tx,vel,1)){
 		perror("Error while getting VELOCIDAD");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -478,12 +484,14 @@ ph_st ph_getEstado(ph_dev* dev,uint8_t* est){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in DAR_ESTADO");
+		return PH_ERROR;
 	}
 
 	if(spi_read((*dev).spi,est,1)){
 		perror("Error while getting ESTADO");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -519,6 +527,49 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp){
 	return (ph_st)rx;
 }
 
+
+ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir){
+	uint8_t pwm=(uint8_t)(256.0*duty/100.0);
+
+	if(ph_setEstado(dev,MANUAL_EST)){
+		printf("Error en la modificación de estado hacia estado manual.\n");
+		return PH_ERROR;
+	}
+
+	if(ph_disable(dev)){
+		printf("Error en la habilitación del puente H con el puntero pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	if (ph_setDireccion(dev,dir)){
+		printf("Error en el set de dirección del puente H pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	if (ph_setPWM(dev,pwm)){
+		printf("No fue posible establecer el pwm para el puente H en ph_step\n");
+		return PH_ERROR;
+	}
+
+	if (ph_enable(dev)){
+		printf("Error en la habilitación del puente H pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	sleep(1);
+
+	if (ph_setPWM(dev,0)){
+		printf("No fue posible establecer el pwm en 0 para el puente H en ph_step\n");
+		return PH_ERROR;
+	}
+
+	if (ph_disable(dev)){
+		printf("Error en la deshabilitación del puente H pasado por parámetro\n");
+		return PH_ERROR;
+	}
+
+	return PH_OK;
+}
 // ph_st ph_setPWMSmooth(ph_dev* devptr, uint8_t pwm, uint8_t stepsize){
 // 	uint8_t curr_pwm;
 // 	int8_t steps;
@@ -562,3 +613,32 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp){
 // 	(*devptr).pwm=pwm;
 // 	return PH_OK;
 // }
+ph_st ph_moveToAngle(ph_dev* dev, int8_t goal_pos){
+	uint8_t curr_pos;
+	if(ph_getVelocidad(dev, &curr_pos)){
+		printf("Error al obtener posición. (ph_robocol.c -> ph_move_to_angle)\n");
+		return PH_ERROR;
+	}
+
+	// goal_pos=(int)(degrees/0.84236 + (134.62112/0.84236));
+
+	if((curr_pos-goal_pos)<0){
+		if(ph_setDireccion(dev, 0x00)){
+			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
+			return PH_ERROR;
+		}
+	}else{
+		if(ph_setDireccion(dev, 0x01)){
+			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
+			return PH_ERROR;
+		}
+	}
+
+	if(ph_setVel(dev, goal_pos)){
+		printf("Error al definir posición objetivo (ph_robocol.c -> ph_move_to_angle)\n");
+		perror("Descripción:");
+		return PH_ERROR;
+	}
+
+	return PH_OK;
+}
