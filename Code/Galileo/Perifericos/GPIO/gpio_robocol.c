@@ -494,12 +494,11 @@ gpio_st gpio_gal_clear(uint8_t num){
 */
 /* ===================================================================*/
 gpio_st build_expander(uint8_t addr){
-	unsigned char i2c_result;
 	if(i2c_open("/dev/i2c-0",addr)<0){
 		perror("Descripcion:");
 		return GPIO_ERROR;
 	}
-	return i2c_result;
+	return GPIO_OK;
 }
 
 /*

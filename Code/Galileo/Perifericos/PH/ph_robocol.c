@@ -43,6 +43,7 @@ ph_st ph_build(ph_dev* dev){
 		return PH_ERROR;
 	}
 
+	printf("Addr: %x\n",(*dev).addr);
 	if (build_expander((*dev).addr)){
 		printf("Error en la creación del expansor para control de puente H\n" );
 	}
@@ -413,12 +414,14 @@ ph_st ph_getCorriente(ph_dev* dev, uint8_t* corr){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in MEDIR_CORRIENTE");
+		return PH_ERROR;
 	}
 
 	if(spi_rw((*dev).spi,&tx,corr,1)){
 		perror("Error while getting CORRIENTE");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -446,12 +449,14 @@ ph_st ph_getVelocidad(ph_dev* dev,uint8_t* vel){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in MEDIR_VELOCIDAD");
+		return PH_ERROR;
 	}
 
 	if(spi_rw((*dev).spi,&tx,vel,1)){
 		perror("Error while getting VELOCIDAD");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
@@ -479,12 +484,14 @@ ph_st ph_getEstado(ph_dev* dev,uint8_t* est){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in DAR_ESTADO");
+		return PH_ERROR;
 	}
 
 	if(spi_read((*dev).spi,est,1)){
 		perror("Error while getting ESTADO");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 /*
