@@ -109,7 +109,7 @@ typedef struct stp_device{
 	uint8_t exp;
 	uint32_t period;
 	uint8_t	step;
-	uint8_t gear_ratio;
+	double gear_ratio;
 	spi_device* spi;
 }stp_device;
 

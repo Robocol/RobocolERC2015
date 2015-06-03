@@ -15,6 +15,7 @@ int32_t position,status,config=0;
 uint8_t step,ocd,tval;
 uint8_t alarm,corr,debug;
 int32_t buf,buf2;
+double fbuf;
 
 debug=0x5A;
 
@@ -26,7 +27,7 @@ dev1.pin_stndby=1;
 dev1.pin_flag=0;
 dev1.exp=EXP2;
 dev1.pin_pwm=3;
-dev1.gear_ratio=1;
+dev1.gear_ratio=15;
 dev1.step=7;
 dev1.period=5000;
 
@@ -174,6 +175,13 @@ while(1){
 			buf=atoi(line);
 			printf("Cambiando OCDT a: %d \n",buf);
 			stp_setOCDT(devptr,buf);
+
+		}else if(!strcmp(line,"ratio\n")){
+			printf("Ingrese la nueva relación:\n");
+			getline(&line,&size,stdin);
+			fbuf=atof(line);
+			printf("Cambiando relación a: %f \n",fbuf);
+			(*devptr).gear_ratio=fbuf;
 
 		}else if(!strcmp(line,"rel\n")){
 			printf("Ingrese dirección:\n");

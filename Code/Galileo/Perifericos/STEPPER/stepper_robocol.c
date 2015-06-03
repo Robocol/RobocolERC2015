@@ -1155,7 +1155,9 @@ stp_st stp_move_degrees(stp_device* dev, uint32_t degrees, int32_t dir){
 	usleep(t);
 
 	stp_clk_disable(dev);
-	stp_output_disable(dev);
+
+	// usleep(400000);	
+	// stp_output_disable(dev);
 }
 
 /*
@@ -1188,22 +1190,20 @@ stp_st stp_return_to_cero(stp_device* dev){
 		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
 	}
 
-	while(pos<(-5)||pos>5){
-		curr_degrees=(int)((pos*(1.8))/(pow(2,step)));
-		printf("curr_degrees: %d\n",curr_degrees);
+	curr_degrees=(int)((pos*(1.8))/(pow(2,step)*(*dev).gear_ratio));
+	printf("curr_degrees: %d\n",curr_degrees);
 
-		if(curr_degrees>0){
-			if(stp_move_degrees(dev,abs(curr_degrees),CLOCKWISE)){
-				printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
-			}
-		}else{
-			if(stp_move_degrees(dev,abs(curr_degrees),COUNTERCLOCKWISE)){
-				printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
-			}
+	if(curr_degrees>0){
+		if(stp_move_degrees(dev,abs(curr_degrees),CLOCKWISE)){
+			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
 		}
-		if(stp_getPosition(dev,&pos)){
-			printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+	}else{
+		if(stp_move_degrees(dev,abs(curr_degrees),COUNTERCLOCKWISE)){
+			printf("Error returning to cero. (stepper_robocol.c>stp_return_to_cero)\n");
 		}
+	}
+	if(stp_getPosition(dev,&pos)){
+		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
 	}
 }
 
