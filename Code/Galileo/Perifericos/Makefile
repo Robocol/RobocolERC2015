@@ -178,7 +178,7 @@ $(ODIR)/lmp_robocol$(LEXT): ../TEMPERATURA/lmp_robocol.c ../TEMPERATURA/lmp_robo
                       -I../TEMPERATURA
 
 ################################################################################################
-#	STEPPER 																			   	   #
+#	ARM																					   	   #
 ################################################################################################
 
 $(ODIR)/arm_robocol$(LEXT): ../BRAZO/arm_robocol.c ../BRAZO/arm_robocol.h  $(ODIR)/i2c_robocol$(LEXT)  \
