@@ -30,31 +30,73 @@ arm_st arm_build(void){
 	(*u_actuator).pin_enable=PINE4;
 	(*u_actuator).addr=EXP1;
 
-	(*sup).pin_cs=PIN6;
-	(*sup).pin_dir=PIN2;
-	(*sup).pin_pwm=PIN3;
+	// (*sup).pin_cs=PIN6;
+	// (*sup).pin_dir=PIN2;
+	// (*sup).pin_pwm=3;
+	// (*sup).exp=EXP2;
+	// (*sup).gear_ratio=14.9;
+	// (*sup).step=2;
+	// (*sup).pin_stndby=PINE0;
+	// (*sup).pin_flag=PINE1;
+	
+	(*sup).pin_cs=PIN7;
+	(*sup).pin_dir=PIN5;
+	(*sup).pin_stndby=0x01;
+	(*sup).pin_flag=0;
 	(*sup).exp=EXP2;
+	(*sup).pin_pwm=3;
 	(*sup).gear_ratio=14.9;
 	(*sup).step=2;
-	(*sup).pin_stndby=PINE0;
-	(*sup).pin_flag=PINE1;
-	
+	(*sup).period=5000;
+
 	(*wrist).pin_cs=PIN7;
 	(*wrist).pin_dir=PIN4;
-	(*wrist).pin_pwm=PIN3;
+	(*wrist).pin_pwm=3;
 	(*wrist).exp=EXP2;
 	(*wrist).gear_ratio=14.9;
 	(*wrist).step=2;
 	(*wrist).pin_stndby=PINE2;
 	(*wrist).pin_flag=PINE3;
+	(*wrist).period=5000;
 
 	(*claw).pin_cs=PIN8;
 	(*claw).pin_dir=PIN5;
-	(*claw).pin_pwm=PIN3;
+	(*claw).pin_pwm=3;
 	(*claw).exp=EXP2
 	(*claw).gear_ratio=14.9;
-	(*claw).step=2;	(*claw).pin_stndby=PINE4;
+	(*claw).step=2;	
+	(*claw).pin_stndby=PINE4;
 	(*claw).pin_flag=PINE5;
+	(*claw).period=5000;
+
+
+	posicionA.ang_motor=0;
+	posicionA.ang_b_actuator=0;
+	posicionA.ang_u_actuator=-30;
+	posicionA.ang_sup=-30;
+	posicionA.ang_wrist=0;
+	posicionA.ang_claw=0;
+
+	posicionB.ang_motor=0;
+	posicionB.ang_b_actuator=-45;
+	posicionB.ang_u_actuator=-45;
+	posicionB.ang_sup=20;
+	posicionB.ang_wrist=0;
+	posicionB.ang_claw=0;
+
+	posicionC.ang_motor=0;
+	posicionC.ang_b_actuator=-45;
+	posicionC.ang_u_actuator=-45;
+	posicionC.ang_sup=-20;
+	posicionC.ang_wrist=0;
+	posicionC.ang_claw=0;
+
+	posicionD.ang_motor=0;
+	posicionD.ang_b_actuator=50;
+	posicionD.ang_u_actuator=-35;
+	posicionD.ang_sup=-15;
+	posicionD.ang_wrist=0;
+	posicionD.ang_claw=0;
 
 	if (ph_build(b_motor)){
 		printf("Error en la inicialización del puente h que maneja el motor inferior \n");
@@ -186,16 +228,16 @@ arm_st arm_hand_step(uint8_t stepper){
 */
 /* ===================================================================*/
 
-arm_st arm_get_ph(uint8_t ph_num,ph_dev* dev){
+arm_st arm_get_ph(uint8_t ph_num,ph_dev** dev){
 	switch(ph_num){
 		case BMOTOR:
-			dev=(*armdev).b_motor;
+			*dev=(*armdev).b_motor;
 			return ARM_OK;
 		case BACTUATOR:
-			dev=(*armdev).b_actuator;
+			*dev=(*armdev).b_actuator;
 			return ARM_OK;
 		case UACTUATOR:
-			dev=(*armdev).u_actuator;
+			*dev=(*armdev).u_actuator;
 			return ARM_OK;
 		default:
 			printf("El número de dispositivo puente h ingresado por parámetro no es válido.\n");
@@ -204,17 +246,18 @@ arm_st arm_get_ph(uint8_t ph_num,ph_dev* dev){
 }
 
 
-arm_st arm_get_stp(uint8_t stp_num,stp_device* dev){
+arm_st arm_get_stp(uint8_t stp_num,stp_device** dev){
 
+	printf("stndby DENTRO DEL MÉTODO: %d\n",(*(*armdev).sup).pin_stndby);
 	switch(stp_num){
 		case SUP:
-			dev=(*armdev).sup;
+			*dev=(*armdev).sup;
 			return ARM_OK;
 		case WRIST:
-			dev=(*armdev).wrist;
+			*dev=(*armdev).wrist;
 			return ARM_OK;
 		case CLAW:
-			dev=(*armdev).claw;
+			*dev=(*armdev).claw;
 			return ARM_OK;
 		default:
 			printf("El número de dispositivo stepper ingresado por parámetro no es válido.\n");
@@ -323,5 +366,88 @@ arm_st arm_moveUActToAngle(int8_t angle){
 */
 /* ===================================================================*/
 arm_st arm_moveSupToAngle(int8_t angle){
-	stp_moveToAngle((*armdev).sup,angle);
+	return stp_moveToAngle((*armdev).sup,angle);
 }
+
+/*
+** ===================================================================
+**     Método      :  arm_moveToA
+*/
+/*!
+**     @resumen
+**          Muevo el brazo a la posición A
+**
+*/
+/* ===================================================================*/
+arm_st arm_moveToPosA(void){
+
+	// if(arm_moveMotorToAngle(posicionA.ang_b_actuator)){
+	// 	printf("Error llevando el BActuator a la posición A\n");
+	// }
+	
+	if(arm_moveBActToAngle(posicionA.ang_b_actuator)){
+		printf("Error llevando el BActuator a la posición A\n");
+	}
+
+	if(arm_moveUActToAngle(posicionA.ang_u_actuator)){
+		printf("Error llevando el UActuator a la posición A\n");
+	}
+
+	if(arm_moveSupToAngle(posicionA.ang_sup)){
+		printf("Error llevando el Supinador a la posición A\n");
+	}
+
+	// if(arm_moveWristToAngle(posicionA.ang_sup)){
+	// 	printf("Error llevando el Supinador a la posición A\n");
+	// }
+
+	// if(arm_moveClawToAngle(posicionA.ang_sup)){
+	// 	printf("Error llevando el Supinador a la posición A\n");
+	// }
+}
+
+/*
+** ===================================================================
+**     Método      :  arm_moveToA
+*/
+/*!
+**     @resumen
+**          Muevo el brazo a la posición A
+**
+*/
+/* ===================================================================*/
+arm_st arm_moveToPos(arm_pos posicion){
+
+	// if(arm_moveMotorToAngle(posicion.ang_b_actuator)){
+	// 	printf("Error llevando el BActuator a la posición\n");
+	// }
+	arm_st st=ARM_OK;
+	if(arm_moveBActToAngle(posicion.ang_b_actuator)){
+		printf("Error llevando el BActuator a la posición\n");
+		st=ARM_ERROR;
+	}
+
+	if(arm_moveUActToAngle(posicion.ang_u_actuator)){
+		printf("Error llevando el UActuator a la posición\n");
+		st=ARM_ERROR;
+	}
+
+	if(arm_moveSupToAngle(posicion.ang_sup)){
+		printf("Error llevando el Supinador a la posición\n");
+		st=ARM_ERROR;
+	}
+
+	// if(arm_moveWristToAngle(posicion.ang_sup)){
+	// 	printf("Error llevando el Supinador a la posición\n");
+	//	st=ARM_ERROR;
+	// }
+
+	// if(arm_moveClawToAngle(posicion.ang_sup)){
+	// 	printf("Error llevando el Supinador a la posición\n");
+	//	st=ARM_ERROR;
+	// }
+
+	return st;
+}
+
+
