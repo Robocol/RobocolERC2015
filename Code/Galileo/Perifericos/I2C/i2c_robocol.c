@@ -166,6 +166,13 @@ i2c_st i2c_write(char* data){
 i2c_st i2c_write_rw(char* data){
     dev.i2c_buff_out=*data;
 
+    if (ioctl((dev).fd,I2C_SLAVE,(dev).addr) < 0) {
+        printf("Failed to acquire bus access and/or talk to slave.\n");
+        perror("Error: ");
+        return I2C_ERROR;
+    }
+
+
     struct i2c_msg mensajes[2]={i2c_message_in,i2c_message_out};
     i2c_msgs.msgs=mensajes;
     i2c_msgs.nmsgs=2;

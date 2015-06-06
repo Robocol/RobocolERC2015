@@ -359,6 +359,9 @@ arm_st prueba_st(stp_device* devptr){
 
 arm_st prueba_ph(ph_dev* devptr){
 
+	build_expander((*devptr).addr);
+	printf("Addr: %d\n", (dev).addr);
+
 	printf("pinEnable: %d\n",(*devptr).pin_enable);
 	printf("Test de funcionamiento de Puente H.\n Utilice una de los siguientes comandos:\n" 
 		"\t enable\t\t\t-Habilita o deshabilita el puente H. Valores de entrada 1 o 0\n"

@@ -128,6 +128,8 @@ arm_st arm_build(void){
 		return ARM_ERROR;
 	}
 
+
+
 	(*armdev).b_motor=b_motor;
 	(*armdev).b_actuator=b_actuator;
 	(*armdev).u_actuator=u_actuator;
@@ -230,14 +232,14 @@ arm_st arm_hand_step(uint8_t stepper){
 
 arm_st arm_get_ph(uint8_t ph_num,ph_dev** dev){
 	switch(ph_num){
-		case BMOTOR:
-			*dev=(*armdev).b_motor;
-			return ARM_OK;
 		case BACTUATOR:
 			*dev=(*armdev).b_actuator;
 			return ARM_OK;
 		case UACTUATOR:
 			*dev=(*armdev).u_actuator;
+			return ARM_OK;
+		case BMOTOR:
+			*dev=(*armdev).b_motor;
 			return ARM_OK;
 		default:
 			printf("El número de dispositivo puente h ingresado por parámetro no es válido.\n");
@@ -371,48 +373,11 @@ arm_st arm_moveSupToAngle(int8_t angle){
 
 /*
 ** ===================================================================
-**     Método      :  arm_moveToA
+**     Método      :  arm_moveToPos
 */
 /*!
 **     @resumen
-**          Muevo el brazo a la posición A
-**
-*/
-/* ===================================================================*/
-arm_st arm_moveToPosA(void){
-
-	// if(arm_moveMotorToAngle(posicionA.ang_b_actuator)){
-	// 	printf("Error llevando el BActuator a la posición A\n");
-	// }
-	
-	if(arm_moveBActToAngle(posicionA.ang_b_actuator)){
-		printf("Error llevando el BActuator a la posición A\n");
-	}
-
-	if(arm_moveUActToAngle(posicionA.ang_u_actuator)){
-		printf("Error llevando el UActuator a la posición A\n");
-	}
-
-	if(arm_moveSupToAngle(posicionA.ang_sup)){
-		printf("Error llevando el Supinador a la posición A\n");
-	}
-
-	// if(arm_moveWristToAngle(posicionA.ang_sup)){
-	// 	printf("Error llevando el Supinador a la posición A\n");
-	// }
-
-	// if(arm_moveClawToAngle(posicionA.ang_sup)){
-	// 	printf("Error llevando el Supinador a la posición A\n");
-	// }
-}
-
-/*
-** ===================================================================
-**     Método      :  arm_moveToA
-*/
-/*!
-**     @resumen
-**          Muevo el brazo a la posición A
+**          Muevo el brazo a la posición especificada
 **
 */
 /* ===================================================================*/
