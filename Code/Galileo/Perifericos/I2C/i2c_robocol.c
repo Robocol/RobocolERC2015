@@ -255,6 +255,7 @@ i2c_st i2c_chaddr(uint8_t addr){
         return I2C_ERROR;
     }
     dev.addr=addr;
-
+    i2c_message_out=(struct i2c_msg){dev.addr,0x00,1,&dev.i2c_buff_out};
+    i2c_message_in=(struct i2c_msg){dev.addr,0x01,1,&dev.i2c_buff_in};
     return I2C_OK;
 }
