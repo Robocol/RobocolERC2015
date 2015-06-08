@@ -343,6 +343,37 @@ struct dispositivo{
 
 /*
 ** ===================================================================
+**     Método      :  become_daemon
+*/
+/*!
+**     @resumen
+**          Convierte un proceso en un demonio cuando es llamado. 
+**			
+**     @param
+**          flags     	   	- Banderas de configuración del demonio
+**     @return
+**                         	- Estado salida del método. 
+*/
+/* ===================================================================*/
+int becomeDaemon(int flags);
+
+/*
+** ===================================================================
+**     Método      :  sighupHandler
+*/
+/*!
+**     @resumen
+**          Maneja las señales del demonio, en especial la señal SIGHUP. 
+**			
+**     @param
+**          sig     	   	- Vector de señal
+*/
+/* ===================================================================*/
+static void sighupHandler(int sig);
+
+
+/*
+** ===================================================================
 **     Método      :  spi_setup
 */
 /*!
@@ -377,6 +408,10 @@ rover_st seleccionar_com();
 */
 /* ===================================================================*/
 rover_st sincronizar_reloj();
+
+/*
+
+
 
 
 
