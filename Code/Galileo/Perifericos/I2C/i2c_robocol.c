@@ -166,6 +166,13 @@ i2c_st i2c_write(char* data){
 i2c_st i2c_write_rw(char* data){
     dev.i2c_buff_out=*data;
 
+    if (ioctl((dev).fd,I2C_SLAVE,(dev).addr) < 0) {
+        printf("Failed to acquire bus access and/or talk to slave.\n");
+        perror("Error: ");
+        return I2C_ERROR;
+    }
+
+
     struct i2c_msg mensajes[2]={i2c_message_in,i2c_message_out};
     i2c_msgs.msgs=mensajes;
     i2c_msgs.nmsgs=2;
@@ -248,6 +255,7 @@ i2c_st i2c_chaddr(uint8_t addr){
         return I2C_ERROR;
     }
     dev.addr=addr;
-
+    i2c_message_out=(struct i2c_msg){dev.addr,0x00,1,&dev.i2c_buff_out};
+    i2c_message_in=(struct i2c_msg){dev.addr,0x01,1,&dev.i2c_buff_in};
     return I2C_OK;
 }

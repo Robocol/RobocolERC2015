@@ -125,8 +125,12 @@ $(ODIR)/ph_robocol$(LEXT): ../PH/ph_robocol.c ../PH/ph_robocol.h $(ODIR)/i2c_rob
 #	ADC																					   	   #
 ################################################################################################
 
-$(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h  $(ODIR)/misc_robocol$(LEXT)
-	$(CC) -c -o $@ $< -I../../MISC
+$(ODIR)/adc_robocol$(LEXT): ../ADC/adc_robocol.c ../ADC/adc_robocol.h $(ODIR)/gpio_robocol$(LEXT)\
+																	$(ODIR)/misc_robocol$(LEXT)\
+																	$(ODIR)/i2c_robocol$(LEXT)
+	$(CC) -c -o $@ $< -I../../MISC\
+					-I../GPIO\
+					-I../I2C 
 
 
 ################################################################################################
@@ -178,7 +182,7 @@ $(ODIR)/lmp_robocol$(LEXT): ../TEMPERATURA/lmp_robocol.c ../TEMPERATURA/lmp_robo
                       -I../TEMPERATURA
 
 ################################################################################################
-#	STEPPER 																			   	   #
+#	ARM																					   	   #
 ################################################################################################
 
 $(ODIR)/arm_robocol$(LEXT): ../BRAZO/arm_robocol.c ../BRAZO/arm_robocol.h  $(ODIR)/i2c_robocol$(LEXT)  \

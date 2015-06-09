@@ -61,6 +61,7 @@ static const uint8_t GPIO29 =29;
 typedef struct adc_dev{
 	uint8_t adc_num;
 	uint16_t* data;
+	float v_ref;
 	int fd;
 }adc_dev;
 
@@ -98,6 +99,11 @@ adc_st build_adc(adc_dev* devptr);
 */
 /* ===================================================================*/
 adc_st get_adc_value(adc_dev* devptr);
+
+adc_st get_volatge(adc_dev *devptr,float* voltage);
+
+
+
 
 /*
 ** ===================================================================

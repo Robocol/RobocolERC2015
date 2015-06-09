@@ -34,4 +34,10 @@ ph_slave: $(OBJ)
 ph_master: $(OBJ)
 	$(CC) -o $@$(EEXT) ph_master.c $^ $(CFLAGS)
 
+ph_slave_control: $(OBJ)
+	$(CC) -o $@$(EEXT) ph_slave_control.c $^ $(CFLAGS)
+
+#Regla de compilación para creación de logs
+ph_master_control: $(OBJ)
+	$(CC) -o $@$(EEXT) ph_master_control.c $^ $(CFLAGS)
 include ../Makefile

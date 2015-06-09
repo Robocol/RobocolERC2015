@@ -100,6 +100,14 @@ adc_st get_adc_value(adc_dev* devptr){
 	return ADC_OK;
 }
 
+adc_st get_voltage(adc_dev *devptr,float* voltage){
+	if (get_adc_value(devptr)){
+		return ADC_ERROR;
+	}
+	(*voltage)=(*((*devptr).data))*(((*devptr)).v_ref)/4095;
+	return ADC_OK;
+}
+
 /*
 ** ===================================================================
 **     Método      :  parse_adc_gpio

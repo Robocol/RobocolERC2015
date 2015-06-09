@@ -5,9 +5,9 @@
 
 #define ARM_OK 			0x00
 #define ARM_ERROR 		0x01
-#define BMOTOR 			0x03
 #define BACTUATOR 		0x01
 #define UACTUATOR 		0x02
+#define BMOTOR 			0x03
 #define SUP 			0x01
 #define WRIST 			0x02
 #define CLAW 			0x03
@@ -28,7 +28,23 @@ typedef struct
 	
 }arm_dev;
 
+typedef struct 
+{
+	int8_t ang_motor;
+	int8_t ang_b_actuator;
+	int8_t ang_u_actuator;
+	int8_t ang_sup;
+	int8_t ang_wrist;
+	int8_t ang_claw;
+	
+}arm_pos;
+
 arm_dev* armdev;
+
+arm_pos posicionA;
+arm_pos posicionB;
+arm_pos posicionC;
+arm_pos posicionD;
 
 /*
 ** ===================================================================
@@ -83,10 +99,10 @@ arm_st arm_ph_step(uint8_t ph_num,uint8_t dir);
 arm_st arm_hand_step(uint8_t stp_num);
 
 
-arm_st arm_get_ph(uint8_t ph_num,ph_dev* dev);
+arm_st arm_get_ph(uint8_t ph_num,ph_dev** dev);
 
 
-arm_st arm_get_stp(uint8_t stp_num,stp_device* dev);
+arm_st arm_get_stp(uint8_t stp_num,stp_device** dev);
 
 /*
 ** ===================================================================
