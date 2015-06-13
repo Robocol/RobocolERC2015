@@ -207,23 +207,36 @@ void parser(void){
 	}else if(!strcmp(line,"s\n")){
 		sendbuf[tx_len++]='s';
 		if (state & FORWARD){
-			ph_setPWMSmooth(devptr1,0,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,0,STEP_SIZE);
+			ph_setPWM(devptr1,0);
+			ph_setPWM(devptr2,0);
 			ph_setDireccion(devptr1,1);
 			ph_setDireccion(devptr2,1);
-			ph_setPWMSmooth(devptr1,DEFAULT_PWM,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,DEFAULT_PWM,STEP_SIZE);
+			ph_setPWM(devptr1,DEFAULT_PWM);
+			ph_setPWM(devptr2,DEFAULT_PWM);
 		}else if ((state & STEER)||(state & STOPPED)){
-			ph_setPWMSmooth(devptr1,DEFAULT_PWM,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,DEFAULT_PWM,STEP_SIZE);
+			ph_setDireccion(devptr1,1);
+			ph_setDireccion(devptr2,1);
+			ph_setPWM(devptr1,DEFAULT_PWM);
+			ph_setPWM(devptr2,DEFAULT_PWM);
 		}
+
+		ph_setDireccion(devptr1,1);
+		ph_setDireccion(devptr2,1);
+
 		state=BACKWARD;
 		printf("s handled\n");
 	}else if(!strcmp(line,"d\n")){
 		sendbuf[tx_len++]='d';
 		int8_t new_pwm=(*devptr1).pwm+INC;
-		ph_setDireccion(devptr1,1);
-		ph_setDireccion(devptr2,1);
+		
+		if(state & BACKWARD){
+			ph_setDireccion(devptr1,0);
+			ph_setDireccion(devptr2,0);
+		}else{
+			ph_setDireccion(devptr1,1);
+			ph_setDireccion(devptr2,1);
+		}
+
 		if(state&STEER){
 			if (new_pwm>MAX_PWM){
 				ph_setPWMSmooth(devptr1,MAX_PWM,STEP_SIZE);
@@ -237,7 +250,6 @@ void parser(void){
 				ph_setPWM(devptr1,0);
 				ph_setPWM(devptr2,0);
 		}
-		state=BACKWARD;
 		state|=STEER;		
 		printf("right handled\n");
 	}else if(!strcmp(line,"pwm\n")){
@@ -305,7 +317,6 @@ void parser(void){
 		sendbuf[tx_len++]='x';
 		ph_setPWM(devptr1,0);
 		ph_setPWM(devptr2,0);
-		state=STOPPED;
 	}else if(!strcmp(line,"exit\n")){
 		sendbuf[tx_len++]='q';
 		printf("Saliendo del programa\n");

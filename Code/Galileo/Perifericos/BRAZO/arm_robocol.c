@@ -45,7 +45,8 @@ arm_st arm_build(void){
 	(*sup).pin_flag=0;
 	(*sup).exp=EXP2;
 	(*sup).pin_pwm=3;
-	(*sup).gear_ratio=14.9;
+	//(*sup).gear_ratio=14.9;
+	(*sup).gear_ratio=1;
 	(*sup).step=2;
 	(*sup).period=5000;
 
@@ -287,25 +288,34 @@ arm_st arm_moveBActToAngle(int8_t angle){
 		return PH_ERROR;
 	}
 
+	sleep(1);
+
 	goal_pos=(int)(angle/0.84236 + (134.62112/0.84236));
 
-	if((curr_pos-goal_pos)<0){
-		if(ph_setDireccion((*armdev).b_actuator, 1)){
-			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
-			return PH_ERROR;
-		}
-	}else{
-		if(ph_setDireccion((*armdev).b_actuator,0)){
-			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
-			return PH_ERROR;
-		}
-	}
+	printf("Goal Pos%d\n",goal_pos );
 
 	if(ph_setVel((*armdev).b_actuator, goal_pos)){
 		printf("Error al definir posición objetivo (ph_robocol.c -> ph_move_to_angle)\n");
 		perror("Descripción:");
 		return PH_ERROR;
 	}
+
+	sleep(1);
+
+	if((curr_pos-goal_pos)<0){
+		printf("SUBIENDO\n");
+		if(ph_setDireccion((*armdev).b_actuator, 1)){
+			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
+			return PH_ERROR;
+		}
+	}else{
+		printf("BAJAR\n");
+		if(ph_setDireccion((*armdev).b_actuator,0)){
+			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
+			return PH_ERROR;
+		}
+	}
+
 
 	return PH_OK;
 }
@@ -325,7 +335,7 @@ arm_st arm_moveBActToAngle(int8_t angle){
 /* ===================================================================*/
 arm_st arm_moveUActToAngle(int8_t angle){
 	uint8_t curr_pos,goal_pos;
-	if(ph_getVelocidad((*armdev).b_actuator, &curr_pos)){
+	if(ph_getVelocidad((*armdev).u_actuator, &curr_pos)){
 		printf("Error al obtener posición. (ph_robocol.c -> ph_move_to_angle)\n");
 		return PH_ERROR;
 	}
@@ -334,18 +344,20 @@ arm_st arm_moveUActToAngle(int8_t angle){
 
 
 	if((curr_pos-goal_pos)<0){
-		if(ph_setDireccion((*armdev).b_actuator, 1)){
+		if(ph_setDireccion((*armdev).u_actuator, 1)){
 			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
 			return PH_ERROR;
 		}
+		printf("BAJANDO\n");
 	}else{
-		if(ph_setDireccion((*armdev).b_actuator,0)){
+		if(ph_setDireccion((*armdev).u_actuator,0)){
 			printf("Error al definir dirección. (ph_robocol.c -> ph_move_to_angle\n)");
 			return PH_ERROR;
 		}
+		printf("SUBIENDO\n");
 	}
 
-	if(ph_setVel((*armdev).b_actuator, goal_pos)){
+	if(ph_setVel((*armdev).u_actuator, goal_pos)){
 		printf("Error al definir posición objetivo (ph_robocol.c -> ph_move_to_angle)\n");
 		perror("Descripción:");
 		return PH_ERROR;
@@ -386,21 +398,25 @@ arm_st arm_moveToPos(arm_pos posicion){
 	// if(arm_moveMotorToAngle(posicion.ang_b_actuator)){
 	// 	printf("Error llevando el BActuator a la posición\n");
 	// }
+	i2c_chaddr((*(*armdev).b_actuator).addr);
+
 	arm_st st=ARM_OK;
 	if(arm_moveBActToAngle(posicion.ang_b_actuator)){
 		printf("Error llevando el BActuator a la posición\n");
 		st=ARM_ERROR;
 	}
 
-	if(arm_moveUActToAngle(posicion.ang_u_actuator)){
-		printf("Error llevando el UActuator a la posición\n");
-		st=ARM_ERROR;
-	}
+	// if(arm_moveUActToAngle(posicion.ang_u_actuator)){
+	// 	printf("Error llevando el UActuator a la posición\n");
+	// 	st=ARM_ERROR;
+	// }
 
-	if(arm_moveSupToAngle(posicion.ang_sup)){
-		printf("Error llevando el Supinador a la posición\n");
-		st=ARM_ERROR;
-	}
+	// i2c_chaddr((*(*armdev).sup).exp);
+
+	// if(arm_moveSupToAngle(posicion.ang_sup)){
+	// 	printf("Error llevando el Supinador a la posición\n");
+	// 	st=ARM_ERROR;
+	// }
 
 	// if(arm_moveWristToAngle(posicion.ang_sup)){
 	// 	printf("Error llevando el Supinador a la posición\n");

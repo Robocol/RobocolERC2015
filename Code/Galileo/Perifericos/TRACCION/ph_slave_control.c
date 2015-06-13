@@ -145,7 +145,6 @@ void parser(char dato, char arg){
 				ph_setVel(devptr2,0);
 				curr_vel=0;
 		}
-		state=BACKWARD;
 		state|=STEER;
 	}else if(dato=='d'){
 		printf("Girando hacia derecha\n");
@@ -245,7 +244,8 @@ int main(int argc, char *argv[]){
 	
 	ph_dev dev1={PINA0,0,1,4,0};
 	ph_dev dev2={PINA1,2,3,4,0};
-
+	dev1.addr=EXP1;
+	dev2.addr=EXP1;
 	ph_build(&dev1);
 	ph_build(&dev2);
 
@@ -254,7 +254,8 @@ int main(int argc, char *argv[]){
 
 	salida=0;
 
-
+	ph_setVel(devptr1,0);
+	ph_setVel(devptr2,0);
 	ph_setEstado(devptr1,32);
 	ph_setEstado(devptr2,32);
 

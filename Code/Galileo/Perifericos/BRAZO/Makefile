@@ -34,6 +34,8 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 #Regla de compilación de ejecutable para prueba del driver
 prueba_arm: $(OBJ)
 	$(CC) -o $@$(EEXT) prueba_arm.c $^ $(CFLAGS) -lm
+prueba_arm_pablo: $(OBJ)
+	$(CC) -o $@$(EEXT) prueba_arm_pablo.c $^ $(CFLAGS) -lm
 
 include ../Makefile
 

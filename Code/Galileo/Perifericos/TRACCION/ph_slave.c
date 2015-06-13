@@ -102,26 +102,34 @@ void parser(char dato, char arg){
  			ph_setPWM(devptr1,DEFAULT_PWM);
 			ph_setPWM(devptr2,DEFAULT_PWM);
 		}
+		ph_setDireccion(devptr1,0);
+		ph_setDireccion(devptr2,0);
 		state=BACKWARD;
 	}else if(dato=='a'){
 		printf("Girando hacia izquierda\n");
 		int8_t new_pwm=(*devptr1).pwm+STEP_SIZE;
-		ph_setDireccion(devptr1,0);
-		ph_setDireccion(devptr2,0);
+		
+		if(state & BACKWARD){
+			ph_setDireccion(devptr1,1);
+			ph_setDireccion(devptr2,1);
+		}else{
+			ph_setDireccion(devptr1,0);
+			ph_setDireccion(devptr2,0);
+		}
+
 		if(state&STEER){
 			if (new_pwm>MAX_PWM){
-				ph_setPWMSmooth(devptr1,MAX_PWM,STEP_SIZE);
-				ph_setPWMSmooth(devptr2,MAX_PWM,STEP_SIZE);
+				ph_setPWM(devptr1,MAX_PWM);
+				ph_setPWM(devptr2,MAX_PWM);
 				printf("Ha alcanzado el minimo pwm(0)admisible para los puentesH de Galileo 1\n");
 			}else{
-				ph_setPWMSmooth(devptr1,new_pwm,STEP_SIZE);
-				ph_setPWMSmooth(devptr2,new_pwm,STEP_SIZE);
+				ph_setPWM(devptr1,new_pwm);
+				ph_setPWM(devptr2,new_pwm);
 			}
 		}else{
 				ph_setPWM(devptr1,0);
 				ph_setPWM(devptr2,0);
 		}
-		state=BACKWARD;
 		state|=STEER;
 
 
@@ -130,40 +138,39 @@ void parser(char dato, char arg){
 		state|=STEER;
 		uint8_t new_pwm=(*devptr1).pwm+STEP_SIZE;
 		if (new_pwm>MAX_PWM){
-			ph_setPWMSmooth(devptr1,MAX_PWM,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,MAX_PWM,STEP_SIZE);
+			ph_setPWM(devptr1,MAX_PWM);
+			ph_setPWM(devptr2,MAX_PWM);
 			printf("Ha alcanzado el maximo pwm admisible para los puentesH de Galileo 1\n");
 		}else{
-			ph_setPWMSmooth(devptr1,new_pwm,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,new_pwm,STEP_SIZE);
+			ph_setPWM(devptr1,new_pwm);
+			ph_setPWM(devptr2,new_pwm);
 		}
 
 
 	}else if(dato=='x'){
 		printf("PWMs a 0\n");
-		state=STOPPED;
 		ph_setPWM(devptr1,0);
 		ph_setPWM(devptr2,0);
 	}else if(dato=='g'){
 		printf("Acelerando\n");
 		uint8_t new_pwm=(*devptr1).pwm+STEP_SIZE;
 		if (new_pwm>MAX_PWM){
-			ph_setPWMSmooth(devptr1,MAX_PWM,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,MAX_PWM,STEP_SIZE);
+			ph_setPWM(devptr1,MAX_PWM);
+			ph_setPWM(devptr2,MAX_PWM);
 			printf("Ha alcanzado el maximo pwm admisible para los puentesH de Galileo 1\n");
 		}else{
-			ph_setPWMSmooth(devptr1,new_pwm,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,new_pwm,STEP_SIZE);
+			ph_setPWM(devptr1,new_pwm);
+			ph_setPWM(devptr2,new_pwm);
 		}
 	}else if(dato=='f'){
 		int8_t new_pwm=(*devptr1).pwm-STEP_SIZE;
 		if (new_pwm<0){
-			ph_setPWMSmooth(devptr1,0,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,0,STEP_SIZE);
+			ph_setPWM(devptr1,0);
+			ph_setPWM(devptr2,0);
 			printf("Ha alcanzado el minimo pwm(0)admisible para los puentesH de Galileo 1\n");
 		}else{
-			ph_setPWMSmooth(devptr1,new_pwm,STEP_SIZE);
-			ph_setPWMSmooth(devptr2,new_pwm,STEP_SIZE);
+			ph_setPWM(devptr1,new_pwm);
+			ph_setPWM(devptr2,new_pwm);
 		}	
 	}else if(dato=='e'){
 		printf("Motores activados\n");
