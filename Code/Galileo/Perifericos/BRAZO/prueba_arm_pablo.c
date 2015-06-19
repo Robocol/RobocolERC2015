@@ -3,12 +3,19 @@
 #include <sys/times.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include "arm_robocol.h"
+
 
 arm_st prueba_ph(ph_dev* devptr);
 arm_st prueba_st(stp_device* devptr);
 arm_st writeLog(char *title);
+
 void stop_measure(int sig);
+void end_prog(int sig);
+void ding(int sig);
 
 size_t size;
 char *line,*title;
@@ -18,16 +25,16 @@ int32_t position,status,config=0;
 uint8_t step,ocd,tval;
 uint8_t corr,debug;
 int32_t buf,buf2;
-double fbuf;
-float		init;
+double  fbuf;
+float	init;
 float	elapsed;
-long	 	CLK_TCK;
+long	CLK_TCK;
 
 struct tms *ts;
 
 uint8_t temp, vel,corr,est;
 uint8_t pwmval;
-int8_t steps=0;
+int8_t  steps=0;
 uint8_t curr_pwm=0;
 uint8_t i=0;
 
@@ -46,16 +53,18 @@ int main(int argc, char const *argv[]){
 	title=malloc(size);
 
 
-	//(void) signal(SIGINT, stop_measure);
+	(void) signal(SIGINT, end_prog);
+	(void) signal(SIGTSTP, stop_measure);
+	(void) signal(SIGALRM, ding);
+
 
 	if(arm_build()){
 		printf("Error al Construir el dispositivo brazo.\n");
 	}
 
-	if(arm_get_ph(BACTUATOR,&ph)){
-		printf("Error en la captura del stp_device con el número %s asociado\n",*line);
-	}
-	printf("pinEnable: %d\n",(*ph).pin_enable);
+	i2c_chaddr((*(*armdev).b_actuator).addr);
+	
+	ph=(*armdev).b_actuator;
 	
 	if(ph_setDireccion(ph,1)){
 		printf("Error en la captura del stp_device con el número %s asociado\n",*line);
@@ -65,33 +74,29 @@ int main(int argc, char const *argv[]){
 		printf("Error en la captura del stp_device con el número %s asociado\n",*line);
 	}	
 
-	if(arm_get_ph(UACTUATOR,&ph)){
-		printf("Error en la captura del stp_device con el número %s asociado\n",*line);
-	}
-	printf("pinEnable: %d\n",(*ph).pin_enable);
-	
+	ph=(*armdev).u_actuator;
+
 	if(ph_setDireccion(ph,1)){
 		printf("Error en la captura del stp_device con el número %s asociado\n",*line);
 	}
 
-	if(ph_setEstado(ph,16)){
-		printf("Error en la captura del stp_device con el número %s asociado\n",*line);
-	}
-
+	stepper=(*armdev).sup;
 
 	if(arm_get_stp(SUP,&stepper)){
 		printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 	}
 
-	if(stp_master_disable(stepper)){
-	printf("Error en Master Disable inicial\n");
-	}
 
 	if(stp_driver_enable(stepper)){
 		printf("Error en driver enable inicial\n" );
 	}
 
-	if(stp_setStepSel(stepper,2)){
+	if(stp_output_enable(stepper)){
+		printf("Error en driver enable inicial\n" );
+	}
+
+
+	if(stp_setStepSel(stepper,3)){
 		printf("Error en setStepSel inicial\n" );
 	}
 
@@ -173,27 +178,35 @@ int main(int argc, char const *argv[]){
 			}
 			finished=0;
 		}else if(!strcmp(line,"posA\n")){
-			printf("Moviendo el brazo a la posición A...\n");
+			printf("Moviendo el brazo a la posición A.\n ¿Cuantos segundos de delay?\n");
 			sprintf(title,"To PosA");
-			arm_moveToPos(posicionA);
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			arm_moveToPos(posicionA,buf);
 			writeLog(title);
 
 		}else if(!strcmp(line,"posB\n")){
-			printf("Moviendo el brazo a la posición B...\n");
+			printf("Moviendo el brazo a la posición B.\n ¿Cuantos segundos de delay?\n");
 			sprintf(title,"To PosB");
-			arm_moveToPos(posicionB);
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			arm_moveToPos(posicionB,buf);
 			writeLog(title);
 
 		}else if(!strcmp(line,"posC\n")){
-			printf("Moviendo el brazo a la posición C...\n");
+			printf("Moviendo el brazo a la posición C.\n ¿Cuantos segundos de delay?\n");
 			sprintf(title,"To PosC");
-			arm_moveToPos(posicionC);
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			arm_moveToPos(posicionC,buf);
 			writeLog(title);
 
 		}else if(!strcmp(line,"posD\n")){
-			printf("Moviendo el brazo a la posición D...\n");
+			printf("Moviendo el brazo a la posición D.\n ¿Cuantos segundos de delay?\n");
 			sprintf(title,"To PosD");
-			arm_moveToPos(posicionD);
+			getline(&line,&size,stdin);
+			buf=atoi(line);
+			arm_moveToPos(posicionD,buf);
 			writeLog(title);
 
 		}else if(!strcmp(line,"exit\n")){
@@ -589,42 +602,48 @@ while(1){
 
 arm_st writeLog(char *title){
 	
-	// uint8_t cor1,cor2,pwm1,pwm2,i;
+	uint8_t cor1,cor2,pwm1,pwm2,i;
 
-	// if((fdl=fopen("brazo.log","a"))<0){
-	// 	printf("Error en apertura de archivo para impresion de log\n");
-	// 	perror("Causa:");
-	// 	exit(1);
-	// }
+	if((fdl=fopen("brazo.log","a"))<0){
+		printf("Error en apertura de archivo para impresion de log\n");
+		perror("Causa:");
+		exit(1);
+	}
 
-	// fprintf(fdl, title);
-	// fprintf(fdl, "\n");
-	
-	// while(medir){
-	// //for (i = 0; i < 200; ++i){
-	// 	ph_getCorriente((*armdev).b_actuator,&cor1);
-	// 	usleep(20000);
-	// 	ph_getCorriente((*armdev).u_actuator,&cor2);
-	// 	usleep(20000);
+	fprintf(fdl, title);
+	fprintf(fdl, "\n");
+	medir=TRUE;
 
-	// 	elapsed=times(ts)/((double)CLK_TCK)-init;
+	while(medir){
+	//	for (i = 0; i < 200; ++i){
+			ph_getTemperatura((*armdev).b_actuator,&pwm1);
+			// ph_getCorriente((*armdev).u_actuator,&cor2);
+			// usleep(200000);
 
-	// 	ph_getTemperatura((*armdev).b_actuator,&pwm1);
-	// 	usleep(20000);
-	// 	ph_getTemperatura((*armdev).u_actuator,&pwm2);
-	// 	usleep(20000);
+			elapsed=times(ts)/((double)CLK_TCK)-init;
 
-	// 	fprintf(fdl,"%.3f,%d,%d,%d,%d\n",elapsed,cor1,pwm1,cor2,pwm2);
-	// 	sleep(4);
-	// }
-	
-	// fclose(fdl);
+			//ph_getTemperatura((*armdev).u_actuator,&pwm2);
+			usleep(200000);
+			// ph_getTemperatura((*armdev).u_actuator,&pwm2);
+			// usleep(200000);
+
+			fprintf(fdl,"%.3f,%d\n",elapsed,pwm1);
+	//	}
+	}
+
+	printf("Fuera del Loop\n");
+	fclose(fdl);
+}
+
+void end_prog(int sig){
+	stp_returnToZero((*armdev).sup);
+	abort();
 }
 
 void stop_measure(int sig){
-	if(medir){
-		medir=FALSE;
-	}else{
-		abort();
-	}
+	medir=FALSE;
+}
+void ding(int sig){
+	printf("ALARM!!!\n");
+	stp_clk_disable((*armdev).sup);
 }
