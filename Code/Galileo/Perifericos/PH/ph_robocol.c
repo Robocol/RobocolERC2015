@@ -37,7 +37,7 @@ ph_st ph_build(ph_dev* dev){
 		return PH_ERROR;
 	}
 	(*dev).spi=new_spi;
-	(*dev).pwm=0;
+
 	if(spi_start("/dev/spidev1.0",100000)){
 		printf("Error en el arranque comunicación spi para manejo de puente H.(ph_robocol.c)\n");
 		return PH_ERROR;
@@ -640,5 +640,61 @@ ph_st ph_moveToAngle(ph_dev* dev, int8_t goal_pos){
 		return PH_ERROR;
 	}
 
+	return PH_OK;
+}
+
+ph_st ph_getPWM(ph_dev *dev , uint8_t* pwm){
+	uint8_t rx,tx;
+
+	tx=DAR_PWM;
+	rx=0x00;
+	if(spi_rw((*dev).spi,&tx,&rx,1)){
+		perror("Error en DAR_PWM. (ph_getPWM -> ph_robocol.c)");
+		return PH_ERROR;
+	}
+
+	if(spi_read((*dev).spi,pwm,1)){
+		perror("Error while getting TEMPERATURA. (ph_getPWM -> ph_robocol.c");
+		return PH_ERROR;
+	}
+	return PH_OK;
+}
+
+ph_st ph_totalBrake(ph_dev *dev){
+	uint8_t pwm;
+
+	if(ph_getPWM(dev,&pwm)){
+		perror("Error en DAR_PWM. (ph_totalBrake ->ph_robocol.c)");
+		if(gpio_exp_clear((*dev).pin_in_a)){
+			perror("Error en el clear de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
+			return PH_ERROR;
+		}
+		if(gpio_exp_clear((*dev).pin_in_b)){
+			perror("Error en el clear de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
+			return PH_ERROR;
+		}
+		return PH_OK;
+	}
+
+	if (pwm<127){
+		if(gpio_exp_clear((*dev).pin_in_a)){
+			perror("Error en el clear de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
+			return PH_ERROR;
+		}
+		if(gpio_exp_clear((*dev).pin_in_b)){
+			perror("Error en el clear de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
+			return PH_ERROR;
+		}
+	}else{
+		if(gpio_exp_set((*dev).pin_in_a)){
+			perror("Error en el set de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
+			return PH_ERROR;
+		}
+		if(gpio_exp_set((*dev).pin_in_b)){
+			perror("Error en el set de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
+			return PH_ERROR;
+		}
+	}
+	printf("FRENO TOTAL EXITOSO\n");
 	return PH_OK;
 }

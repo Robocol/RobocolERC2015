@@ -53,6 +53,7 @@
 #define CAMBIAR_PWM 	0x0A
 #define DAR_ESTADO		0x0B
 #define DAR_TEMPERATURA	0x0C
+#define DAR_PWM			0x0D
 
 /*--------------------------------------------------------------------------*/
 /*
@@ -92,7 +93,6 @@ typedef struct{
 	uint8_t	pin_in_a;
 	uint8_t	pin_in_b;
 	uint8_t	pin_enable;
-	uint8_t pwm;
 	uint8_t addr;
 	spi_device* spi;    //No es necesario que el usuario instancie este campo.
 }ph_dev;
@@ -407,6 +407,10 @@ ph_st ph_step(ph_dev* dev, uint8_t duty, uint8_t dir);
 */
 /* ===================================================================*/
 ph_st ph_move_to_angle(ph_dev* dev, uint8_t degrees);
+
+ph_st ph_getPWM(ph_dev *dev , uint8_t* pwm);
+
+ph_st ph_totalBrake(ph_dev *dev);
 
 
 #endif
