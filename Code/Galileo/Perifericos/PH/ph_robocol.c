@@ -519,12 +519,14 @@ ph_st ph_getTemperatura(ph_dev* dev,uint8_t* temp){
 	rx=0x00;
 	if(spi_rw((*dev).spi,&tx,&rx,1)){
 		perror("Error in DAR_TEMPERATURA");
+		return PH_ERROR;
 	}
 
 	if(spi_read((*dev).spi,temp,1)){
 		perror("Error while getting TEMPERATURA");
+		return PH_ERROR;
 	}
-	return (ph_st)rx;
+	return PH_OK;
 }
 
 
@@ -660,41 +662,48 @@ ph_st ph_getPWM(ph_dev *dev , uint8_t* pwm){
 	return PH_OK;
 }
 
-ph_st ph_totalBrake(ph_dev *dev){
-	uint8_t pwm;
+ph_st ph_vccBrake(ph_dev *dev){
 
-	if(ph_getPWM(dev,&pwm)){
-		perror("Error en DAR_PWM. (ph_totalBrake ->ph_robocol.c)");
-		if(gpio_exp_clear((*dev).pin_in_a)){
-			perror("Error en el clear de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
-			return PH_ERROR;
-		}
-		if(gpio_exp_clear((*dev).pin_in_b)){
-			perror("Error en el clear de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
-			return PH_ERROR;
-		}
-		return PH_OK;
+	if(gpio_exp_set((*dev).pin_in_a)){
+		printf("Error en el set de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
+		return PH_ERROR;
+	}
+	if(gpio_exp_set((*dev).pin_in_b)){
+		printf("Error en el set de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
+		return PH_ERROR;
 	}
 
-	if (pwm<127){
-		if(gpio_exp_clear((*dev).pin_in_a)){
-			perror("Error en el clear de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
-			return PH_ERROR;
-		}
-		if(gpio_exp_clear((*dev).pin_in_b)){
-			perror("Error en el clear de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
-			return PH_ERROR;
-		}
-	}else{
-		if(gpio_exp_set((*dev).pin_in_a)){
-			perror("Error en el set de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
-			return PH_ERROR;
-		}
-		if(gpio_exp_set((*dev).pin_in_b)){
-			perror("Error en el set de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
-			return PH_ERROR;
-		}
+	printf("\nFRENO EFECTUADO\nDeshabilitando puenteH...\n");
+
+	if (ph_disable(dev)){
+		printf("Error desahbilitando el puenteH. (ph_totalBrake -> ph_robocol.c)\n");
+		return PH_ERROR;
 	}
+
 	printf("FRENO TOTAL EXITOSO\n");
+
+	return PH_OK;
+}
+
+ph_st ph_gndBrake(ph_dev *dev){
+
+	if(gpio_exp_clear((*dev).pin_in_a)){
+		printf("Error en el set de pin_in_a de puenteH. (ph_totalBrake -> ph_robocol.c)");
+		return PH_ERROR;
+	}
+	if(gpio_exp_clear((*dev).pin_in_b)){
+		printf("Error en el set de pin_in_b de puenteH. (ph_totalBrake -> ph_robocol.c)");
+		return PH_ERROR;
+	}
+
+	printf("\nFRENO EFECTUADO\nDeshabilitando puenteH...\n");
+
+	if (ph_disable(dev)){
+		printf("Error desahbilitando el puenteH. (ph_totalBrake -> ph_robocol.c)\n");
+		return PH_ERROR;
+	}
+
+	printf("FRENO TOTAL EXITOSO\n");
+
 	return PH_OK;
 }

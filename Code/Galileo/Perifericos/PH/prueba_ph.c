@@ -70,26 +70,26 @@ int main(){
 			
 	}
 
-	printf("Test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
-			"\t enable\t\t\t-Habilita o deshabilita el puente H. Valores de entrada 1 o 0\n"
-			"\t getvel\t-Imprime la velocidad actual del motor\n "
-			"\t gettemp\t-Imprime la temperatura actual del motor\n "
-			"\t getcorr\t-Imprime la corriente actual que atravieza el motor\n"
-			"\t getstate\t \t-Imprime el estado de operación actual del motor\n"
-			"\t pwm\t\t-Cambia ciclo útil del PWM. Valor de entrada entre 0 y 255\n"
-			"\t dir\t-Cambia la dirección de giro del motor. Valor de entrada 1 o 0\n"
-			"\t setvel\t-Cambia la velocidad objetivo del controlador. Valor de entrada entre ------\n"
-			"\t setstate\t \t-Cambia el estado de operación del puente H. Valor de entrada entre 16 o 32 TODO: Parser\n"
-			"\t kic\t\t-Cambia el valor de KIC. Valor de entrada entre 0 y 255\n"
-			"\t kpc\t\t-Cambia el valor de KPC. Valor de entrada entre 0 y 255\n"
-			"\t kiv\t\t-Cambia el valor de KIV. Valor de entrada entre 0 y 255\n"
-			"\t kpv\t\t-Cambia el valor de KPV. Valor de entrada entre 0 y 255\n"
-			"\t sp_vel\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
-			"\t sp_cor\t\t\t-Cambia el valor de SP_CORRIENTE. Valor de entrada entre 0 y 255\n"
-			"\t motor\t\t\t-Cambia el motor. Valor de entrada 1 o 2\n"
-			"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
-
 	while(1){
+		printf("Test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
+				"\t enable\t\t\t-Habilita o deshabilita el puente H. Valores de entrada 1 o 0\n"
+				"\t getvel\t-Imprime la velocidad actual del motor\n "
+				"\t gettemp\t-Imprime la temperatura actual del motor\n "
+				"\t getcorr\t-Imprime la corriente actual que atravieza el motor\n"
+				"\t getstate\t \t-Imprime el estado de operación actual del motor\n"
+				"\t pwm\t\t-Cambia ciclo útil del PWM. Valor de entrada entre 0 y 255\n"
+				"\t dir\t-Cambia la dirección de giro del motor. Valor de entrada 1 o 0\n"
+				"\t setvel\t-Cambia la velocidad objetivo del controlador. Valor de entrada entre ------\n"
+				"\t setstate\t \t-Cambia el estado de operación del puente H. VAlor de entrada entre 16 o 32 TODO: Parser\n"
+				"\t kic\t\t-Cambia el valor de KIC. Valor de entrada entre 0 y 255\n"
+				"\t kpc\t\t-Cambia el valor de KPC. Valor de entrada entre 0 y 255\n"
+				"\t kiv\t\t-Cambia el valor de KIV. Valor de entrada entre 0 y 255\n"
+				"\t kpv\t\t-Cambia el valor de KPV. Valor de entrada entre 0 y 255\n"
+				"\t sp_vel\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
+				"\t sp_cor\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
+				"\t motor\t\t\t-Cambia el motor. Valor de entrada 1 o 2\n"
+				"\t gB\t\t\t-Frena el motor a GND\n"
+				"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
 
 			printf("Ingrese un comando\n");
 			getline(&line,&size,stdin);
@@ -224,30 +224,14 @@ int main(){
 					ph_setPWM(devptr,debug);
 				}
 
-			}else{
-			printf("Bienvenido al test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
-					"\t enable\t\t\t-Habilita o deshabilita el puente H. Valores de entrada 1 o 0\n"
-					"\t getvel\t-Imprime la velocidad actual del motor\n "
-					"\t gettemp\t-Imprime la temperatura actual del motor\n "
-					"\t getcorr\t-Imprime la corriente actual que atravieza el motor\n"
-					"\t getstate\t \t-Imprime el estado de operación actual del motor\n"
-					"\t pwm\t\t-Cambia ciclo útil del PWM. Valor de entrada entre 0 y 255\n"
-					"\t dir\t-Cambia la dirección de giro del motor. Valor de entrada 1 o 0\n"
-					"\t setvel\t-Cambia la velocidad objetivo del controlador. Valor de entrada entre ------\n"
-					"\t setstate\t \t-Cambia el estado de operación del puente H. VAlor de entrada entre 16 o 32 TODO: Parser\n"
-					"\t kic\t\t-Cambia el valor de KIC. Valor de entrada entre 0 y 255\n"
-					"\t kpc\t\t-Cambia el valor de KPC. Valor de entrada entre 0 y 255\n"
-					"\t kiv\t\t-Cambia el valor de KIV. Valor de entrada entre 0 y 255\n"
-					"\t kpv\t\t-Cambia el valor de KPV. Valor de entrada entre 0 y 255\n"
-					"\t sp_vel\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
-					"\t sp_cor\t\t\t-Cambia el valor de SP_VELOCIDAD. Valor de entrada entre 0 y 255\n"
-					"\t motor\t\t\t-Cambia el motor. Valor de entrada 1 o 2\n"
-					"\t debug\t\t\t-Permite rápido envia de CAMBIAR_PWM con un valor de 0x5A\n");
+			}
+			else if(!strcmp(line,"gB\n")){
+				ph_gndBrake(devptr);
 			}
 			printf("--------------------------------------------------------------\n");
 		}
 }
 
 static void sig_handler(int sig){
-	ph_totalBrake(devptr);
+	ph_vccBrake(devptr);
 }
