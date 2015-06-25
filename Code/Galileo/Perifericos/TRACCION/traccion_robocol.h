@@ -1,6 +1,5 @@
 /*
  * --------------------------------------------------------------------------------------
- * spi_robocol.c (0.5)
  *
  *  Created on: Jun, 2015
  *
@@ -29,9 +28,7 @@
 /*
  *                 INCLUSIÓN DE LIBRERIAS
  */
-#include <stdio.h>
-#include <stdint.h>
-#include <fcntl.h>
+
 #include "ph_robocol.h"
 
 /*--------------------------------------------------------------------------*/
@@ -40,43 +37,50 @@
  */
 	typedef int tr_st;
 
-	int tr_fd;
-
 	typedef struct {
-		uint8_t state;
+		uint8_t mv_state;
+		uint8_t ctl_state;
 		uint8_t type;
-		uint8_t pwm;
-		uint8_t vel;
+		uint8_t vel_pwm;
 		ph_dev *front_ph;
 		ph_dev *back_ph;
 		uint8_t device_built;
 	} tr_dev;
 
-tr_dev	tr_device;
-
-
 #define TR_ERROR	0x01
 #define TR_OK 		0x00
 
 
+const uint8_t TR_BUILT =0x01;
+const uint8_t TR_NOT_BUILT=0x00;
+const uint8_t CW_DIR=1;
+const uint8_t ANTI_CW_DIR=0;
+const uint8_t UPPER_BMASK=0b11110000;
+const uint8_t LOWER_BMASK=0b00001111;
 /*--------------------------------------------------------------------------*/
 /*
  *                  DEFINICIÓN DE TYPES
  */
-const uint8_t MASTER = 0x01;
-const uint8_t SLAVE = 0x02;
-const uint8_t LEFT_SIDE = 0x04;
-const uint8_t RIGHT_SIDE= 0x08;
+const uint8_t TR_MASTER 	= 0x01;
+const uint8_t TR_SLAVE 		= 0x02;
+const uint8_t TR_LEFT_SIDE  = 0x04;
+const uint8_t TR_RIGHT_SIDE = 0x08;
 
 /*--------------------------------------------------------------------------*/
 /*
  *                  DEFINICIÓN DE STATES
  */
-const uint8_t STOPPED 	= 0x00;
-const uint8_t FORWARD 	= 0x01;
-const uint8_t BACKWARD 	= 0x02;
-const uint8_t STEER 	= 0x04;
+const uint8_t TR_STOPPED 	= 0x01;
+const uint8_t TR_FORWARD 	= 0x02;
+const uint8_t TR_BACKWARD 	= 0x04;
+const uint8_t TR_STEER 		= 0x08;
+const uint8_t TR_AUTO 		= 0x10;
+const uint8_t TR_MANUAL		= 0x20;
 
+
+
+tr_dev	tr_device;
+tr_device.device_built=TR_NOT_BUILT;
 
 /* =====================================================================================*/
 /*
@@ -119,11 +123,11 @@ tr_st tr_build(uint8_t type);
 **          El dispositivo se dirije hacia adelante a el argumento 
 **			ingresado
 **     @param
-**          arg     	   	- Entero representando el PWM o la velocidad
+**          vp     	   	- Entero representando el PWM o la velocidad
 **							a la que se desea que los motores retrocedan
 */
 /* ===================================================================*/
-spi_st tr_forward(int arg);
+tr_st tr_forward(uint8_t vp);
 
 /*
 ** ===================================================================
@@ -134,11 +138,11 @@ spi_st tr_forward(int arg);
 **          El dispositivo se dirije hacia adelante a el argumento 
 **			ingresado
 **     @param
-**          arg     	   	- Entero representando el PWM o la velocidad
+**          vp     	   	- Entero representando el PWM o la velocidad
 **							a la que se desea que los motores retrocedan
 */
 /* ===================================================================*/
-spi_st tr_backward(uint8_t arg);
+tr_st tr_backward(uint8_t vp);
 
 
 /*
@@ -153,7 +157,7 @@ spi_st tr_backward(uint8_t arg);
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-spi_st tr_spin(int dir);
+tr_st tr_spin(uint8_t dir);
 
 /*
 ** ===================================================================
@@ -167,7 +171,7 @@ spi_st tr_spin(int dir);
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-spi_st tr_diffTurn(int dir);
+tr_st tr_diffTurn(uint8_t dir);
 
 /*
 ** ===================================================================
@@ -181,7 +185,7 @@ spi_st tr_diffTurn(int dir);
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-spi_st tr_Turn(int dir);
+tr_st tr_Turn(uint8_t dir);
 
 /*
 ** ===================================================================
@@ -195,7 +199,7 @@ spi_st tr_Turn(int dir);
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-spi_st tr_diagonalSpin(int dir);
+tr_st tr_diagonalSpin(uint8_t dir);
 
 
 /*
@@ -210,6 +214,34 @@ spi_st tr_diagonalSpin(int dir);
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-spi_st tr_diagonalSpin(int dir);
+tr_st tr_diagonalSpin(uint8_t dir);
+
+/*
+** ===================================================================
+**     Método      :  tr_eBrake
+*/
+/*!
+**     @resumen
+**			Freno de emergencia que activa el freno a VCC de los puentes
+** 			H de la tracción.
+*/
+/* ===================================================================*/
+tr_st tr_eBrake(void);
+
+/*
+** ===================================================================
+**     Método      :  tr_setVP
+*/
+/*!
+**     @resumen
+**			Asignar pwm o velocidad objetivo según el estado de operación
+**			de la tracción. Se asigna también a la estructura
+**			global de tracción.
+*/
+/* ===================================================================*/
+tr_st tr_setVP(uint8_t vp);
+
+
+
 
 #endif

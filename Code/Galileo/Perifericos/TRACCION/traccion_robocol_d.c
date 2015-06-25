@@ -1,3 +1,4 @@
+#include "traccion_robocol.h"
 
 tr_st tr_build(uint8_t type){
 	uint8_t master;
@@ -7,7 +8,7 @@ tr_st tr_build(uint8_t type){
 		return TR_ERROR;
 	}
 
-	if ((type>>2)==3 || type&(0b00000011)==3){
+	if ((type&(TR_MASTER|TR_SLAVE))==3 || type&(TR_LEFT_SIDE|TR_RIGHT_SIDE)==3){
 		printf("Error en el type ingresado por prarámetro.El número en cuestión presenta conflicto entre dos tipos excluyentes.\n");
 		return TR_ERROR;
 	}
@@ -56,20 +57,53 @@ tr_st tr_build(uint8_t type){
 		printf("Error en asignación de velocidad a 0 para front_ph.(tr_build->traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
-	tr_device.state=AUTO|STOPPED;
+
+	if (ph_enable(*tr_device.front_ph)){
+		printf("Error en la habilitación de front_ph.(tr_build->traccion_robocol.c)\n");
+		return TR_ERROR;		
+	}
+	printf("front_ph HABILITADO\n");
+
+	if(ph_enable(*tr_device.back_ph)){
+		printf("Error en la habilitación de back_ph.(tr_build->traccion_robocol.c)\n");
+		return TR_ERROR;
+	}
+	printf("back_ph HABILITADO\n");
+
+	tr_device.mv_state=TR_STOPPED;
+	tr_device.ctl_state=TR_AUTO;
 	tr_device.vel_pwm=0;
-	tr_device.device_built=1;
+	tr_device.device_built=TR_BUILT;
 
 	return TR_OK;
 }
 
+tr_st tr_forward(uint8_t vp){
+
+	if (tr_device.state&TR_STOPPED){
+		if (ph_setDireccion(tr_device.front_ph,CW_DIR))
+		{
+			printf("Error en asignación de dirección para front_ph. (tr_forward -> traccion_robocol.c) \n");
+			return TR_ERROR;
+		}
+
+		if (ph_setDireccion(tr_device.back_ph,CW_DIR))
+		{
+			printf("Error en asignación de dirección para back_ph. (tr_forward -> traccion_robocol.c) \n");
+			return TR_ERROR;
+		}
+		tr_device.state=(tr_device.state ^ (tr_device.state & LOWER_BMASK))|(TR_FORWARD);
+	}
+}
+
+
 tr_st tr_eBrake(void){
-	if (ph_totalBrake(tr_device.front_ph)){
+	if (ph_vccBrake(tr_device.front_ph)){
 		printf("Error en eBrake para front_ph.(tr_eBrake -> traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
 
-	if (ph_totalBrake(tr_device.back_ph)){
+	if (ph_vccBrake(tr_device.back_ph)){
 		printf("Error en eBrake para back_ph.(tr_eBrake -> traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
@@ -78,6 +112,43 @@ tr_st tr_eBrake(void){
 }
 
 tr_st tr_setVP(uint8_t vp){
-	tr_device.vel_pwm=vp;
+	if (tr_device.state&TR_STOPPED)
+	{
+		printf("Debe primero asignar la dirección de movimiento. Estado de movimiento se encuentra en TR_STOPPED. (tr_setVP->traccion_robocol.c)\n");
+		return TR_ERROR;
+	}else{
+		if(tr_device.state&(TR_AUTO)){
+			if(ph_setVel(tr_device.front_ph,vp)){
+				printf("Error en asignación de velocidad para front_ph.(tr_setVP->traccion_robocol.c)\n");
+				return TR_ERROR;
+			}
+
+			if(ph_setVel(tr_device.back_ph,vp)){
+				printf("Error en asignación de velocidad para back_ph.(tr_setVP->traccion_robocol.c)\n");
+				return TR_ERROR;
+			}
+
+		}else if(tr_device.state&(TR_MANUAL)){
+			if(ph_setPWM(tr_device.front_ph,vp)){
+				printf("Error en asignación de PWM para front_ph.(tr_setVP->traccion_robocol.c)\n");
+				return TR_ERROR;
+			}
+
+			if(ph_setPWM(tr_device.back_ph,vp)){
+				printf("Error en asignación de PWM para back_ph.(tr_setVP->traccion_robocol.c)\n");
+				return TR_ERROR;
+			}
+
+		}else{
+			printf("Error en el estado de la estructura tracción. No se identifica estado TR_MANUAL O TR_AUTO. (tr_setVP->traccion_robocol.c)\n");
+			return TR_ERROR;
+		}
+
+		if (vp==0){
+			tr_device.state=(tr_device.state ^ (tr_device.state & LOWER_BMASK))|(TR_STOPPED);
+		}
+
+		tr_device.vel_pwm=vp;
+	}
 	return TR_OK;
 }
