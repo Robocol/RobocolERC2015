@@ -245,8 +245,6 @@ void init_INT0(void){
 ISR(PCINT1_vect)
 {
 	cli();
-	//TODO hay que hacer un condicional, dado que puede ocurrir
-	//interrupcion por el pin Qdec o por el pin FAULT
 
 	// Hace un conteo de un pulso de la senal index
 	countQDEC++;

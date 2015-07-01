@@ -254,10 +254,22 @@ int main(int argc, char *argv[]){
 
 	salida=0;
 
-	ph_setVel(devptr1,0);
-	ph_setVel(devptr2,0);
-	ph_setEstado(devptr1,32);
-	ph_setEstado(devptr2,32);
+	if(ph_setEstado(devptr1,16)){
+	printf("Error en set de Estado a 16(prueba_ph.c)\n");
+	perror("Descripción");		
+	}
+	if(ph_setVel(devptr1,0)){
+		printf("Error en set de velocidad(prueba_ph.c)\n");
+		perror("Descripción");	
+	}
+	if(ph_setEstado(devptr2,16)){
+		printf("Error en set de Estado a 16(prueba_ph.c)\n");
+		perror("Descripción");		
+	}
+	if(ph_setVel(devptr2,0)){
+		printf("Error en set de PWM(prueba_ph.c)\n");
+		perror("Descripción");	
+	}
 
 	/* Se copia la interfaz de red */
 

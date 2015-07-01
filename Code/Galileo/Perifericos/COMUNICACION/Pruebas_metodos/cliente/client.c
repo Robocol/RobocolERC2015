@@ -155,7 +155,7 @@ main(int argc, char *argv[])
 
 	/* Send requested sequence length, with terminating newline */
 
-	reqLenStr = "imagen";
+	reqLenStr = "conectar";
 	if (write(cfd, reqLenStr, strlen(reqLenStr)) == -1)
 		printf("Partial/failed write (reqLenStr)");
 	if (write(cfd, "\n", 1) != 1)
@@ -167,9 +167,15 @@ main(int argc, char *argv[])
 		close(cfd);
 		printf("No hay fin de línea\n");                
        	}
-	
-	printf(LenStr);
+
+	printf("valor igual a %x", LenStr);
 	//tam = atoi(LenStr)
+
+	//TODO: Método conectar. Cliente envía conectar, servidor responde OK
+
+	//TODO: Reportar_estado. Se llama, devuelve el estado y lo muestra en la consola
+
+	//TODO: 
 
 	reqLenStr = "tamanho";
 	if (write(cfd, reqLenStr, strlen(reqLenStr)) == -1)
