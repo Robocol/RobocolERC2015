@@ -517,14 +517,14 @@ void control_parser(){
 			spi_put(curAct);
 			break;
 			case MEDIR_VELOCIDAD:
-			control_getActualPosition();
+			//control_getActualPosition();
 			spi_put(PosAct);
 			break;
 			case MEDIR_TEMP:
 			error=errorAnterior_P;
 //			control_getTemp();
 //			spi_put(tempAct);
-			spi_put(error);
+			spi_put(PWM);
 			break;
 			case DAR_ESTADO:
 			spi_put(ESTADO);
@@ -597,7 +597,8 @@ int main(void) {
 	adc_init();
 	pwm_init();
 	spi_initslave(0);
-	pwm_set(0);
+	PWM=0;
+	pwm_set(PWM);
 	ESTADO=MANUAL_EST;
 
 	sei();
@@ -605,8 +606,32 @@ int main(void) {
 		
 		switch (ESTADO) {
 		case AUTO_EST:
+			//gpio_put(LED_PIN,1);
 			control_getActualPosition();
+			
 
+			if((0x04 & PINA)!=0){//El actuador baja: ON/OFF en cascada con corriente (lazo interno)
+				gpio_put(LED_PIN,0);
+				error_posicion=setPointPosicion-PosAct;					
+				if (error_posicion>2){
+					PWM=40;
+					pwm_set(40);
+				}else{
+					PWM=0;
+					pwm_set(0);
+				}
+			} else{
+				error_posicion=PosAct-setPointPosicion;
+				gpio_put(LED_PIN,1);	
+				if (error_posicion>2){
+					PWM=40;
+					pwm_set(40);
+				}else{
+					PWM=0;
+					pwm_set(0);
+				}
+			}
+/*
 			//Impulso para el arranque en bajada
 			if (((0x04 & PINA)!=0)&&(PosAct>159)){
 				PWM=127;
@@ -615,10 +640,10 @@ int main(void) {
 			
 			//Impulso para el arranque en subida
 			if(((0x04 & PINA)==0)&&(Impulso>0)){
-				PWM=127;
+				PWM=30;
 				pwm_set(PWM);
 				Impulso--;	
-				_delay_ms(20);			
+				_delay_ms(100);			
 			}
 
 			if((0x04 & PINA)!=0){//El actuador baja: ON/OFF en cascada con corriente (lazo interno)
@@ -626,7 +651,7 @@ int main(void) {
 				gpio_put(LED_PIN,0);
 				direccion=0;
 				error_posicion=PosAct-setPointPosicion;
-				setPointCorriente=20;
+				setPointCorriente=30;
 
 				if (error_posicion>2){
 					for(i=0;i<6;i++){			
@@ -652,7 +677,7 @@ int main(void) {
 					_delay_ms(12);
 				}	
 			}
-			
+*/			
 
 			break;
 		case MANUAL_EST:

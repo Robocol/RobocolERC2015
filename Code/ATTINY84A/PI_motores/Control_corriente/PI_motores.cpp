@@ -50,6 +50,7 @@
 #define CAMBIAR_PWM	0x0A
 #define DAR_ESTADO	0x0B
 #define MEDIR_TEMP	0x0C
+#define MEDIR_PWM	0x0D
 
 //Valores a transmitir por SPI que no contienen información propiamente
 #define ACK_galileo	0xAA
@@ -83,11 +84,14 @@ volatile struct usidriverStatus_t spi_status; // The driver status bits.
 
 
 // ConstantesControlador Velocidad
-float KP_V = 0.045;//Ku=2.7
-float KI_V = 0.054;//0.0340;//Tu=0.00304*14
+float KP_V = 1.36;//Ku=7
+float KI_V = 1.36;//0.0340;//Tu=2
+
+float KD_V = 0.9;//0.0340;//Tu=0.00304*14
 int16_t  errorAnterior_V=0;
+int16_t  errorAnteriorAnterior_V=0;
 float UAnterior_V=0; //Acción de control anterior (sp_corriente)
-uint8_t setPointVelocidad=240;
+uint8_t setPointVelocidad=30;
 uint8_t velAct=0; //Medición de posición para el brazo
 
 uint16_t countQDEC; //Almacena el conteo de pulsos que llegan del encoder
@@ -95,8 +99,8 @@ uint16_t countQDEC; //Almacena el conteo de pulsos que llegan del encoder
 
 
 // Contantes Controlador  de Corriente
-float KP_C =0.000108;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-float KI_C =0.000462;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+float KP_C =0.036;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+float KI_C =0.15428;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
 int16_t  errorAnterior_C=0;
 float  UAnterior_C=0; //Acción de control anterior (PWM)
 uint8_t setPointCorriente=0;
@@ -317,21 +321,23 @@ void control_getTemp(void){
 *********************************************************************************************************/
 uint8_t bloquePiVelocidad(int16_t error){
 	int16_t setPointCorriente;
-	float deltaU_V,k1,k2;	
+	float deltaU_V,k1,k2,k3;	
 
-	k1 = KP_V+KI_V;
-	k2 = -KP_V;
+	//Cálculo de constantes para utilizar la fórmula de Euler
+	k1 = KP_V + KI_V + KD_V;
+	k2 = -KP_V - 2*KD_V;
+	k3 = KD_V;
 
 
-	deltaU_V = k1*error +k2*errorAnterior_V;
+	deltaU_V = k1*error +k2*errorAnterior_V +k3*errorAnteriorAnterior_V;
 	
 	UAnterior_V= UAnterior_V+deltaU_V;
 	setPointCorriente= UAnterior_V;
 
 	//Satura la acción de control para garantizar un máximo de 7.44 A
-	if(setPointCorriente>160){
-		setPointCorriente=160;
-		UAnterior_V=160;
+	if(setPointCorriente>100){
+		setPointCorriente=100;
+		UAnterior_V=100;
 	}	
 	else if(setPointCorriente<0){
 		setPointCorriente=0;
@@ -339,7 +345,7 @@ uint8_t bloquePiVelocidad(int16_t error){
 	}
 	
 	//Adapta las ganancias dependiendo del setpoint de corriente
-	if(setPointCorriente<15){
+/*	if(setPointCorriente<15){
 		KP_C =0.18;
 		KI_C =0.7714;
 	}
@@ -375,8 +381,10 @@ uint8_t bloquePiVelocidad(int16_t error){
 		KP_C =0.000059;
 		KI_C =0.000231;
 	}
+*/
 	
-	errorAnterior_V=error;	
+	errorAnteriorAnterior_V=errorAnterior_V;
+	errorAnterior_V=error;
 	
 	
 	return setPointCorriente;
@@ -390,27 +398,34 @@ uint8_t bloquePiVelocidad(int16_t error){
 ** Se demora 42ms
 *********************************************************************************************************/
 uint8_t bloquePiCorriente(int16_t error){
-	int8_t cicloUtil;	
+	uint8_t cicloUtil;	
 	float k1,k2,deltaU_C;	
 		
 	k1 = KP_C+KI_C; 
 	k2 = -KP_C;
 	
 	deltaU_C = k1*error +k2*errorAnterior_C;
+
+	if(deltaU_C>255){
+		deltaU_C=255;
+	}else if(deltaU_C<-255){
+		deltaU_C=-255;
+	}
 	
 	
 	UAnterior_C=UAnterior_C+deltaU_C;
 	cicloUtil=UAnterior_C;
 	
 	if(cicloUtil>255){
-		cicloUtil=255;
-		UAnterior_C=255;
+		cicloUtil=250;
+		UAnterior_C=250;
 	}	
 	else if(cicloUtil<1){
 		cicloUtil=1;
 		UAnterior_C=1;
 	}	
 	
+
 	errorAnterior_C=error;
 	
 	
@@ -526,7 +541,7 @@ void control_parser(){
 	if(parsear){
 		switch (encabezado){
 			case MEDIR_CORRIENTE:
-			control_getActualCurrent();
+			//control_getActualCurrent();
 			spi_put(curAct);
 			break;
 			case MEDIR_VELOCIDAD:
@@ -612,6 +627,7 @@ int main(void) {
 	pwm_set(0);
 	qdec_init();
 	ESTADO=MANUAL_EST;
+
 	sei();
 	while (1) {
 		
@@ -619,6 +635,7 @@ int main(void) {
 		case AUTO_EST:
 			gpio_put(LED_PIN,0);
 
+			
 			//Mide velocidad y actualiza velAct			
 			qdec_on();			
 			_delay_ms(5);
