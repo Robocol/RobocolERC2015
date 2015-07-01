@@ -54,29 +54,31 @@
 
 const uint8_t TR_BUILT =0x01;
 const uint8_t TR_NOT_BUILT=0x00;
-const uint8_t CW_DIR=1;
-const uint8_t COUNTER_CW_DIR=0;
-const uint8_t UPPER_BMASK=0b11110000;
-const uint8_t LOWER_BMASK=0b00001111;
+
 /*--------------------------------------------------------------------------*/
 /*
  *                  DEFINICIÓN DE TYPES
  */
 const uint8_t TR_MASTER 	= 0x01;
 const uint8_t TR_SLAVE 		= 0x02;
-const uint8_t TR_LEFT_SIDE  = 0x04;
-const uint8_t TR_RIGHT_SIDE = 0x08;
+
+const uint8_t TR_LEFT_SIDE  = 0x01;
+const uint8_t TR_RIGHT_SIDE = 0x02;
+
+
 
 /*--------------------------------------------------------------------------*/
 /*
  *                  DEFINICIÓN DE STATES
  */
-const uint8_t TR_STOPPED 	= 0x01;
-const uint8_t TR_FORWARD 	= 0x02;
-const uint8_t TR_BACKWARD 	= 0x04;
-const uint8_t TR_STEER 		= 0x08;
-const uint8_t TR_AUTO 		= 0x10;
-const uint8_t TR_MANUAL		= 0x20;
+
+const uint8_t TR_FORWARD 	= 0x01;
+const uint8_t TR_BACKWARD 	= 0x02;
+const uint8_t TR_STEER 		= 0x04;
+const uint8_t TR_STOPPED 	= 0x08;
+
+const uint8_t TR_AUTO 		= 0x01;
+const uint8_t TR_MANUAL		= 0x02;
 
 const uint8_t TR_TURN_LEFT  = 0x01;
 const uint8_t TR_TURN_RIGHT = 0x02;

@@ -1,6 +1,6 @@
 #include "traccion_robocol.h"
 
-tr_st tr_build(uint8_t type){
+tr_st tr_build(uint8_t type,uint8_t side){
 	uint8_t master;
 	uint8_t right;
 	if (tr_device.device_built){
@@ -8,12 +8,17 @@ tr_st tr_build(uint8_t type){
 		return TR_ERROR;
 	}
 
-	if ((type&(TR_MASTER|TR_SLAVE))==3 || type&(TR_LEFT_SIDE|TR_RIGHT_SIDE)==3){
+	if ((type&(TR_MASTER|TR_SLAVE))>2){
 		printf("Error en el type ingresado por prarámetro.El número en cuestión presenta conflicto entre dos tipos excluyentes.\n");
 		return TR_ERROR;
 	}
 
+	if (side&(TR_LEFT_SIDE|TR_RIGHT_SIDE)>3){
+		printf("Error en el side ingresado por prarámetro.El número en cuestión presenta conflicto entre dos tipos excluyentes.\n");
+	}
+
 	tr_device.type=type;
+	tr_device.side=side;
 
 	(*(tr_device.front_ph)).pin_cs=PINA0;
 	(*(tr_device.front_ph)).pin_in_a=0;
@@ -80,20 +85,33 @@ tr_st tr_build(uint8_t type){
 
 tr_st tr_forward(uint8_t vp){
 
-	if (tr_device.state&TR_STOPPED){
-		if (ph_setDireccion(tr_device.front_ph,CW_DIR))
-		{
-			printf("Error en asignación de dirección para front_ph. (tr_forward -> traccion_robocol.c) \n");
+	if (tr_device.mv_state==TR_BACKWARD){
+		if(tr_setVP(0)){
+			printf("Error llevando velocidad a cero. (tr_forward -> traccion_robocol.c) \n");
 			return TR_ERROR;
 		}
-
-		if (ph_setDireccion(tr_device.back_ph,CW_DIR))
-		{
-			printf("Error en asignación de dirección para back_ph. (tr_forward -> traccion_robocol.c) \n");
-			return TR_ERROR;
-		}
-		tr_device.state=(tr_device.state ^ (tr_device.state & LOWER_BMASK))|(TR_FORWARD);
 	}
+
+
+	if (ph_setDireccion(tr_device.front_ph,tr_device.side&TR_FORWARD))
+	{
+		printf("Error en asignación de dirección para front_ph. (tr_forward -> traccion_robocol.c) \n");
+		return TR_ERROR;
+	}
+
+	if (ph_setDireccion(tr_device.back_ph,tr_device.side&TR_FORWARD))
+	{
+		printf("Error en asignación de dirección para back_ph. (tr_forward -> traccion_robocol.c) \n");
+		return TR_ERROR;
+	}
+
+	tr_device.state=TR_FORWARD;
+	if(tr_setVP(vp)){
+		printf("Error llevando vel_pwm a %d. (tr_forward -> traccion_robocol.c) \n",vp);
+		return TR_ERROR;
+	}
+
+	return
 }
 
 
@@ -145,10 +163,11 @@ tr_st tr_setVP(uint8_t vp){
 		}
 
 		if (vp==0){
-			tr_device.state=(tr_device.state ^ (tr_device.state & LOWER_BMASK))|(TR_STOPPED);
+			tr_device.mv_state=TR_STOPPED;
 		}
 
 		tr_device.vel_pwm=vp;
 	}
 	return TR_OK;
 }
+
