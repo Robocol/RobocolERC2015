@@ -95,6 +95,7 @@ int16_t  errorAnteriorAnterior_P=0;
 float UAnterior_P=0; //Acción de control anterior (sp_corriente)
 uint8_t setPointPosicion=155;
 uint8_t PosAct=0; //Medición de posición para el brazo
+uint8_t direccion=0;
 
 
 // Contantes Controlador  de Corriente
@@ -295,7 +296,9 @@ void adc_init() {
 unsigned char adc_get() {
 	unsigned char lectura=0;
 	ADCSRA|=(1<<ADSC);
+	//direccion=10;
 	while ((ADCSRA & (1<<ADIF)) != 0x10);
+	//direccion=11;
 	//Espera conversion completa
 	lectura = ADCH;
 	ADCSRA |=(1 << ADIF);
@@ -337,7 +340,7 @@ void control_getActualPosition(void) {
 ** Returned value: NA
 *********************************************************************************************************/
 void control_getActualCurrent(void) {
-	ADMUX=0;
+	ADMUX=0x0;
 	curAct=adc_get();
 }
 
@@ -361,19 +364,10 @@ void control_getTemp(void){
 **		     direccion - Es la direccion del actuador
 ** Returned value: setPointCorriente
 *********************************************************************************************************/
-uint8_t bloquePidPosicion(int16_t error, char direccion){
+uint8_t bloquePidPosicion(int16_t error){
 	int16_t setPointCorriente;
 	float deltaU_P,k1,k2,k3;
 
-	if(direccion==1){
-		KP_P = 0.2;//Ku=2.7 0.2*Ku
-		KI_P = 1;//0.0340;//Tu=0.00304*14 "2Kp/Tu
-		KD_P = 0.0266;//KpTu/3	
-	}else{
-		KP_P = 0.2;//Ku=2.7 0.2*Ku
-		KI_P = 0.01;//0.0340;//Tu=0.00304*14 "2Kp/Tu
-		KD_P = 0.0266;//KpTu/3	
-	}	
 	//Cálculo de constantes para utilizar la fórmula de Euler
 	k1 = KP_P + KI_P + KD_P;
 	k2 = -KP_P - 2*KD_P;
@@ -386,39 +380,27 @@ uint8_t bloquePidPosicion(int16_t error, char direccion){
 	UAnterior_P= UAnterior_P+deltaU_P;
 	setPointCorriente= UAnterior_P;
 
-	if(direccion==1){
-		//Límites para la subida sin carga
-		if(setPointCorriente>60){
-			setPointCorriente=60;
-			UAnterior_P=60;
-		}
-
-		//Cálculo de las ganancias adaptativas
-		if(setPointCorriente<30){
-			KP_C =0.45;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =1.5;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}else if(setPointCorriente<40){
-			KP_C =0.00375;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =0.0125;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}else if(setPointCorriente<60){
-			KP_C =0.00075;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =0.0027;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}else if(setPointCorriente<100){
-			KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
-			KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
-		}
-	
-	}else{
-		//Límites para la bajada sin carga
-		if(setPointCorriente>20){
-			setPointCorriente=20;
-			UAnterior_P=20;
-		}
-
-		KP_C =0.00375;
-		KI_C =0.0125;
-
+	//Límites para la subida sin carga
+	if(setPointCorriente>60){
+		setPointCorriente=60;
+		UAnterior_P=60;
 	}
+
+	//Cálculo de las ganancias adaptativas
+	if(setPointCorriente<30){
+		KP_C =0.45;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =1.5;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+	}else if(setPointCorriente<40){
+		KP_C =0.00375;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =0.0125;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+	}else if(setPointCorriente<60){
+		KP_C =0.00075;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =0.0027;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+	}else if(setPointCorriente<100){
+		KP_C =0.00045;//0.1125;//40:0.06;//0.24;//0.104;//0.1040;//Ku=0.26=1.95
+		KI_C =0.0015;//40:0.19;//346;//346.38;//0.0067;//Tu=0.0083=0.0034
+	}
+	
 	 
 	//Límite inferior del setpoint
 	if(setPointCorriente<0){
@@ -496,7 +478,7 @@ void bloqueServoControl(char direccion){
 	for(n=0;n<20;n++){
 		control_getActualPosition();
 		error_posicion = servocontrol[n] - PosAct;
-		setPointCorriente=bloquePidPosicion(error_posicion,direccion);
+		setPointCorriente=bloquePidPosicion(error_posicion);
 		
 		//Se ejecuta el control de corriente durante 90 ms (6 ciclos)
 		for(j=0;j<6;j++){
@@ -535,7 +517,7 @@ void control_parser(){
 	if(parsear){
 		switch (encabezado){
 			case MEDIR_CORRIENTE:
-			control_getActualCurrent();
+			//control_getActualCurrent();
 			spi_put(curAct);
 			break;
 			case MEDIR_VELOCIDAD:
@@ -544,7 +526,7 @@ void control_parser(){
 			break;
 			case MEDIR_TEMP:
 			control_getTemp();
-			spi_put(tempAct);
+			spi_put(PWM);
 			break;
 			case DAR_ESTADO:
 			spi_put(ESTADO);
@@ -609,10 +591,10 @@ ISR(USI_OVF_vect)
 }
 
 int main(void) {
-	int16_t error_posicion=0;
+	int error_posicion=0;
 	int16_t error_corriente=0;
 	uint8_t i;
-	char direccion=0x00;
+	char cambio=0;
 	gpio_init();
 	adc_init();
 	pwm_init();
@@ -625,11 +607,41 @@ int main(void) {
 		
 		switch (ESTADO) {
 		case AUTO_EST:
+			direccion=8;
+						
 			control_getActualPosition();
-			if((0x04 & PINA)==0){//El actuador baja: ON/OFF en cascada con corriente (lazo interno)
+			direccion=9;
+			if(cambio==0){
+				gpio_put(LED_PIN,1);
+				cambio=1;	
+			}else{
 				gpio_put(LED_PIN,0);
-				direccion=0;
+				cambio=0;	
+			}
+		
+			
+			if((0x04 & PINA)>>2){//El actuador sube: PID en cascada con corriente (lazo interno)
+				//gpio_put(LED_PIN,1);	
+				direccion=1;
+				error_posicion=setPointPosicion-PosAct;	
+
+				direccion=2;	
+				setPointCorriente=bloquePidPosicion(error_posicion);
+				direccion=3;
+				for(i=0;i<6;i++){			
+					control_getActualCurrent();
+					error_corriente=setPointCorriente-curAct;
+					PWM=bloquePiCorriente(error_corriente);
+					pwm_set(PWM);
+					_delay_ms(12);
+				}
+				direccion=4;	
+			}else{//El actuador baja: ON/OFF en cascada con corriente (lazo interno)
+				//gpio_put(LED_PIN,0);
+				direccion=5;	
 				error_posicion=PosAct-setPointPosicion;
+
+				direccion=6;
 				setPointCorriente=20;
 				KP_C =0.00375;
 				KI_C =0.0125;
@@ -645,26 +657,18 @@ int main(void) {
 				}else{
 					pwm_set(0);
 				}
-			}else{//El actuador sube: PID en cascada con corriente (lazo interno)
-				gpio_put(LED_PIN,1);	
-				direccion=1;
-				error_posicion=setPointPosicion-PosAct;		
-				setPointCorriente=bloquePidPosicion(error_posicion,direccion);
-				for(i=0;i<6;i++){			
-					control_getActualCurrent();
-					error_corriente=setPointCorriente-curAct;
-					PWM=bloquePiCorriente(error_corriente);
-					pwm_set(PWM);
-					_delay_ms(12);
-				}	
+				direccion=7;
 			}
-			
+			//gpio_put(LED_PIN,0);
+
 
 			break;
 		case MANUAL_EST:
+			gpio_put(LED_PIN,1);
 			pwm_set(PWM);
 			break;
 		case FAIL_EST:
+			gpio_put(LED_PIN,0);
 			pwm_set(0);
 			errorAnterior_C=0;
 			errorAnterior_P=0;

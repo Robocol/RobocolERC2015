@@ -200,6 +200,23 @@ $(ODIR)/arm_robocol$(LEXT): ../BRAZO/arm_robocol.c ../BRAZO/arm_robocol.h  $(ODI
 						-I../PWM \
 						-I../STEPPER \
 						-I../BRAZO
+################################################################################################
+#	STEPPER																				   	   #
+################################################################################################
+
+$(ODIR)/traccion_robocol$(LEXT): ../TRACCION/traccion_robocol.c ../TRACCION/traccion_robocol.h  $(ODIR)/i2c_robocol$(LEXT)  \
+                                                            					$(ODIR)/gpio_robocol$(LEXT) \
+                                                            					$(ODIR)/spi_robocol$(LEXT)	\
+ 		                                           								$(ODIR)/misc_robocol$(LEXT) \
+       																			$(ODIR)/pwmg_robocol$(LEXT) \
+       																			$(ODIR)/ph_robocol$(LEXT)
+	$(CC) -c -o $@ $< -I../GPIO \
+						-I../I2C  \
+						-I../SPI  \
+						-I../../MISC \
+						-I../PH \
+						-I../PWM \
+                        -I../TRACCION
 
 .PHONY: clean
 

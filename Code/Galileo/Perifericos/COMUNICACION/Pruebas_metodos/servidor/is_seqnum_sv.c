@@ -73,6 +73,16 @@
 	#define false 0
 #endif
 
+
+/* Modos de operación del ROVER */
+typedef uint8_t rover_status;
+#define NC 0X00
+#define INIT 0X01
+#define SAFE 0x02
+#define NORMAL 0x03
+#define FAULT_RECOVERY  0x04
+
+
 /* Bit-mask values for 'flags' argument of becomeDaemon() */
 
 #define BD_NO_CHDIR           01    /* Don't chdir("/") */
@@ -105,6 +115,10 @@ off_t fsize(const char *filename) {
 
     return -1; 
 }
+
+/*	Variables Globales	*/
+rover_status status = NC;
+
 
 /* Read characters from 'fd' until a newline is encountered. If a newline
   character is not encountered in the first (n - 1) bytes, then the excess
@@ -261,39 +275,11 @@ static void logClose(void)
     fclose(logfp);
 }
 
-int main(int argc, char *argv[]) {
+int configurar_servidor(void){
 
-	//Variables locales servidor
-	char reqLenStr[INT_LEN];	/* Buffer para almacenar lo que llega de un cliente */
-	struct sockaddr_storage claddr;	/* Buffer para almacenar lo que llegs del cliente */	
-	int lfd, cfd, optval;//
-	socklen_t addrlen;
 	struct addrinfo hints; // Estructura de informacion del socket y la direccion
 	struct addrinfo *result, *rp;//
-	#define ADDRSTRLEN (NI_MAXHOST + NI_MAXSERV + 10)
-	ssize_t escritos;
-	logOpen(LOG_FILE);
-
-	if(becomeDaemon(0) == -1)
-		logMessage("Fail becomeDaemon");
-
-
-
-	
-//Verifica los parametros ingresados por terminal
-	if (argc > 2 && strcmp(argv[1], "--help") == 0){
-		printf("%s [init-seq-num]\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-
-//Configuración servidor
-
-	/* Ignore the SIGPIPE signal, so that we find out about broken connection
-	errors via a failure from write(). */
-	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR){
-	        logMessage("Fail ignoring SIGPIPE ");
-		exit(EXIT_FAILURE);
-	}
+	int lfd, cfd, optval;//
 
 	/* Call getaddrinfo() to obtain a list of addresses that
 	we can try binding to */
@@ -321,8 +307,8 @@ int main(int argc, char *argv[]) {
 	            continue;                   /* On error, try next address */
 
 	        if (setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))== -1){		
-			logMessage("Fail setting socket options (%s)", strerror(errno));
-			exit(4);
+			logMessage("Fallo al configurar las opciones del socket (%s)", strerror(errno));
+			return -1;
 		}
 
 	        if (bind(lfd, rp->ai_addr, rp->ai_addrlen) == 0)
@@ -334,92 +320,214 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (rp == NULL){
-		logMessage("Could not bind to any socket (%s)", strerror(errno));
-		exit(5);
+		logMessage("No se pudo enlazar a ningun socket (%s)", strerror(errno));
+		return -1;
 	}
 
 	if (listen(lfd, BACKLOG) == -1){
-		logMessage("Fail listening (%s)", strerror(errno));
-		exit(6);
+		logMessage("Fallo escuchando (%s)", strerror(errno));
+		return -1;
 	}
-	printf("Configura el servidor");
-	logMessage("Configura el servidor");
+	return lfd;
+
+	logMessage("Se configuro el servidor exitosamente");
 
 	freeaddrinfo(result);
+}
+
+int escribir_respuesta(char* respuesta, int cfd){
+
+	if(write(cfd,respuesta,strlen(respuesta))<0){
+		logMessage("Fallo al escribir en el Socket (%s)", strerror(errno));
+		return -1;
+	}
+
+	if(write(cfd,"\n",1)<0){
+		logMessage("Fallo al escribir en el Socket un ENTER(%s)", strerror(errno));
+		return -1;
+	}
+	return 0;
+}
+
+int apagar_tarjeta(void){
+	//Se ejecuta la orden poweroff	
+	if(system("poweroff")<0){
+		logMessage("Error al apagar la tarjeta");
+		return -1;
+	}
+	return 0;
+}
+
+int configurar_fecha(char* fecha_hora){
+	char* anho;
+	char* mes;
+	char* dia;
+	char* hora;
+	char* minutos;
+	char* segundos;
+	char formato_fecha[40];
+	
+	//Se separa el string con la fecha y la hora
+	anho = strtok(fecha_hora, "-");
+	logMessage("anho: %s",anho);
+	mes = strtok(NULL, "-");
+	logMessage("mes: %s",mes);
+	dia = strtok(NULL, "-");
+	logMessage("dia: %s",dia);
+	hora = strtok(NULL, "-");
+	logMessage("hora: %s",hora);
+	minutos = strtok(NULL, "-");
+	logMessage("minutos: %s",minutos);
+	segundos = strtok(NULL, "-");
+	logMessage("segundos: %s",segundos);
+	
+	//Se crea el comando de configuracion de la hora en BASH	
+	sprintf(formato_fecha, "date --set \"%s-%s-%s %s:%s:%s\"",anho, mes, dia, hora, minutos, segundos);
+	logMessage("EL comando es: %s", formato_fecha);
+
+	//Se ejecuta la orden date	
+	if(system(formato_fecha)<0){
+		logMessage("No se pudo cambiar la hora");
+		return -1;
+	}
+	logMessage("Se cambio la hora exitosamente");
+	return 0;
 
 
-	for (;;) {                  /* Handle clients iteratively */
+}
 
-	        /* Accept a client connection, obtaining client's address */
+int parser_comandos(char* comando, int cfd){
+	char str[18];
+	
+	/* Si hay una peticion de conectar */
+	if(strcmp(comando,"conectar\n")==0){ //Comando que retorna el estado de la tarjeta y pasa a estado SAFE
+		logMessage("Llego el comando conectar");
 
-        	addrlen = sizeof(struct sockaddr_storage);
-        	cfd = accept(lfd, (struct sockaddr *) &claddr, &addrlen);
-        	if (cfd == -1) {
+		//Cambia el estado de la Galileo
+		status=SAFE;
+		logMessage("Paso a estado Safe");
+
+		//Imprime el status en la variable str
+		sprintf(str, "%u", status);
+		if(escribir_respuesta(str,cfd)==-1){
+			logMessage("Error al responder");
+			return -1;
+		}
+
+	}else if(strcmp(comando,"fecha\n")==0){ //Comando que cambia la fecha y la hora
+		logMessage("Llego el comando fecha");
+
+		//Informa al cliente que llegó la petición
+		if(escribir_respuesta("OK",cfd)==-1){
+			logMessage("Error al responder");
+			return -1;
+		}
+
+		//Lee la fecha y la hora
+		if (readLine(cfd, str, 19) <= 0) {
+			close(cfd);
+			logMessage("No hay fin de línea");	
+			return -1;
+        	}
+		logMessage(str);
+
+		//Configura la fecha y la hora
+		if(configurar_fecha(str)==-1){
+			logMessage("No se pudo configurar la fecha y la hora");
+			return -1;
+		}
+
+	}else if(strcmp(comando,"estado\n")==0){ //Comando que retorna el estado de la tarjeta
+		logMessage("Llego el comando estado");
+		
+		//Imprime el status en la variable str
+		sprintf(str, "%u", status);
+		if(escribir_respuesta(str,cfd)==-1){
+			logMessage("Error al responder");
+			return -1;
+		}
+	}else if(strcmp(comando,"desconectar\n")==0){ //Comando que apaga la tarjeta
+		logMessage("Llego el comando desconectar");
+		
+		//Imprime el status en la variable str
+		if(apagar_tarjeta()==-1){
+			logMessage("No se pudo apagar");
+			return -1;
+		}
+	}
+	return 0;
+
+}
+
+
+
+int main(int argc, char *argv[]) {
+	
+	//Variables locales servidor
+	char comando[INT_LEN];	/* Buffer para almacenar lo que llega de un cliente */
+	struct sockaddr_storage claddr;	/* Buffer para almacenar lo que llegs del cliente */	
+	int cfd,lfd;//
+	socklen_t addrlen;
+	char str[15];
+
+	ssize_t escritos; // Bytes escritos
+	
+	/* El proceso se convierte en un demonio */
+	if(becomeDaemon(0) == -1)
+		printf("\nEl proceso del servidor no pudo volverse un demonio\n");
+	logOpen(LOG_FILE);
+
+
+	
+//Configuración servidor
+
+	/* Ignore the SIGPIPE signal, so that we find out about broken connection
+	errors via a failure from write(). */
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR){
+	        logMessage("Fail ignoring SIGPIPE ");
+		exit(EXIT_FAILURE);
+	}
+
+	/* Se configura el servidor */
+	lfd = configurar_servidor();
+	if(lfd==-1){
+		logMessage("No se pudo configurar el servidor");
+		exit(EXIT_FAILURE);
+	}
+
+
+	for (;;) {                  /* Loop infinito que  maneja las peticiones de los clientes */
+
+		/* Acepta la conexion de un cliente */
+		addrlen = sizeof(struct sockaddr_storage);
+		cfd = accept(lfd, (struct sockaddr *) &claddr, &addrlen);
+		if (cfd == -1) {
 			logMessage("Accept error (%s)", strerror(errno));
 			continue;
-        	}
-		logMessage("acepto cliente ");
-
-		printf("7. Adquirio la información del cliente\n");
+		}
+		logMessage("Acepto una conexion de un cliente");
 
 		/* Lee la peticion del cliente y envia una respuesta o si no cierra el socket 
 		y espera una nueva conexion */
-
-	        if (readLine(cfd, reqLenStr, INT_LEN) <= 0) {
+		if (readLine(cfd, comando, INT_LEN) <= 0) {
 			close(cfd);
-			logMessage("No hay fin de línea\n");	
+			logMessage("No hay fin de línea");	
 			continue;                   
         	}
 
-		printf(reqLenStr);
+		/* Imprime el texto que llegó */
+		logMessage("Comando: %s",comando);
 
-		/* Si hay una peticion de imagen adquiere y envia la imagen */
-		if(strcmp(reqLenStr,"imagen\n")==0){
-			logMessage("Ingreso al método para adquirir la imagen\n");
-			
-			logMessage("Leyo el estado:\n");
-			
-			logMessage("\n");
-
-			/* Se verifica cual imagen es mas reciente 
-			stat("./imagen1.mp4", &attrib1);	// get the attributes of afile.txt
-			clock1 = localtime(&(attrib1.st_ctime));	// Get the last modified time
-			tiempo=attrib1.st_mtim.tv_nsec; 
-			imagen_rec="imagen1.mp4";
-
-			
-			
-
-			 Envia el tamanho de la imagen */
-			//sprintf(str, "%d", sz);
-			escritos = write(cfd,"good",15);
-			if(escritos==-1){
-				logMessage("Failing writing socket (%s)", strerror(errno));
-				exit(9);
-			}
-
-			escritos = write(cfd,"\n",1);		
-			if(escritos==-1){
-				logMessage("Failing writing socket (%s)", strerror(errno));
-				exit(9);
-			}
-
-			// Lee una linea de respuesta  
-        		if (readLine(cfd, reqLenStr, INT_LEN) <= 0) {
-       				close(cfd);
-	    			logMessage("No hay fin de linea (%s)", strerror(errno));	
-				continue;                   
-       			}
-
-			logMessage(reqLenStr);
-						
+		/* Analiza el comando y realiza una acción */
+		if(parser_comandos(comando, cfd)==-1)
+			logMessage("No se respondio al comando");		
 		
-        	}		 
+	}		 
 
-        	if (close(cfd) == -1)           /* Close connection */
-			logMessage("Close error (%s)", strerror(errno));	
-		
-		logMessage("Finalizo rutina\n");
-    	}
+      	if (close(cfd) == -1)           /* Close connection */
+		logMessage("Close error (%s)", strerror(errno));	
+	
+	logMessage("Finalizo rutina\n");
+    	
 
 }
