@@ -40,6 +40,7 @@
 	typedef struct {
 		uint8_t mv_state;
 		uint8_t ctl_state;
+		uint8_t side;
 		uint8_t type;
 		uint8_t vel_pwm;
 		ph_dev *front_ph;
@@ -54,7 +55,7 @@
 const uint8_t TR_BUILT =0x01;
 const uint8_t TR_NOT_BUILT=0x00;
 const uint8_t CW_DIR=1;
-const uint8_t ANTI_CW_DIR=0;
+const uint8_t COUNTER_CW_DIR=0;
 const uint8_t UPPER_BMASK=0b11110000;
 const uint8_t LOWER_BMASK=0b00001111;
 /*--------------------------------------------------------------------------*/
@@ -77,10 +78,11 @@ const uint8_t TR_STEER 		= 0x08;
 const uint8_t TR_AUTO 		= 0x10;
 const uint8_t TR_MANUAL		= 0x20;
 
-
+const uint8_t TR_TURN_LEFT  = 0x01;
+const uint8_t TR_TURN_RIGHT = 0x02;
 
 tr_dev	tr_device;
-tr_device.device_built=TR_NOT_BUILT;
+//tr_device.device_built=TR_NOT_BUILT;
 
 /* =====================================================================================*/
 /*
@@ -120,7 +122,7 @@ tr_st tr_build(uint8_t type);
 */
 /*!
 **     @resumen
-**          El dispositivo se dirije hacia adelante a el argumento 
+**          El dispositivo se dirije hacia adelante según el argumento 
 **			ingresado
 **     @param
 **          vp     	   	- Entero representando el PWM o la velocidad
@@ -135,8 +137,8 @@ tr_st tr_forward(uint8_t vp);
 */
 /*!
 **     @resumen
-**          El dispositivo se dirije hacia adelante a el argumento 
-**			ingresado
+**          El dispositivo se dirije hacia atrás según el argumento 
+**			ingresadosado
 **     @param
 **          vp     	   	- Entero representando el PWM o la velocidad
 **							a la que se desea que los motores retrocedan
@@ -151,13 +153,13 @@ tr_st tr_backward(uint8_t vp);
 */
 /*!
 **     @resumen
-**          El dispositivo se dirije hacia adelante a el argumento 
-**			ingresado
+**          El dispositivo gira sobre su propio eje en la dirección y
+**			velocidad especificada por parámetro.
 **     @param
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-tr_st tr_spin(uint8_t dir);
+tr_st tr_spin(uint8_t dir, uint8_t arg);
 
 /*
 ** ===================================================================
@@ -165,42 +167,30 @@ tr_st tr_spin(uint8_t dir);
 */
 /*!
 **     @resumen
-**          El dispositivo se dirije hacia adelante a el argumento 
-**			ingresado
+**          El dispositivo gira diferencialmente. Esto quiere decir que 
+**			uno de los lados del vehículo continúa a su velocidad actual
+**			mientras que el otro la disminuye según un valor ingresado por
+**			parámetro. Si la velocidad resultante es negativa, el otro 
+**			lado cambiará su dirección.
 **     @param
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-tr_st tr_diffTurn(uint8_t dir);
+tr_st tr_diffTurn(uint8_t dir, uint32_t arg);
 
 /*
 ** ===================================================================
-**     Método      :  tr_spin
+**     Método      :  tr_diagonalDiffTurn
 */
 /*!
 **     @resumen
-**          El dispositivo se dirije hacia adelante a el argumento 
-**			ingresado
+**          El dispositivo realiza un giro diferencial utilizando únicamente 
+**			los motores de una de las diagonales del robot 
 **     @param
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-tr_st tr_Turn(uint8_t dir);
-
-/*
-** ===================================================================
-**     Método      :  tr_spin
-*/
-/*!
-**     @resumen
-**          El dispositivo se dirije hacia adelante a el argumento 
-**			ingresado
-**     @param
-**          dir     	   	- Dirección de giro
-*/
-/* ===================================================================*/
-tr_st tr_diagonalSpin(uint8_t dir);
-
+tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg);
 
 /*
 ** ===================================================================
@@ -208,13 +198,13 @@ tr_st tr_diagonalSpin(uint8_t dir);
 */
 /*!
 **     @resumen
-**          El dispositivo se dirije hacia adelante a el argumento 
-**			ingresado
+**          Obtiene la inclinación relativa de rover leyendo el valor 
+**			del ADC del balancín
 **     @param
-**          dir     	   	- Dirección de giro
+**          tilt     	   	- Puntero a la posición de memoria donde 
 */
 /* ===================================================================*/
-tr_st tr_diagonalSpin(uint8_t dir);
+tr_st tr_getTilt(uint8_t dir);
 
 /*
 ** ===================================================================

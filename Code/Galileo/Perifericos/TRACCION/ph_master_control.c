@@ -35,12 +35,12 @@ volatile uint8_t state;
 volatile uint8_t curr_vel;
 volatile int8_t new_vel;
 size_t size=40;	
-char sendbuf[BUF_SIZ];					//Tamaño del buffer para nueavas lineas
-char* line;			//Puntero al buffer de linea
+char sendbuf[BUF_SIZ];				//Tamaño del buffer para nueavas lineas
+char* line;							//Puntero al buffer de linea
 uint8_t temp,vel,corr,est,debug;	//Buffers para los diferentes mediciones
 uint8_t addr=0b0111000;				//Direccion expansor I2C
-ph_dev* devptr1;						//puntero a puente h
-ph_dev* devptr2;						//puntero a puente h
+ph_dev* devptr1;					//puntero a puente h
+ph_dev* devptr2;					//puntero a puente h
 int buf;							//buff para envío de mensajes
 int tx_len = 0;
 int inittx=0;

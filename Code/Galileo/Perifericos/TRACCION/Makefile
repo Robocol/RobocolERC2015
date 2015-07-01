@@ -17,6 +17,7 @@ _OBJ = spi_robocol$(LEXT) \
        i2c_robocol$(LEXT) \
        gpio_robocol$(LEXT)\
        ph_robocol$(LEXT) \
+       traccion_robocol$(LEXT)\
        misc_robocol$(LEXT)
 
 #Concatenación de objetos con ruta de ubicación predeterminada
@@ -40,4 +41,7 @@ ph_slave_control: $(OBJ)
 #Regla de compilación para creación de logs
 ph_master_control: $(OBJ)
 	$(CC) -o $@$(EEXT) ph_master_control.c $^ $(CFLAGS)
+
+prueba_traccion: $(OBJ)
+	$(CC) -o $@$(EEXT) prueba_traccion.c $^ $(CFLAGS)
 include ../Makefile
