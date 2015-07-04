@@ -35,35 +35,35 @@
 /*
  *                  DEFINICIÓN DE ESTRUCTURAS
  */
-	typedef int tr_st;
+typedef int tr_st;
 
-	typedef struct {
-		uint8_t mv_state;
-		uint8_t ctl_state;
-		uint8_t side;
-		uint8_t type;
-		uint8_t vel_pwm;
-		ph_dev *front_ph;
-		ph_dev *back_ph;
-		uint8_t device_built;
-	} tr_dev;
+typedef struct tr_dev{
+	uint8_t mv_state;
+	uint8_t ctl_state;
+	uint8_t side;
+	uint8_t type;
+	uint8_t vel_pwm;
+	ph_dev *front_ph;
+	ph_dev *back_ph;
+	uint8_t device_built;
+} tr_dev;
 
 #define TR_ERROR	0x01
 #define TR_OK 		0x00
 
 
-const uint8_t TR_BUILT =0x01;
-const uint8_t TR_NOT_BUILT=0x00;
+#define TR_BUILT 		0x01
+#define TR_NOT_BUILT	0x00
 
 /*--------------------------------------------------------------------------*/
 /*
  *                  DEFINICIÓN DE TYPES
  */
-const uint8_t TR_MASTER 	= 0x01;
-const uint8_t TR_SLAVE 		= 0x02;
+#define TR_MASTER 		0x01
+#define TR_SLAVE 		0x02
 
-const uint8_t TR_LEFT_SIDE  = 0x01;
-const uint8_t TR_RIGHT_SIDE = 0x02;
+#define TR_LEFT_SIDE  	0x02
+#define TR_RIGHT_SIDE 	0x01
 
 
 
@@ -72,18 +72,18 @@ const uint8_t TR_RIGHT_SIDE = 0x02;
  *                  DEFINICIÓN DE STATES
  */
 
-const uint8_t TR_FORWARD 	= 0x01;
-const uint8_t TR_BACKWARD 	= 0x02;
-const uint8_t TR_STEER 		= 0x04;
-const uint8_t TR_STOPPED 	= 0x08;
+#define TR_FORWARD 		0x01
+#define TR_BACKWARD 	0x02
+#define TR_STEER 		0x04
+#define TR_STOPPED 		0x08
 
-const uint8_t TR_AUTO 		= 0x01;
-const uint8_t TR_MANUAL		= 0x02;
+#define TR_AUTO 		0x01
+#define TR_MANUAL		0x02
 
-const uint8_t TR_TURN_LEFT  = 0x01;
-const uint8_t TR_TURN_RIGHT = 0x02;
+#define TR_TURN_LEFT  	0x01
+#define TR_TURN_RIGHT 	0x02
 
-tr_dev	tr_device;
+struct tr_dev tr_device;
 //tr_device.device_built=TR_NOT_BUILT;
 
 /* =====================================================================================*/
@@ -116,7 +116,7 @@ multiplexores, referirse al esquema de conexión de los GPIO para la Intel Galil
 **							
 */
 /* ===================================================================*/
-tr_st tr_build(uint8_t type);
+tr_st tr_build(uint8_t type,uint8_t side);
 
 /*
 ** ===================================================================
@@ -232,8 +232,5 @@ tr_st tr_eBrake(void);
 */
 /* ===================================================================*/
 tr_st tr_setVP(uint8_t vp);
-
-
-
 
 #endif
