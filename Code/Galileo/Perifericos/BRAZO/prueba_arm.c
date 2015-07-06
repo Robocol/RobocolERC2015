@@ -10,7 +10,7 @@ FILE *fdl;
 
 int32_t position,status,config=0;
 uint8_t step,ocd,tval;
-uint8_t alarm,corr,debug;
+uint8_t corr,debug;
 int32_t buf,buf2;
 double fbuf;
 
@@ -63,7 +63,7 @@ int main(int argc, char const *argv[]){
 		printf("Error en driver enable inicial\n" );
 	}
 
-	if(stp_setStepSel(stepper,2)){
+	if(stp_setStepSel(stepper,0)){
 		printf("Error en setStepSel inicial\n" );
 	}
 
@@ -212,10 +212,6 @@ arm_st prueba_st(stp_device* devptr){
 		}else if(!strcmp(line,"getconfig\n")){
 			stp_getConfig(devptr,&config);
 			printf("Config: %X \n",config);
-
-		}else if(!strcmp(line,"getalarm\n")){
-			stp_getAlarmEn(devptr,&alarm);
-			printf("Alarm: %X \n",alarm);
 
 		}else if(!strcmp(line,"getstep\n")){
 			stp_getStepSel(devptr,&step);

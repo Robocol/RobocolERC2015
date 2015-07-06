@@ -1,5 +1,10 @@
 #ifndef ARM_ROBOCOL_H
 #define ARM_ROBOCOL_H
+#include <sys/types.h>
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include "ph_robocol.h"
 #include "stepper_robocol.h"
 

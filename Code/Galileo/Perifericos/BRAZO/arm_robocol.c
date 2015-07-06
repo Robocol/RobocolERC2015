@@ -476,19 +476,19 @@ arm_st arm_moveToPos(arm_pos posicion, uint8_t delay){
 		st=ARM_ERROR;
 	}
 
-	//sleep(delay);
+	sleep(delay);
 
-	// if(arm_moveUActToAngle(posicion.ang_u_actuator)){
-	// 	printf("Error llevando el UActuator a la posición\n");
-	// 	st=ARM_ERROR;
-	// }
+	if(arm_moveUActToAngle(posicion.ang_u_actuator)){
+		printf("Error llevando el UActuator a la posición\n");
+		st=ARM_ERROR;
+	}
 
-	//i2c_chaddr((*(*armdev).sup).exp);
+	i2c_chaddr((*(*armdev).sup).exp);
 
-	// if(arm_moveSupToAngle(posicion.ang_sup)){
-	// 	printf("Error llevando el Supinador a la posición\n");
-	// 	st=ARM_ERROR;
-	// }
+	if(arm_moveSupToAngle(posicion.ang_sup)){
+		printf("Error llevando el Supinador a la posición\n");
+		st=ARM_ERROR;
+	}
 
 	// if(arm_moveWristToAngle(posicion.ang_sup)){
 	// 	printf("Error llevando el Supinador a la posición\n");
