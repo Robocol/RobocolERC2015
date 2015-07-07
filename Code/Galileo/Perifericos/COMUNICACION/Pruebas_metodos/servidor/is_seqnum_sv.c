@@ -1,25 +1,34 @@
-/*************************************************************************\
-*                  Copyright (C) Michael Kerrisk, 2010.                   *
-*                                                                         *
-* This program is free software. You may use, modify, and redistribute it *
-* under the terms of the GNU Affero General Public License as published   *
-* by the Free Software Foundation, either version 3 or (at your option)   *
-* any later version. This program is distributed without any warranty.    *
-* See the file COPYING.agpl-v3 for details.                               *
-\*************************************************************************/
-
-/* Listing 59-6 */
-
-/* is_seqnum_sv.c
-
-   A simple Internet stream socket server. Our service is to provide
-   unique sequence numbers to clients.
-
-   Usage:  is_seqnum_sv [init-seq-num]
-                        (default = 0)
-
-   See also is_seqnum_cl.c.
+/*
+** =====================================================================================
+**     USO DEL DRIVER
 */
+/*!
+**     @resumen
+**          Esta librería incluye los métodos de alto nivel que manejan las comunicaciones internas del ROVER  y las comunicaciones
+**		del ROVER con el cuarto de control. El ROVER tiene 4 modos de operación: 
+**
+**          mode 			- Modo de inicio (INIT): En este modo las Galileo se encienden, se ejecutan sus scripts de inicio y **					se sincroniza su reloj. Una vez sincronizados los relojs la tarjeta cambia a estado SAFE. En este **					estado se ejecuta el main que utiliza esta librería.
+**
+**					- Modo de operación segura (SAFE): Es el estado incial del ROVER después del encendido. En 
+**					este modo el ROVER inicia todos los drivers y realiza un diagnóstico general de su compor-
+**					tamiento. En este modo NO se puede mover ningún actuador o motor pero sí se puede verificar la
+**					comunicación con todas las tarjetas. Adicionalmente, en este modo el ROVER está a la expectativa
+**					de una orden por cualquiera de las alternativas de comunicación externa que lo haga cambiar a modo
+**					normal. Si hay alguna falla en la comunicación el ROVER lo informará a nivel de la interfaz; **					dependiendo de la falla se podrá o no pasar a modo NORMAL. En este modo se pueden hacer los cambios **					de configuración necesarios en cada tarjeta: Negociar los diccionarios
+**
+**					- Modo de operación normal (NORMAL): En este modo el ROVER cumple con un ciclo de operación que 
+**					se encarga de adquirir, compilar y transmitir los diagnósticos. Además actualiza los setpoints de
+**					los controladores con base en lo que determine el usuario a nivel de la interfaz de usuario. La **					operación en este modo es cíclica. Es decir, cada cierto tiempo se adquieren los datos de diagnóstico
+**					y cada cierto tiempo se actualizan los setpoints.
+**
+**					- Modo de recuperación de fallas (FAIL): En este modo el ROVER sigue operando ya que la falla que 
+**					pudo haberse producido no afecta la operación completa del ROVER. La falla se indica a nivel de la **					interfaz de monitoreo y el operador de dicha interfaz puede tomar acciones de recuperación mientras **					que el operador principal maneja el ROVER. En caso que la falla sea una falla total, el sistema **					ingresa a modo de operación segura y proporciona un diagnóstico. En resumen, en este modo el ROVER 
+**					funciona de forma acíclica: no envía diagnósticos ciclicamente ya que permite pequeñas interrupciones
+**					en el ciclo para recuperar las fallas parciales.
+**
+**
+*/
+/* =====================================================================================*/
 #define _BSD_SOURCE             /* To get definitions of NI_MAXHOST and
                                    NI_MAXSERV from <netdb.h> */
 #include <netdb.h>
@@ -56,7 +65,7 @@
 
 #define PORT_NUM "50002"        /* Port number for server */
 
-#define INT_LEN 30              /* Size of string able to hold largest
+#define INT_LEN 40              /* Size of string able to hold largest
                                    integer (including terminating '\n') */
 
 #define BACKLOG 50
@@ -82,6 +91,16 @@ typedef uint8_t rover_status;
 #define NORMAL 0x03
 #define FAULT_RECOVERY  0x04
 
+/* Modos de operación de cada tarjeta */
+typedef char galileo_role;
+#define MASTER 0x01
+#define SLAVE  0x02
+
+
+/* Modos de operacion del brazo */
+typedef char arm_mode;
+#define MODO_AUTO 0X01
+#define MODO_NORMAL 0x02
 
 /* Bit-mask values for 'flags' argument of becomeDaemon() */
 
@@ -118,6 +137,8 @@ off_t fsize(const char *filename) {
 
 /*	Variables Globales	*/
 rover_status status = NC;
+galileo_role rol_net = SLAVE;
+
 
 
 /* Read characters from 'fd' until a newline is encountered. If a newline
@@ -127,7 +148,6 @@ rover_status status = NC;
   first (n - 1) bytes. The function return value is the number of bytes
   placed in buffer (which includes the newline character if encountered,
   but excludes the terminating null byte). */
-
 ssize_t readLine(int fd, void *buffer, size_t n){
 	ssize_t numRead;                    /* # of bytes fetched by last read() */
 	size_t totRead;                     /* Total bytes read so far */
@@ -173,108 +193,158 @@ ssize_t readLine(int fd, void *buffer, size_t n){
 	return totRead;
 }
 
-
+/*
+** ===================================================================
+**     Método      :  becomeDaemon
+**
+**     @resumen
+**          Vuelve al proceso actual un proceso demonio. 
+**			
+**     @param
+**          flags     	   	- Opciones del demonio
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
 int becomeDaemon(int flags)
 {
-    int maxfd, fd;
+	int maxfd, fd;
 
-    switch (fork()) {                   /* Become background process */
-    case -1: return -1;
-    case 0:  break;                     /* Child falls through... */
-    default: _exit(EXIT_SUCCESS);       /* while parent terminates */
-    }
 
-    if (setsid() == -1)                 /* Become leader of new session */
-        return -1;
+	switch (fork()) {                   /* Become background process */
+		case -1: return -1;
+		case 0:  break;                     /* Child falls through... */
+		default: _exit(EXIT_SUCCESS);       /* while parent terminates */
+	}
 
-    switch (fork()) {                   /* Ensure we are not session leader */
-    case -1: return -1;
-    case 0:  break;
-    default: _exit(EXIT_SUCCESS);
-    }
+	if (setsid() == -1)                 /* Become leader of new session */
+		return -1;
 
-    if (!(flags & BD_NO_UMASK0))
-        umask(0);                       /* Clear file mode creation mask */
+	switch (fork()) {                   /* Ensure we are not session leader */
+		case -1: return -1;
+		case 0:  break;
+		default: _exit(EXIT_SUCCESS);
+	}
 
-    if (!(flags & BD_NO_CHDIR))
-        chdir("/");                     /* Change to root directory */
+	if (!(flags & BD_NO_UMASK0))
+		umask(0);                       /* Clear file mode creation mask */
 
-    if (!(flags & BD_NO_CLOSE_FILES)) { /* Close all open files */
-        maxfd = sysconf(_SC_OPEN_MAX);
-        if (maxfd == -1)                /* Limit is indeterminate... */
-            maxfd = BD_MAX_CLOSE;       /* so take a guess */
+	if (!(flags & BD_NO_CHDIR))
+		chdir("/");                     /* Change to root directory */
 
-        for (fd = 0; fd < maxfd; fd++)
-            close(fd);
-    }
+	if (!(flags & BD_NO_CLOSE_FILES)) { /* Close all open files */
+		maxfd = sysconf(_SC_OPEN_MAX);
+	if (maxfd == -1)                /* Limit is indeterminate... */
+		maxfd = BD_MAX_CLOSE;       /* so take a guess */
 
-    if (!(flags & BD_NO_REOPEN_STD_FDS)) {
-        close(STDIN_FILENO);            /* Reopen standard fd's to /dev/null */
+	for (fd = 0; fd < maxfd; fd++)
+		close(fd);
+	}
 
-        fd = open("/dev/null", O_RDWR);
+	if (!(flags & BD_NO_REOPEN_STD_FDS)) {
+		close(STDIN_FILENO);            /* Reopen standard fd's to /dev/null */
 
-        if (fd != STDIN_FILENO)         /* 'fd' should be 0 */
-            return -1;
-        if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO)
-            return -1;
-        if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
-            return -1;
-    }
+	fd = open("/dev/null", O_RDWR);
 
-    return 0;
+	if (fd != STDIN_FILENO)         /* 'fd' should be 0 */
+		return -1;
+	if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO)
+		return -1;
+	if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
+		return -1;
+	}
+
+	return 0;
 }
 
+/*
+** ===================================================================
+**     Método      :  logMessage
+**
+**     @resumen
+**          Imprime un mensaje en el log. 
+**			
+**     @param
+**          flags     	   	- Mensaje a imprimir
+**
+** ===================================================================*/
 static void logMessage(const char *format, ...)
 {
-    va_list argList;
-    const char *TIMESTAMP_FMT = "%F %X";        /* = YYYY-MM-DD HH:MM:SS */
+	va_list argList;
+	const char *TIMESTAMP_FMT = "%F %X";        /* = YYYY-MM-DD HH:MM:SS */
 #define TS_BUF_SIZE sizeof("YYYY-MM-DD HH:MM:SS")       /* Includes '\0' */
-    char timestamp[TS_BUF_SIZE];
-    time_t t;
-    struct tm *loc;
+	char timestamp[TS_BUF_SIZE];
+	time_t t;
+	struct tm *loc;
 
-    t = time(NULL);
-    loc = localtime(&t);
-    if (loc == NULL ||
-           strftime(timestamp, TS_BUF_SIZE, TIMESTAMP_FMT, loc) == 0)
-        fprintf(logfp, "???Unknown time????: ");
-    else
-        fprintf(logfp, "%s: ", timestamp);
+	t = time(NULL);
+	loc = localtime(&t);
+	if (loc == NULL || strftime(timestamp, TS_BUF_SIZE, TIMESTAMP_FMT, loc) == 0)
+		fprintf(logfp, "???Unknown time????: ");
+	else
+		fprintf(logfp, "%s: ", timestamp);
 
-    va_start(argList, format);
-    vfprintf(logfp, format, argList);
-    fprintf(logfp, "\n");
-    va_end(argList);
+	va_start(argList, format);
+	vfprintf(logfp, format, argList);
+	fprintf(logfp, "\n");
+	va_end(argList);
 }
 
-/* Open the log file 'logFilename' */
-
+/*
+** ===================================================================
+**     Método      :  logOpen
+**
+**     @resumen
+**          Abre un archivo para almacenar el log. 
+**			
+**     @param
+**          flags     	   	- Ruta del archivo que contiene el log
+**
+** ===================================================================*/
 static void logOpen(const char *logFilename)
 {
-    mode_t m;
+	mode_t m;
 
-    m = umask(077);
-    logfp = fopen(logFilename, "a");
-    umask(m);
+	m = umask(077);
+	logfp = fopen(logFilename, "a");
+	umask(m);
 
-    /* If opening the log fails we can't display a message... */
+	/* If opening the log fails we can't display a message... */
 
-    if (logfp == NULL)
-        exit(EXIT_FAILURE);
+	if (logfp == NULL)
+		exit(EXIT_FAILURE);
 
-    setbuf(logfp, NULL);                    /* Disable stdio buffering */
+	setbuf(logfp, NULL);                    /* Disable stdio buffering */
 
-    logMessage("Opened log file");
+	logMessage("Opened log file");
 }
 
-/* Close the log file */
-
+/*
+** ===================================================================
+**     Método      :  logClose
+**
+**     @resumen
+**          Cierra el archivo que almacena el log. 
+**			
+**
+** ===================================================================*/
 static void logClose(void)
 {
-    logMessage("Closing log file");
-    fclose(logfp);
+	logMessage("Closing log file");
+	fclose(logfp);
 }
 
+/*
+** ===================================================================
+**     Método      :  configurar_servidor
+**
+**     @resumen
+**          Configura el servidor y lo deja listo para aceptar solicitudes. 
+**			
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
 int configurar_servidor(void){
 
 	struct addrinfo hints; // Estructura de informacion del socket y la direccion
@@ -335,6 +405,21 @@ int configurar_servidor(void){
 	freeaddrinfo(result);
 }
 
+/*
+** ===================================================================
+**     Método      :  escribir_respuesta
+**
+**     @resumen
+**          Escribe un String en el socket y añade un fin de línea. 
+**			
+**     @param
+**          respuesta  	   	- String a escribir en el socket
+**     @param
+**                         	- File Descriptor del Socket. 
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
 int escribir_respuesta(char* respuesta, int cfd){
 
 	if(write(cfd,respuesta,strlen(respuesta))<0){
@@ -349,6 +434,17 @@ int escribir_respuesta(char* respuesta, int cfd){
 	return 0;
 }
 
+/*
+** ===================================================================
+**     Método      :  apagar_tarjeta
+**
+**     @resumen
+**          Apaga la tarjeta Galileo. 
+**
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
 int apagar_tarjeta(void){
 	//Se ejecuta la orden poweroff	
 	if(system("poweroff")<0){
@@ -358,6 +454,20 @@ int apagar_tarjeta(void){
 	return 0;
 }
 
+/*
+** ===================================================================
+**     Método      :  configurar_fecha
+**
+**     @resumen
+**          Configura la fecha de la tarjeta Galileo. 
+**			
+**     @param
+**          fecha_hora     	- Fecha en formato default (ver interfaz)
+**
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
 int configurar_fecha(char* fecha_hora){
 	char* anho;
 	char* mes;
@@ -381,12 +491,12 @@ int configurar_fecha(char* fecha_hora){
 	segundos = strtok(NULL, "-");
 	logMessage("segundos: %s",segundos);
 	
-	//Se crea el comando de configuracion de la hora en BASH	
-	sprintf(formato_fecha, "date --set \"%s-%s-%s %s:%s:%s\"",anho, mes, dia, hora, minutos, segundos);
-	logMessage("EL comando es: %s", formato_fecha);
+	//Se crea el comando de configuracion de la hora en BASH
+	sprintf(formato_fecha, "date --set \"%s-%s-%s %s:%s\"",anho, mes, dia, hora, minutos);
+	logMessage(formato_fecha);
 
 	//Se ejecuta la orden date	
-	if(system(formato_fecha)<0){
+	if(system(formato_fecha)!=0){
 		logMessage("No se pudo cambiar la hora");
 		return -1;
 	}
@@ -396,6 +506,24 @@ int configurar_fecha(char* fecha_hora){
 
 }
 
+/*
+** ===================================================================
+**     Método      :  parser_comandos
+**
+**     @resumen
+**          Analiza el comando que llegó y ejecuta una acción. Los
+**		comandos analizados son comandos simples. Es decir no
+**		tienen parámetros después del comando.
+**			
+**     @param
+**          comando     	- comando a ejecutar
+**     @param
+**          cfd		     	- File Descriptor del Socket
+**
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
 int parser_comandos(char* comando, int cfd){
 	char str[18];
 	
@@ -442,6 +570,7 @@ int parser_comandos(char* comando, int cfd){
 		
 		//Imprime el status en la variable str
 		sprintf(str, "%u", status);
+		logMessage(str);
 		if(escribir_respuesta(str,cfd)==-1){
 			logMessage("Error al responder");
 			return -1;
@@ -454,12 +583,172 @@ int parser_comandos(char* comando, int cfd){
 			logMessage("No se pudo apagar");
 			return -1;
 		}
+	}else{ //Comando no válido
+		logMessage("Comando no valido");
+		return -1;
 	}
 	return 0;
 
 }
 
+/*
+** ===================================================================
+**     Método      :  parser_comandos_mov
+**
+**     @resumen
+**          Analiza el comando que llegó y ejecuta una acción. Los
+**		comandos analizados son comandos de movimiento. Es 
+**		decir tiene parámetros después del comando. Los pa-
+**		rámetros definen el movimiento
+**			
+**     @param
+**          comando     	- comando a ejecutar
+**     @param
+**          cfd		     	- File Descriptor del Socket
+**
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
+int parser_comandos_mov(char* comando, int cfd){
+	char str[18];
+	char* accion;
+	char* parte;
+	char* modo;
+	char* direccion;
+	char* velocidad;
+	char* angulo1;
+	char* angulo2;
+	char* angulo3;
 
+
+	char formato_fecha[40];
+
+	logMessage("Comando que ingreso al metodo: %s",comando);
+	
+	//Se separa la accion del string que contiene el comando
+	accion = strtok(comando, "/");
+	logMessage("accion: %s",accion);
+	if(strcmp(accion,"mover")!=0){
+		logMessage("Error: El metodo se llamo incorrectamente");
+		return -1;
+	}
+
+	//Se separa la parte a mover del string que contiene el comando
+	parte = strtok(NULL, "/");
+	logMessage("Parte a mover: %s",parte);
+
+	//Se determina que parte se va a mover, se obtienen los parámetros y se mueve
+	if(strcmp(parte,"brazo")==0){
+		logMessage("Se va a mover el brazo");
+
+		modo = strtok(NULL, "/");
+		logMessage("Modo de operacion:%s",modo);
+
+		//Se determinan los parámetros
+		angulo1 = strtok(NULL, "/");
+		angulo2 = strtok(NULL, "/");
+		angulo3 = strtok(NULL, "/");
+		
+		// Se ejecuta la accion asociada al modo de operación del brazo
+		if(strcmp(modo,"auto")==0){
+			logMessage("Accion de modo automatico");
+			logMessage("Angulos: %s, %s, %s",angulo1,angulo2,angulo3);						
+		}else if(strcmp(modo,"normal")==0){
+			logMessage("Accion de modo normal");
+			logMessage("Angulos: %s, %s, %s",angulo1,angulo2,angulo3);
+		}else{
+			logMessage("Error: Modo desconocido");
+			return -1;	
+		}
+	}else if(strcmp(parte,"traccion")==0){
+		logMessage("Se va a mover la tracción");
+
+		direccion = strtok(NULL, "/");
+		logMessage("Direccion del ROVER:%s",direccion);
+
+		//Se determinan los parámetros
+		velocidad = strtok(NULL, "/");
+
+		// Se ejecuta la accion asociada al modo de operación del brazo
+		if(strcmp(direccion,"f")==0){
+			logMessage("Mover adelante");
+			logMessage("Velocidad: %s",velocidad);						
+		}else if(strcmp(direccion,"b")==0){
+			logMessage("Mover atras");
+			logMessage("Velocidad: %s",velocidad);
+		}else if(strcmp(direccion,"r")==0){
+			logMessage("girar derecha");
+			logMessage("Velocidad: %s",velocidad);						
+		}else if(strcmp(modo,"l")==0){
+			logMessage("Girar izquierda");
+			logMessage("Velocidad: %s",velocidad);
+		}else{
+			logMessage("Error: Direccion desconocida");
+			return -1;	
+		}
+		
+	}else{
+		logMessage("Error: Parte a mover desconocida");
+		return -1;
+	}
+
+	return 0;
+
+}
+
+/*
+** ===================================================================
+**     Método      :  parser_comandos_diag
+**
+**     @resumen
+**          Analiza el comando que llegó y ejecuta una acción. Los
+**		comandos analizados son comandos de diagnostico. 
+**			
+**     @param
+**          comando     	- comando a ejecutar
+**     @param
+**          cfd		     	- File Descriptor del Socket
+**
+**     @return
+**                         	- Estado de salida del método (-1 error). 
+**
+** ===================================================================*/
+int parser_comandos_diag(char* comando, int cfd){
+	char str[18];
+	char* accion;
+	char* parte;
+
+	char formato_fecha[40];
+	
+	//Se separa la accion del string que contiene el comando
+	accion = strtok(comando, "/");
+	logMessage("accion: %s",accion);
+	if(strcmp(accion,"diagnosticar")!=0){
+		logMessage("Error: El metodo se llamo incorrectamente");
+		return -1;
+	}
+
+	//Se separa la parte a diagnosticar del string que contiene el comando
+	parte = strtok(NULL, "/");
+	logMessage("Parte a diagnosticar: %s",parte);
+
+	//Se determina que parte se va a diagnosticar, se obtienen los parámetros y se envían
+	if(strcmp(parte,"brazo")==0){
+		logMessage("Se va a diagnosticar el brazo");
+
+
+	}else if(strcmp(parte,"traccion")==0){
+		logMessage("Se va a diagnosticar la tracción");
+	
+	}else{
+		logMessage("Error: Parte a diagnosticar desconocida");
+		return -1;
+	}
+
+	return 0;
+
+}
 
 int main(int argc, char *argv[]) {
 	
@@ -468,9 +757,9 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_storage claddr;	/* Buffer para almacenar lo que llegs del cliente */	
 	int cfd,lfd;//
 	socklen_t addrlen;
-	char str[15];
-
-	ssize_t escritos; // Bytes escritos
+	char* comando_filtrado;
+	char* comando_analizar;
+	char* param1_comando;
 	
 	/* El proceso se convierte en un demonio */
 	if(becomeDaemon(0) == -1)
@@ -517,10 +806,40 @@ int main(int argc, char *argv[]) {
 
 		/* Imprime el texto que llegó */
 		logMessage("Comando: %s",comando);
+		
+		strcpy(comando_analizar,comando);
+		comando_filtrado=strtok(comando_analizar, "/");
+		logMessage("Comando filtrado: %s",comando_filtrado);
+		param1_comando=strtok(NULL,"/");
+		if(param1_comando!=NULL){
+			/* Imprime el tipo de comando que llegó */
+			logMessage("Comando complejo");
 
-		/* Analiza el comando y realiza una acción */
-		if(parser_comandos(comando, cfd)==-1)
-			logMessage("No se respondio al comando");		
+			/* Determina la acción del comando */
+			if(strcmp(comando_filtrado,"mover")==0){
+				/* Analiza el comando y realiza una acción */
+				if(parser_comandos_mov(comando, cfd)==-1)
+					logMessage("No se ejecuto el comando adecuadamente");
+			}else if(strcmp(comando_filtrado,"diagnosticar")==0){
+				/* Analiza el comando y realiza una acción */
+				if(parser_comandos_diag(comando, cfd)==-1)
+					logMessage("No se ejecuto el comando adecuadamente");
+			}else{
+				logMessage("Accion desconocida");
+			}
+
+
+		
+		}else{
+			/* Imprime el tipo de comando que llegó */
+			logMessage("Comando normal");
+
+			/* Analiza el comando y realiza una acción */
+			if(parser_comandos(comando, cfd)==-1)
+				logMessage("No se ejecuto el comando adecuadamente");			
+		}
+
+		
 		
 	}		 
 
