@@ -395,7 +395,7 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 				}
 			}
 
-		}else{
+		}else {
 			if(tr_forward(tr_device.vel_pwm)){
 				printf("Error al tratar de mover el lado izquierdo hacia adelante (tr_diagonalDiffTurn -> traccion_robocol.c)\n");
 				return TR_ERROR;
@@ -416,6 +416,7 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 		}
 	}else{
 		if(tr_device.side==TR_LEFT_SIDE){
+			
 			if(tr_device.vel_pwm < arg){
 				if(tr_backward(arg - tr_device.vel_pwm)){
 					printf("Error al tratar de mover el lado izquierdo hacia adelante (tr_diagonalDiffTurn -> traccion_robocol.c)\n");

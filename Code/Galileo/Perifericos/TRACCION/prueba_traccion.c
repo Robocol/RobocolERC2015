@@ -9,18 +9,20 @@ FILE *fdl;
 int32_t position,status,config=0;
 uint8_t step,ocd,tval;
 uint8_t corr,debug;
-int32_t buf,buf2;
+int32_t buf,buf2,arg;
 double fbuf;
 
 uint8_t temp, vel,corr,est;
-uint8_t pwmval;
+uint8_t vel_pwm,giro,res;
 uint8_t i=0;
 
 int main(int argc, char const *argv[]){
 
 	ph_dev* ph;
 	size=40;
+	vel_pwm=50;
 	line=malloc(size);
+	giro=1;
 	uint8_t finished=0;
 
 	printf("Test de funcionamiento del sistema de traccion (ERC 2015-ROBOCOL).\n Seleccione el lado del robot que utilizará:\n"
@@ -50,7 +52,11 @@ int main(int argc, char const *argv[]){
 			"\ts\t\t\t Atras\n"
 			"\ta\t\t\t Girar a izquierda\n"
 			"\td\t\t\t Girar a derecha\n"
-			"\tph\t\t\t Manejar una rueda específica usando el test para puentes H  (ERC 2015-ROBOCOL)\n"
+			"\tx\t\t\t Detener\n"
+			"\te\t\t\t Freno de Emergencia\n"
+			"\tvelpwm\t\t Cambia la velocidad de todos los motores a la ingresada\n"
+			"\tselGiro\t\t Selecciona el tipo de giro\n"
+			"\tdiffArg\t\t Selecciona la differencia de velocidades para los giros diferenciales\n"
 			);
 
 		printf("Ingrese un comando\n");
@@ -78,19 +84,84 @@ int main(int argc, char const *argv[]){
 			finished=0;
 		}else if(!strcmp(line,"w\n")){
 			printf("Moviendo hacia adelante..\n");
-			tr_forward(50);
+			tr_forward(vel_pwm);
 
 		}else if(!strcmp(line,"s\n")){
 			printf("Moviendo hacia atrás...\n");
-			tr_backward(50);
+			tr_backward(vel_pwm);
+
+		}else if(!strcmp(line,"x\n")){
+			printf("Deteniendo\n");
+			tr_forward(0);
+
+		}else if(!strcmp(line,"e\n")){
+			printf("Freno de Emergencia!");
+			tr_eBrake();
 
 		}else if(!strcmp(line,"a\n")){
 			printf("Girando a la izquierda...\n");
-			tr_spin(TR_TURN_LEFT, 50);
-
+			tr_setVP(vel_pwm);
+			if(giro==1){
+				printf("Giro sobre el eje\n");
+				res=tr_spin(TR_TURN_LEFT, vel_pwm);	
+			}else if(giro==2){
+				printf("Giro diferencial\n");
+				res=tr_diffTurn(TR_TURN_LEFT, arg);	
+			}else if(giro==3){
+				printf("Giro diferencial diagonal\n");
+				res=tr_diagonalDiffTurn(TR_TURN_LEFT, arg);	
+			}
+			if(res){
+				printf("Error girando a la izquierda\n");
+			}
 		}else if(!strcmp(line,"d\n")){
 			printf("Girando a la derecha...\n");
-			tr_spin(TR_TURN_RIGHT, 50);
+			tr_setVP(vel_pwm);
+			if(giro==1){
+				printf("Giro sobre el eje\n");
+				res=tr_spin(TR_TURN_RIGHT, vel_pwm);	
+			}else if(giro==2){
+				printf("Giro diferencial\n");
+				res=tr_diffTurn(TR_TURN_RIGHT, arg);	
+			}else if(giro==3){
+				printf("Giro diferencial diagonal\n");
+				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, arg);	
+			}
+
+			if(res){
+				printf("Error girando a la derecha\n");
+			}
+		}else if(!strcmp(line,"selGiro\n")){
+			printf("Selecciones una de las siguientes opciones:\n"
+			"\t1\t\t\t Giro sobre el eje\n"
+			"\t2\t\t\t Giro diferencial\n"
+			"\t3\t\t\t Giro diferencial diagonal\n");
+
+
+			getline(&line,&size,stdin);
+			giro=atoi(line);
+			if(giro==1){
+				printf("Escogido: Giro sobre el eje\n");
+			}else if(giro==2){
+				printf("Escogido: Giro diferencial\n");
+			}else if(giro==3){
+				printf("Escogido: Giro diferencial diagonal\n");
+			}else{
+				printf("Error: En valor ingresado no es válido. Intente nuevamente\n");
+			}
+
+		}else if(!strcmp(line,"velpwm\n")){
+			printf("Ingrese la velocidad/pwm deseado:\n");
+			getline(&line,&size,stdin);
+			vel_pwm=atoi(line);
+			printf("Cambiando velocidad/pwm a: %d \n",vel_pwm);
+			tr_setVP(vel_pwm);
+
+		}else if(!strcmp(line,"diffArg\n")){
+			printf("Ingrese la diferencia de velocidad/pwm para el giro diferencial deseado:\n");
+			getline(&line,&size,stdin);
+			arg=atoi(line);
+			printf("Cambiando velocidad/pwm diferencial a: %d \n",arg);
 
 		}else if(!strcmp(line,"exit\n")){
 			finished=1;
@@ -98,7 +169,6 @@ int main(int argc, char const *argv[]){
 	}
 	return 0;
 }
-
 
 tr_st prueba_ph(ph_dev* devptr){
 

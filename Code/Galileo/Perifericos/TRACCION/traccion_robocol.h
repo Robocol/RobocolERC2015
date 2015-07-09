@@ -62,8 +62,8 @@ typedef struct tr_dev{
 #define TR_MASTER 		0x01
 #define TR_SLAVE 		0x02
 
-#define TR_LEFT_SIDE  	0x02
-#define TR_RIGHT_SIDE 	0x01
+#define TR_LEFT_SIDE  	0x01
+#define TR_RIGHT_SIDE 	0x02
 
 
 
