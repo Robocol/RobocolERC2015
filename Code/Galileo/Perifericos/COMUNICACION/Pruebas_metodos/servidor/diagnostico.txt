@@ -1,0 +1,7 @@
+brazo
+anguloAmarillo:0
+anguloRojo:0
+anguloRosado:0
+giroBrazo:0
+giroMuneca:0
+fin

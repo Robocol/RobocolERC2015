@@ -653,10 +653,17 @@ int parser_comandos_mov(char* comando, int cfd){
 		// Se ejecuta la accion asociada al modo de operación del brazo
 		if(strcmp(modo,"auto")==0){
 			logMessage("Accion de modo automatico");
-			logMessage("Angulos: %s, %s, %s",angulo1,angulo2,angulo3);						
+			logMessage("Angulos: %s, %s, %s",angulo1,angulo2,angulo3);
+
+			/*TODO Posicionar brazo */
+
+						
 		}else if(strcmp(modo,"normal")==0){
 			logMessage("Accion de modo normal");
 			logMessage("Angulos: %s, %s, %s",angulo1,angulo2,angulo3);
+
+			/*TODO Mover brazo de a pasos pequeños */
+
 		}else{
 			logMessage("Error: Modo desconocido");
 			return -1;	
@@ -673,16 +680,28 @@ int parser_comandos_mov(char* comando, int cfd){
 		// Se ejecuta la accion asociada al modo de operación del brazo
 		if(strcmp(direccion,"f")==0){
 			logMessage("Mover adelante");
-			logMessage("Velocidad: %s",velocidad);						
+			logMessage("Velocidad: %s",velocidad);	
+
+			/*TODO Comandos para mover adelante */
+					
 		}else if(strcmp(direccion,"b")==0){
 			logMessage("Mover atras");
 			logMessage("Velocidad: %s",velocidad);
+
+			/*TODO Comandos para mover atras */
+
 		}else if(strcmp(direccion,"r")==0){
 			logMessage("girar derecha");
 			logMessage("Velocidad: %s",velocidad);						
+
+			/*TODO Comandos para girar a la derecha */
+
 		}else if(strcmp(modo,"l")==0){
 			logMessage("Girar izquierda");
 			logMessage("Velocidad: %s",velocidad);
+
+			/*TODO Comandos para girar a la izquierda */
+
 		}else{
 			logMessage("Error: Direccion desconocida");
 			return -1;	
@@ -718,6 +737,10 @@ int parser_comandos_diag(char* comando, int cfd){
 	char str[18];
 	char* accion;
 	char* parte;
+	char respuesta[INT_LEN];
+	int fd;
+	int sz;
+	int escritos;
 
 	char formato_fecha[40];
 	
@@ -732,14 +755,89 @@ int parser_comandos_diag(char* comando, int cfd){
 	//Se separa la parte a diagnosticar del string que contiene el comando
 	parte = strtok(NULL, "/");
 	logMessage("Parte a diagnosticar: %s",parte);
+	logMessage("Comando: %s",comando);
 
 	//Se determina que parte se va a diagnosticar, se obtienen los parámetros y se envían
-	if(strcmp(parte,"brazo")==0){
+	if(strcmp(parte,"brazo\n")==0){
 		logMessage("Se va a diagnosticar el brazo");
+		
+		// Se abre el archivo que contiene el diagnostico
+		fd=open("/home/root/diagnostico_brazo.txt",O_RDONLY);				
+		if(fd==-1){
+			logMessage("Error: No se pudo abrir el archivo que contiene el diagnostico");
+			return -1;
+		}
 
+		// Se obtiene el tamanho del archivo
+		sz=fsize("/home/root/diagnostico_brazo.txt");
+		logMessage("Tamanho del archivo = %i", sz);
 
-	}else if(strcmp(parte,"traccion")==0){
-		logMessage("Se va a diagnosticar la tracción");
+		// Se envia el tamanho del archivo
+		sprintf(str, "%d", sz);
+		if(escribir_respuesta(str,cfd)==-1){
+			logMessage("Error: no se envio el tamanho");
+			return -1;
+		}
+
+		// Lee una linea de respuesta  
+       		if (readLine(cfd, respuesta, INT_LEN) <= 0) {
+ 			logMessage("Error: No hay fin de línea");	
+		}
+
+		logMessage("Llego: %s",respuesta);
+
+		// Compara la respuesta y envia el archivo de diagnóstico
+		if(strcmp(respuesta,"ok\n")==0){
+			escritos = sendfile(cfd, fd, NULL, sz);
+			if (escritos == -1){
+				logMessage("Error: No se pudo enviar el archivo");
+				return -1;				
+			}
+			logMessage("Se envio correctamente el archivo");
+		}
+
+		// Cierra el archivo del diagnostico
+		close(fd);
+	}else if(strcmp(parte,"traccion\n")==0){
+		logMessage("Se va a diagnosticar la traccion");
+		
+		// Se abre el archivo que contiene el diagnostico
+		fd=open("/home/root/diagnostico_traccion.txt",O_RDONLY);				
+		if(fd==-1){
+			logMessage("Error: No se pudo abrir el archivo que contiene el diagnostico");
+			return -1;
+		}
+
+		// Se obtiene el tamanho del archivo
+		sz=fsize("/home/root/diagnostico_traccion.txt");
+		logMessage("Tamanho del archivo = %i", sz);
+
+		// Se envia el tamanho del archivo
+		sprintf(str, "%d", sz);
+		if(escribir_respuesta(str,cfd)==-1){
+			logMessage("Error: no se envio el tamanho");
+			return -1;
+		}
+
+		// Lee una linea de respuesta  
+       		if (readLine(cfd, respuesta, INT_LEN) <= 0) {
+			logMessage("Error: No hay fin de línea");	
+		}
+
+		logMessage("Llego: %s",respuesta);
+
+		// Compara la respuesta y envia el archivo de diagnóstico
+		if(strcmp(respuesta,"ok\n")==0){
+			escritos = sendfile(cfd, fd, NULL, sz);
+			if (escritos == -1){
+				logMessage("Error: No se pudo enviar el archivo");
+				return -1;				
+			}
+			logMessage("Se envio correctamente el archivo");
+		}
+
+		// Cierra el archivo del diagnostico
+		close(fd);
 	
 	}else{
 		logMessage("Error: Parte a diagnosticar desconocida");

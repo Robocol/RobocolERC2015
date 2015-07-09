@@ -1,0 +1,9 @@
+motor1
+corriente:0
+temperatura:0
+velocidad:0
+motor2
+corriente:0
+temperatura:0
+velocidad:0
+fin
