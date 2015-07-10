@@ -1,0 +1,22 @@
+ventana derecha: comunicacion
+	datos gps - colocar posicion control de mando
+	mostrar posicion del robot gps
+	mostar dato vector diferencia 
+
+ventana superior:
+	10.5.5.3
+	probar ventanas emergentes html
+
+brazo:
+	realizar adecuaciones del brazo
+
+	
+menu inicio:
+	opcion reportar estado "estado actual"
+	opcion verificar tarjeta. actualizar colores interfaz
+
+tareas:
+	procar char* -> string  
+
+diseñar metodo de inicio de comandos para manejar
+	llama al metdo reposrtar estado  -> se espera estado normal 
