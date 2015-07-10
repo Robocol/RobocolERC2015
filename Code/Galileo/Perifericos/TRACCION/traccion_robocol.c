@@ -301,10 +301,14 @@ tr_st tr_spin(uint8_t dir, uint8_t arg){
 /* ===================================================================*/
 tr_st tr_diffTurn(uint8_t dir, uint32_t arg){
 
+	uint8_t prev_vp;
+
 	if(dir!=TR_TURN_LEFT && dir!=TR_TURN_RIGHT){
 		printf("La dirección ingresada no es válida. Debe utilizarse TR_TURN_LEFT o TR_TURN_RIGHT  (tr_diffTurn -> traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
+
+	prev_vp=tr_device.vel_pwm;
 
 	if(dir==TR_TURN_RIGHT){
 		if(tr_device.side==TR_RIGHT_SIDE){
@@ -346,6 +350,8 @@ tr_st tr_diffTurn(uint8_t dir, uint32_t arg){
 		}
 	}
 
+	tr_device.vel_pwm=prev_vp;
+	
 	return TR_OK;
 }
 
@@ -364,10 +370,14 @@ tr_st tr_diffTurn(uint8_t dir, uint32_t arg){
 /* ===================================================================*/
 tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 
+	uint8_t prev_vp;
+
 	if(dir!=TR_TURN_LEFT && dir!=TR_TURN_RIGHT){
 		printf("La dirección ingresada no es válida. Debe utilizarse TR_TURN_LEFT o TR_TURN_RIGHT  (tr_diagonalDiffTurn -> traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
+
+	prev_vp=tr_device.vel_pwm;
 
 	if(dir==TR_TURN_RIGHT){
 		if(tr_device.side==TR_RIGHT_SIDE){
@@ -460,6 +470,8 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 			}
 		}
 	}
+
+	tr_device.vel_pwm=prev_vp;
 
 	return TR_OK;
 }
