@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]){
 
 	getline(&line,&size,stdin);
 	if(!strcmp(line,"l\n")){
-		printf("before built right\n");
+		printf("before built left\n");
 		if(tr_build(TR_SLAVE,TR_LEFT_SIDE)){
 			printf("Error al Construir el dispositivo de traccion.\n");
 		}
@@ -45,7 +45,7 @@ int main(int argc, char const *argv[]){
 		printf("built right\n");
 	}
 
-
+	tr_setCtlState(1);
 	while(!finished){
 	printf("Test de funcionamiento del sistema de traccion (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n"
 			"\tw\t\t\t Adelante.\n"
@@ -162,6 +162,10 @@ int main(int argc, char const *argv[]){
 			getline(&line,&size,stdin);
 			arg=atoi(line);
 			printf("Cambiando velocidad/pwm diferencial a: %d \n",arg);
+
+		}else if(!strcmp(line,"diag\n")){
+			printf("Ingrese la diferencia de velocidad/pwm para el giro diferencial deseado:\n");
+			tr_diagnostico();
 
 		}else if(!strcmp(line,"exit\n")){
 			finished=1;
