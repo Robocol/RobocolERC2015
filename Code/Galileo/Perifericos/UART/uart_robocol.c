@@ -73,10 +73,12 @@ uart_st uart_write(const void* buff, int size){
 }
 
 uart_st uart_read(void* buff, int size){
-    if(read(u_dev.fd,buff,size)<0){
+	uint8_t len;
+    if(len=read(u_dev.fd,buff,size)<0){
       perror("Error en lectura de información desde canal UART");
       return UART_ERROR;
     }
+	buff[len]='\0';
     return UART_OK;
 }
 
@@ -97,5 +99,7 @@ uart_st setWaitFlag(uint8_t flag){
 
 void sig_handler(int status)
 {
-  WAIT_FLAG=FALSE;
+	// Se pone a dormir el proceso para que el buffer tenga tiempo para llenarse
+	usleep(10000);
+	WAIT_FLAG=FALSE;
 }
