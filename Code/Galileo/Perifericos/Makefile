@@ -218,6 +218,27 @@ $(ODIR)/traccion_robocol$(LEXT): ../TRACCION/traccion_robocol.c ../TRACCION/trac
 						-I../PWM \
                         -I../TRACCION
 
+################################################################################################
+#	SERVIDOR     																		   	   #
+################################################################################################
+
+
+$(ODIR)/servidor_robocol$(LEXT): ../COMUNICACION/servidor_robocol.c ../COMUNICACION/servidor_robocol.h  $(ODIR)/i2c_robocol$(LEXT)  \
+                                                            					$(ODIR)/gpio_robocol$(LEXT) \
+                                                            					$(ODIR)/spi_robocol$(LEXT)	\
+ 		                                           								$(ODIR)/misc_robocol$(LEXT) \
+       																			$(ODIR)/pwmg_robocol$(LEXT) \
+       																			$(ODIR)/ph_robocol$(LEXT)	\
+       																			$(ODIR)/traccion_robocol$(LEXT)
+	$(CC) -c -o $@ $< -I../GPIO \
+						-I../I2C  \
+						-I../SPI  \
+						-I../../MISC \
+						-I../PH \
+						-I../PWM \
+                        -I../TRACCION\
+                        -I../COMUNICACION   																			
+
 .PHONY: clean
 
 clean:

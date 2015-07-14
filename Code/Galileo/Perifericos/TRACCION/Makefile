@@ -42,6 +42,6 @@ ph_slave_control: $(OBJ)
 ph_master_control: $(OBJ)
 	$(CC) -o $@$(EEXT) ph_master_control.c $^ $(CFLAGS)
 
-prueba_traccion: $(OBJ)
+prueba_traccion:$(OBJ)
 	$(CC) -o $@$(EEXT) prueba_traccion.c $^ $(CFLAGS)
 include ../Makefile
