@@ -477,9 +477,13 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 }
 
 tr_st tr_diagnostico(void){
-	char* line;
+	char *path="./diagnostico.txt";
+	FILE* fdl;
 	uint8_t velf,tempf,corrf;
 	uint8_t velb,tempb,corrb;
+
+
+	printf("1\n");
 
 	if(ph_getVelocidad(tr_device.front_ph,&velf)){
 		printf("Error leyendo la velocidad del motor frontal\n");
@@ -497,7 +501,7 @@ tr_st tr_diagnostico(void){
 	}
 
 
-
+	printf("1\n");
 	if(ph_getVelocidad(tr_device.back_ph,&velb)){
 		printf("Error leyendo la velocidad del motor trasero\n");
 		return TR_ERROR;
@@ -513,12 +517,71 @@ tr_st tr_diagnostico(void){
 		return TR_ERROR;
 	}
 
-	sprintf(line, "%d,%d,%d/n",corrb,tempb,velb);
 
+	if((fdl=fopen(path,"w"))<0){
+		printf("Error en apertura de archivo para impresion de log\n");
+		perror("Causa:");
+		exit(1);
+	}
+
+	printf("1\n");
+
+	if(tr_device.side==TR_LEFT_SIDE){
+		if(fprintf(fdl, "brazo:0,0,0,0,0\n"
+					"motorrf:0,0,0\n"
+					"motorrb:0,0,0\n"					
+					"motorlf:%3d,%3d,%3d\n"
+					"motorlb:%3d,%3d,%3d\n"
+					"fin\n",corrf,tempf,velf,corrb,tempb,velb)<0){
+			printf("Error escribiendo sobre el archivo de diagnóstico del motor izquierdo\n");
+		}
+	}else if(tr_device.side==TR_RIGHT_SIDE){
+		if(fprintf(fdl, "brazo:0,0,0,0,0\n"
+					"motorrf:%3d,%3d,%3d\n"
+					"motorrb:%3d,%3d,%3d\n"
+					"motorlf:0,0,0\n"
+					"motorlb:0,0,0\n"	
+					"fin\n",corrf,tempf,velf,corrb,tempb,velb)<0){
+			printf("Error escribiendo sobre el archivo de diagnóstico del motor derecho\n");
+		}
+	}
+
+	fclose(fdl);
+	return TR_OK;
 }
 
+tr_st tr_setCtlState(uint8_t state){
+	uint8_t est=0;
 
+	if(state==TR_AUTO){
+		if(ph_setEstado(tr_device.back_ph,AUTO_EST)){
+			printf("Error cambiando a estado AUTO el motor trasero\n");
+			return TR_ERROR;
+		}
 
+		if(ph_setEstado(tr_device.front_ph,AUTO_EST)){
+			printf("Error cambiando a estado AUTO el motor delantero\n");
+			return TR_ERROR;			
+		}
 
+		printf("Estado auto\n");
+	}else if(state==TR_MANUAL){
+		if(ph_setEstado(tr_device.back_ph,MANUAL_EST)){
+			printf("Error cambiando a estado AUTO el motor trasero\n");
+			return TR_ERROR;			
+		}
 
+		if(ph_setEstado(tr_device.front_ph,MANUAL_EST)){
+			printf("Error cambiando a estado AUTO el motor delantero\n");
+			return TR_ERROR;			
+		}
+		printf("Estado manual\n");
+	}else{
+			printf("Error: El estado de control ingresado (%d) no es válido\n",state);
+			return TR_ERROR;
+	}
 
+	ph_getEstado( tr_device.front_ph, &est);
+	printf("estado:%d\n", est);
+	tr_device.ctl_state=state;
+}

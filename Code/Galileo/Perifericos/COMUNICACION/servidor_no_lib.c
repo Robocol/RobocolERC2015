@@ -763,6 +763,10 @@ int parser_comandos_mov(char* comando, int cfd){
 			printf("Deteniendo\n");
 			tr_forward(0);
 
+		}else if(!strcmp(direccion,"i")){
+			printf("Estado a %d\n",velocidad);
+			tr_setCtlState(velocidad);
+
 		}else{
 			logMessage("Error: Direccion desconocida");
 			return -1;	
@@ -927,7 +931,7 @@ int main(int argc, char *argv[]) {
 	logOpen(LOG_FILE);
 
 
-	if(tr_build(TR_SLAVE,TR_RIGHT_SIDE)){
+	if(tr_build(TR_SLAVE,TR_LEFT_SIDE)){
 		printf("Error al Construir el dispositivo de traccion.\n");
 	}
 
@@ -940,7 +944,7 @@ int main(int argc, char *argv[]) {
 	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR){
 	        logMessage("Fail ignoring SIGPIPE ");
 		exit(EXIT_FAILURE);
-	}
+	} 
 
 	/* Se configura el servidor */
 	lfd = configurar_servidor();
@@ -949,6 +953,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	tr_setCtlState(1);
 
 	for (;;) {                  /* Loop infinito que  maneja las peticiones de los clientes */
 
