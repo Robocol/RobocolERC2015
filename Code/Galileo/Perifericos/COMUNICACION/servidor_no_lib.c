@@ -690,7 +690,7 @@ int parser_comandos_mov(char* comando, int cfd){
 			if(tr_forward(velocidad)){
 				logMessage("Error moviendo hacia adelante");
 			}
-			
+					
 		}else if(strcmp(direccion,"b")==0){
 			logMessage("Mover atras");
 			logMessage("Velocidad: %d",velocidad);
@@ -756,25 +756,16 @@ int parser_comandos_mov(char* comando, int cfd){
 			
 
 		}else if(!strcmp(direccion,"e")){
-			logMessage("Freno de Emergencia!");
+			printf("Freno de Emergencia!");
 			tr_eBrake();
 
 		}else if(!strcmp(direccion,"x")){
-			logMessage("Deteniendo\n");
+			printf("Deteniendo\n");
 			tr_forward(0);
-
-		}else if(!strcmp(direccion,"i")){
-			logMessage("Diagnosticando\n");
-			tr_diagnostico();
-
-		}else if(!strcmp(direccion,"m")){
-			logMessage("Cambiando estado de control a: %d\n",velocidad);
-			tr_setCtlState(velocidad);
 
 		}else{
 			logMessage("Error: Direccion desconocida");
 			return -1;	
-
 		}
 		
 	}else{
@@ -929,34 +920,19 @@ int main(int argc, char *argv[]) {
 	char* comando_filtrado;
 	char* comando_analizar;
 	char* param1_comando;
-
-	//getline(&line,&size,stdin);
-	// if(!strcmp(line,"l\n")){
-	// 	if(tr_build(TR_SLAVE,TR_LEFT_SIDE)){
-	// 		logMessage("Error al Construir el dispositivo de traccion.\n");
-	// 	}
-	// 	printf("built left\n");
-	// }else if(!strcmp(line,"r\n")){
-	// 	if(tr_build(TR_SLAVE,TR_RIGHT_SIDE)){
-	// 		logMessage("Error al Construir el dispositivo de traccion.\n");
-	// 	}
-	// 	printf("built right\n");
-	// }
-
-	if(tr_build(TR_SLAVE,TR_LEFT_SIDE)){
-		logMessage("Error al Construir el dispositivo de traccion.\n");
-	}
-
-	tr_setCtlState(TR_MANUAL);
-	printf("State :%d\n", tr_device.ctl_state);
 	
 	/* El proceso se convierte en un demonio */
 	if(becomeDaemon(0) == -1)
 		printf("\nEl proceso del servidor no pudo volverse un demonio\n");
 	logOpen(LOG_FILE);
 
+
+	if(tr_build(TR_SLAVE,TR_RIGHT_SIDE)){
+		printf("Error al Construir el dispositivo de traccion.\n");
+	}
+
+
 	
-		
 //Configuración servidor
 
 	/* Ignore the SIGPIPE signal, so that we find out about broken connection
@@ -973,9 +949,6 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	tr_setCtlState(TR_MANUAL);
-
-	logMessage("State :%d\n", tr_device.ctl_state);
 
 	for (;;) {                  /* Loop infinito que  maneja las peticiones de los clientes */
 

@@ -54,7 +54,7 @@ tr_st tr_build(uint8_t type,uint8_t side){
 	}
 	
 
-	if(ph_setEstado(tr_device.front_ph,32)){
+	if(ph_setEstado(tr_device.front_ph,MANUAL_EST)){
 		printf("Error en asignación de estado a AUTO_EST para front_ph.(tr_build->traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
@@ -64,7 +64,7 @@ tr_st tr_build(uint8_t type,uint8_t side){
 		return TR_ERROR;
 	}
 
-	if(ph_setEstado(tr_device.back_ph,32)){
+	if(ph_setEstado(tr_device.back_ph,MANUAL_EST)){
 		printf("Error en asignación de estado a AUTO_EST para el back_ph.(tr_build->traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
@@ -87,10 +87,9 @@ tr_st tr_build(uint8_t type,uint8_t side){
 	printf("back_ph HABILITADO\n");
 
 	tr_device.mv_state=TR_STOPPED;
-	tr_device.ctl_state=TR_AUTO;
+	tr_device.ctl_state=TR_MANUAL;
 	tr_device.vel_pwm=0;
 	tr_device.device_built=TR_BUILT;
-
 
 	return TR_OK;
 }
@@ -141,7 +140,7 @@ tr_st tr_eBrake(void){
 }
 
 tr_st tr_setVP(uint8_t vp){
-	
+	printf("changing speed to %d\n",vp);
 
 	if (tr_device.mv_state==TR_STOPPED){
 		printf("Debe primero asignar la dirección de movimiento. Estado de movimiento se encuentra en TR_STOPPED. (tr_setVP->traccion_robocol.c)\n");
@@ -157,7 +156,6 @@ tr_st tr_setVP(uint8_t vp){
 				printf("Error en asignación de velocidad para back_ph.(tr_setVP->traccion_robocol.c)\n");
 				return TR_ERROR;
 			}
-			printf("changing speed to %d\n",vp);
 
 		}else if(tr_device.ctl_state==TR_MANUAL){
 			if(ph_setPWM(tr_device.front_ph,vp)){
@@ -471,7 +469,6 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 				}
 			}
 		}
-
 	}
 
 	tr_device.vel_pwm=prev_vp;
@@ -480,13 +477,9 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 }
 
 tr_st tr_diagnostico(void){
-	char *path="./diagnostico.txt";
-	FILE* fdl;
+	char* line;
 	uint8_t velf,tempf,corrf;
 	uint8_t velb,tempb,corrb;
-
-
-	printf("1\n");
 
 	if(ph_getVelocidad(tr_device.front_ph,&velf)){
 		printf("Error leyendo la velocidad del motor frontal\n");
@@ -504,7 +497,7 @@ tr_st tr_diagnostico(void){
 	}
 
 
-	printf("1\n");
+
 	if(ph_getVelocidad(tr_device.back_ph,&velb)){
 		printf("Error leyendo la velocidad del motor trasero\n");
 		return TR_ERROR;
@@ -520,73 +513,12 @@ tr_st tr_diagnostico(void){
 		return TR_ERROR;
 	}
 
+	sprintf(line, "%d,%d,%d/n",corrb,tempb,velb);
 
-	if((fdl=fopen(path,"w"))<0){
-		printf("Error en apertura de archivo para impresion de log\n");
-		perror("Causa:");
-		exit(1);
-	}
-
-	printf("1\n");
-
-	if(tr_device.side==TR_LEFT_SIDE){
-		if(fprintf(fdl, "brazo:0,0,0,0,0\n"
-					"motorrf:0,0,0\n"
-					"motorrb:0,0,0\n"					
-					"motorlf:%3d,%3d,%3d\n"
-					"motorlb:%3d,%3d,%3d\n"
-					"fin\n",corrf,tempf,velf,corrb,tempb,velb)<0){
-			printf("Error escribiendo sobre el archivo de diagnóstico del motor izquierdo\n");
-		}
-	}else if(tr_device.side==TR_RIGHT_SIDE){
-		if(fprintf(fdl, "brazo:0,0,0,0,0\n"
-					"motorrf:%3d,%3d,%3d\n"
-					"motorrb:%3d,%3d,%3d\n"
-					"motorlf:0,0,0\n"
-					"motorlb:0,0,0\n"	
-					"fin\n",corrf,tempf,velf,corrb,tempb,velb)<0){
-			printf("Error escribiendo sobre el archivo de diagnóstico del motor derecho\n");
-		}
-	}
-
-
-	fclose(fdl);
-	return TR_OK;
 }
 
-tr_st tr_setCtlState(uint8_t state){
-	uint8_t est=0;
 
-	if(state==TR_AUTO){
-		if(ph_setEstado(tr_device.back_ph,AUTO_EST)){
-			printf("Error cambiando a estado AUTO el motor trasero\n");
-			return TR_ERROR;
-		}
 
-		if(ph_setEstado(tr_device.front_ph,AUTO_EST)){
-			printf("Error cambiando a estado AUTO el motor delantero\n");
-			return TR_ERROR;			
-		}
 
-		printf("Estado auto\n");
-	}else if(state==TR_MANUAL){
-		if(ph_setEstado(tr_device.back_ph,MANUAL_EST)){
-			printf("Error cambiando a estado AUTO el motor trasero\n");
-			return TR_ERROR;			
-		}
 
-		if(ph_setEstado(tr_device.front_ph,MANUAL_EST)){
-			printf("Error cambiando a estado AUTO el motor delantero\n");
-			return TR_ERROR;			
-		}
-		printf("Estado manual\n");
-	}else{
-			printf("Error: El estado de control ingresado (%d) no es válido\n",state);
-			return TR_ERROR;
-	}
 
-	ph_getEstado( tr_device.front_ph, &est);
-	printf("estado:%d\n", est);
-	tr_device.ctl_state=state;
-	return TR_OK;
-}
