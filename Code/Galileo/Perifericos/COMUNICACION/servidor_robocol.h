@@ -62,7 +62,7 @@ typedef char arm_mode;
 #define BD_MAX_CLOSE  8192          /* Maximum file descriptors to close if
                                        sysconf(_SC_OPEN_MAX) is indeterminate */
 #define TS_BUF_SIZE sizeof("YYYY-MM-DD HH:MM:SS")       /* Includes '\0' */
-
+#define TR_DIAGNOSTIC_PATH "/home/root/LOGS/diagnostico.txt"
 
 
 ///////////////////////////////////////////////////////////////////

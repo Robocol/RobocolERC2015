@@ -489,6 +489,7 @@ int parser_comandos(char* comando, int cfd){
 **                         	- Estado de salida del método (-1 error). 
 **
 ** ===================================================================*/
+
 int parser_comandos_mov(char* comando, int cfd){
 	char str[18];
 	char* 	accion;
@@ -500,9 +501,8 @@ int parser_comandos_mov(char* comando, int cfd){
 	char* 	angulo1;
 	char* 	angulo2;
 	char* 	angulo3;
-	uint8_t giro;
-	uint8_t res;
-
+ 	uint8_t giro;
+ 	uint8_t res;
 
 	char formato_fecha[40];
 
@@ -563,7 +563,7 @@ int parser_comandos_mov(char* comando, int cfd){
 		// Se ejecuta la accion asociada al modo de operación del brazo
 		if(strcmp(direccion,"f")==0){
 			logMessage("Mover adelante");
-			logMessage("Velocidad: %s",velocidad);	
+			logMessage("Velocidad: %d",velocidad);	
 
 			/*TODO Comandos para mover adelante */
 			if(tr_forward(velocidad)){
@@ -572,7 +572,7 @@ int parser_comandos_mov(char* comando, int cfd){
 					
 		}else if(strcmp(direccion,"b")==0){
 			logMessage("Mover atras");
-			logMessage("Velocidad: %s",velocidad);
+			logMessage("Velocidad: %d",velocidad);
 
 			/*TODO Comandos para mover atras */
 			if(tr_backward(velocidad)){
@@ -581,17 +581,17 @@ int parser_comandos_mov(char* comando, int cfd){
 
 		}else if(strcmp(direccion,"r")==0){
 			logMessage("girar derecha");
-			logMessage("Velocidad: %s",velocidad);						
+			logMessage("Velocidad: %d",velocidad);						
 
 			if(giro==1){
 				logMessage("Giro sobre el eje\n");
-				res=tr_spin(TR_TURN_RIGHT, tr_device.vel_pwm);	
+				res=tr_spin(TR_TURN_RIGHT, velocidad);	
 			}else if(giro==2){
 				logMessage("Giro diferencial\n");
 				res=tr_diffTurn(TR_TURN_RIGHT, velocidad);	
 			}else if(giro==3){
 				logMessage("Giro diferencial diagonal\n");
-				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, velocidad);	
+				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, velocidad);
 			}
 			if(res){
 				printf("Error girando a la derecha\n");
@@ -599,14 +599,14 @@ int parser_comandos_mov(char* comando, int cfd){
 
 			/*TODO Comandos para girar a la derecha */
 
-		}else if(strcmp(modo,"l")==0){
+		}else if(strcmp(direccion,"l")==0){
 			logMessage("Girar izquierda");
-			logMessage("Velocidad: %s",velocidad);
+			logMessage("Velocidad: %d",velocidad);
 
 			/*TODO Comandos para girar a la izquierda */
 			if(giro==1){
 				logMessage("Giro sobre el eje\n");
-				res=tr_spin(TR_TURN_LEFT, tr_device.vel_pwm);	
+				res=tr_spin(TR_TURN_LEFT, velocidad);	
 			}else if(giro==2){
 				logMessage("Giro diferencial\n");
 				res=tr_diffTurn(TR_TURN_LEFT, velocidad);	
@@ -615,24 +615,47 @@ int parser_comandos_mov(char* comando, int cfd){
 				res=tr_diagonalDiffTurn(TR_TURN_LEFT, velocidad);	
 			}
 			if(res){
-				printf("Error girando a la izquierda\n");
+				logMessage("Error girando a la izquierda\n");
+				return -1:
 			}			
 
-		}else if(strcmp(modo,"c")==0){
+		}else if(strcmp(direccion,"c")==0){
 
 			if(velocidad==1){
-				printf("Escogido: Giro sobre el eje\n");
+				logMessage("Escogido: Giro sobre el eje\n");
 				giro=velocidad;
 			}else if(velocidad==2){
-				printf("Escogido: Giro diferencial\n");
+				logMessage("Escogido: Giro diferencial\n");
 				giro=velocidad;
 			}else if(velocidad==3){
-				printf("Escogido: Giro diferencial diagonal\n");
+				logMessage("Escogido: Giro diferencial diagonal\n");
 				giro=velocidad;
 			}else{
-				printf("Error: En valor ingresado %d no corresponde a ningún giro\n",velocidad);
+				logMessage("Error: En valor ingresado %d no corresponde a ningún giro\n",velocidad);
+				return -1;
 			}
 			
+
+		}else if(!strcmp(direccion,"e")){
+			printf("Freno de Emergencia!");
+			if(tr_eBrake()){
+				logMessage("Error en tr_eBrake para freno de Emergencia");
+				return -1;
+			}
+
+		}else if(!strcmp(direccion,"x")){
+			printf("Deteniendo\n");
+			if(tr_setVP(0)){
+				logMessage("Error en tr_setVP para freno común");
+				return -1;
+			}
+
+		}else if(!strcmp(direccion,"i")){
+			printf("Estado a %d\n",velocidad);
+			if(tr_setCtlState(velocidad)={
+				logMessage("Error en tr_setCtlState");
+				return -1;
+			}
 
 		}else{
 			logMessage("Error: Direccion desconocida");
@@ -647,7 +670,6 @@ int parser_comandos_mov(char* comando, int cfd){
 	return 0;
 
 }
-
 /*
 ** ===================================================================
 **     Método      :  parser_comandos_diag
@@ -694,14 +716,14 @@ int parser_comandos_diag(char* comando, int cfd){
 		logMessage("Se va a diagnosticar el brazo");
 		
 		// Se abre el archivo que contiene el diagnostico
-		fd=open("/home/root/diagnostico_brazo.txt",O_RDONLY);				
+		fd=open("/home/root/LOGS/diagnostico_brazo.txt",O_RDONLY);				
 		if(fd==-1){
 			logMessage("Error: No se pudo abrir el archivo que contiene el diagnostico");
 			return -1;
 		}
 
 		// Se obtiene el tamanho del archivo
-		sz=fsize("/home/root/diagnostico_brazo.txt");
+		sz=fsize("/home/root/LOGS/diagnostico_brazo.txt");
 		logMessage("Tamanho del archivo = %i", sz);
 
 		// Se envia el tamanho del archivo
@@ -712,8 +734,9 @@ int parser_comandos_diag(char* comando, int cfd){
 		}
 
 		// Lee una linea de respuesta  
-       		if (readLine(cfd, respuesta, INT_LEN) <= 0) {
- 			logMessage("Error: No hay fin de línea");	
+       	if (readLine(cfd, respuesta, INT_LEN) <= 0) {
+ 			logMessage("Error: No hay fin de línea");
+ 			return -1;
 		}
 
 		logMessage("Llego: %s",respuesta);
@@ -732,16 +755,19 @@ int parser_comandos_diag(char* comando, int cfd){
 		close(fd);
 	}else if(strcmp(parte,"traccion\n")==0){
 		logMessage("Se va a diagnosticar la traccion");
-		
+		if (tr_diagnostico()){
+			logMessage("Error en el diagnóstico de tracción");
+			return -1;
+		}
 		// Se abre el archivo que contiene el diagnostico
-		fd=open("/home/root/diagnostico_traccion.txt",O_RDONLY);				
+		fd=open(TR_DIAGNOSTIC_PATH,O_RDONLY);				
 		if(fd==-1){
 			logMessage("Error: No se pudo abrir el archivo que contiene el diagnostico");
 			return -1;
 		}
 
 		// Se obtiene el tamanho del archivo
-		sz=fsize("/home/root/diagnostico_traccion.txt");
+		sz=fsize(TR_DIAGNOSTIC_PATH);
 		logMessage("Tamanho del archivo = %i", sz);
 
 		// Se envia el tamanho del archivo
@@ -752,8 +778,9 @@ int parser_comandos_diag(char* comando, int cfd){
 		}
 
 		// Lee una linea de respuesta  
-       		if (readLine(cfd, respuesta, INT_LEN) <= 0) {
-			logMessage("Error: No hay fin de línea");	
+       	if (readLine(cfd, respuesta, INT_LEN) <= 0) {
+			logMessage("Error: No hay fin de línea");
+			return -1;	
 		}
 
 		logMessage("Llego: %s",respuesta);

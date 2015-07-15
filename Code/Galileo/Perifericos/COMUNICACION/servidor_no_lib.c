@@ -761,7 +761,7 @@ int parser_comandos_mov(char* comando, int cfd){
 
 		}else if(!strcmp(direccion,"x")){
 			printf("Deteniendo\n");
-			tr_forward(0);
+			tr_setVP(0);
 
 		}else if(!strcmp(direccion,"i")){
 			printf("Estado a %d\n",velocidad);

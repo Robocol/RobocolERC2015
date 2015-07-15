@@ -140,7 +140,7 @@ tr_st tr_eBrake(void){
 }
 
 tr_st tr_setVP(uint8_t vp){
-	printf("changing speed to %d\n",vp);
+	printf("Changing speed to %d (tr_setVP -> traccion_robocol.c)\n",vp);
 
 	if (tr_device.mv_state==TR_STOPPED){
 		printf("Debe primero asignar la dirección de movimiento. Estado de movimiento se encuentra en TR_STOPPED. (tr_setVP->traccion_robocol.c)\n");
@@ -476,8 +476,8 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 	return TR_OK;
 }
 
-tr_st tr_diagnostico(void){
-	char *path="./diagnostico.txt";
+tr_st tr_diagnostico(char *d_path){
+	char *path=d_path;
 	FILE* fdl;
 	uint8_t velf,tempf,corrf;
 	uint8_t velb,tempb,corrb;

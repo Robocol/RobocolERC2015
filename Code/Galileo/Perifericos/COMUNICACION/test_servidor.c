@@ -10,15 +10,41 @@ int main(int argc, char *argv[]) {
 	char* comando_filtrado;
 	char* comando_analizar;
 	char* param1_comando;
+	uint8_t estado;
 	
-	/* El proceso se convierte en un demonio */
-	if(becomeDaemon(0) == -1)
-		printf("\nEl proceso del servidor no pudo volverse un demonio\n");
-	logOpen(LOG_FILE);
+	if (argc==2)
+	{
+		if (!strcmp(argv[1],"l")){
+			printf("ESTOY EN LEFT :)\n");
+			if(tr_build(TR_SLAVE,TR_LEFT_SIDE)){
+				printf("Error al Construir el dispositivo de traccion.\n");
+				return -1;
+			}
+		}else if(!strcmp(argv[1],"r")){
+			printf("ESTOY EN RIGHT :)\n");
+			if(tr_build(TR_SLAVE,TR_RIGHT_SIDE)){
+				printf("Error al Construir el dispositivo de traccion.\n");
+				return -1;
+			}
+		}else{
+			printf("Argumento ingresado no válido. Ingrese l o r para seleccionar el tipo de la tracción\n");
+			return -1;
+		}
+	}else{
+		printf("Argumento ingresado no válido. Ingrese l o r para seleccionar el tipo de la tracción\n");
+		return -1;
+	}
 
-
-	
 //Configuración servidor
+	tr_setCtlState(TR_AUTO);
+
+	/* El proceso se convierte en un demonio */
+	if(becomeDaemon(0) == -1){
+		printf("\nEl proceso del servidor no pudo volverse un demonio\n");
+	}
+	
+	logOpen(LOG_FILE);
+	
 
 	/* Ignore the SIGPIPE signal, so that we find out about broken connection
 	errors via a failure from write(). */
@@ -36,6 +62,11 @@ int main(int argc, char *argv[]) {
 
 
 	for (;;) {                  /* Loop infinito que  maneja las peticiones de los clientes */
+		logMessage("Estado de Traccion: %d",tr_device.ctl_state);
+		ph_getEstado( tr_device.front_ph, &estado);
+		logMessage("Estado Puente H front: %d",estado);
+		ph_getEstado( tr_device.back_ph, &estado);
+		logMessage("Estado Puente H back: %d",estado);
 
 		/* Acepta la conexion de un cliente */
 		addrlen = sizeof(struct sockaddr_storage);
@@ -68,12 +99,14 @@ int main(int argc, char *argv[]) {
 			/* Determina la acción del comando */
 			if(strcmp(comando_filtrado,"mover")==0){
 				/* Analiza el comando y realiza una acción */
-				if(parser_comandos_mov(comando, cfd)==-1)
+				if(parser_comandos_mov(comando, cfd)==-1){
 					logMessage("No se ejecuto el comando adecuadamente");
+				}
 			}else if(strcmp(comando_filtrado,"diagnosticar")==0){
 				/* Analiza el comando y realiza una acción */
-				if(parser_comandos_diag(comando, cfd)==-1)
+				if(parser_comandos_diag(comando, cfd)==-1){
 					logMessage("No se ejecuto el comando adecuadamente");
+				}
 			}else{
 				logMessage("Accion desconocida");
 			}
