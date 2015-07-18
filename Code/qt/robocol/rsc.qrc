@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>imagenes/Antena.png</file>
+        <file>imagenes/llantaD.png</file>
+        <file>imagenes/llantaI.png</file>
+        <file>imagenes/Interfaz.png</file>
+        <file alias="amarillo">imagenes/baro2/amarillo.png</file>
+        <file alias="azul">imagenes/baro2/azul.png</file>
+        <file alias="rojo">imagenes/baro2/rojo.png</file>
+        <file alias="rosado">imagenes/baro2/rosado.png</file>
+        <file alias="fantasma1">imagenes/baro2/fantasma1.png</file>
+        <file alias="fantasma2">imagenes/baro2/fantasma2.png</file>
+        <file alias="fantasma3">imagenes/baro2/fantasma3.png</file>
+        <file alias="fantasma4">imagenes/baro2/fantasma4.png</file>
+    </qresource>
+</RCC>
