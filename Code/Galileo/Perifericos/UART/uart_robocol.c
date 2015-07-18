@@ -72,13 +72,13 @@ uart_st uart_write(const void* buff, int size){
     return UART_OK;
 }
 
-uart_st uart_read(void* buff, int size){
+uart_st uart_read(char* buff, int size){
 	uint8_t len;
     if(len=read(u_dev.fd,buff,size)<0){
       perror("Error en lectura de información desde canal UART");
       return UART_ERROR;
     }
-	buff[len]='\0';
+	  buff[len]='\0';
     return UART_OK;
 }
 

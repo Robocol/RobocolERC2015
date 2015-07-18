@@ -93,6 +93,13 @@ $(ODIR)/gpio_robocol$(LEXT): ../GPIO/gpio_robocol.c ../GPIO/gpio_robocol.h $(ODI
                    	  -I../I2C \
                    	  -I../../MISC
 
+################################################################################################
+#	GPIO 																			   		   #
+################################################################################################
+$(ODIR)/uart_robocol$(LEXT): ../UART/uart_robocol.c ../UART/uart_robocol.h $(ODIR)/misc_robocol$(LEXT)
+	$(CC) -c -o $@ $< -I../UART \
+                   	  -I../../MISC
+
 
 ################################################################################################
 #	SPI 																			   		   #
@@ -238,6 +245,16 @@ $(ODIR)/servidor_robocol$(LEXT): ../COMUNICACION/servidor_robocol.c ../COMUNICAC
 						-I../PWM \
                         -I../TRACCION\
                         -I../COMUNICACION   																			
+
+################################################################################################
+#	GPS    																		   	   #
+################################################################################################
+
+
+$(ODIR)/gps_robocol$(LEXT): ../GPS/gps_robocol.c ../GPS/gps_robocol.h  $(ODIR)/uart_robocol$(LEXT)  \
+ 		                                           								$(ODIR)/misc_robocol$(LEXT) 
+	$(CC) -c -o $@ $< -I../UART \
+						-I../../MISC   
 
 .PHONY: clean
 

@@ -36,14 +36,11 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <signal.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
 #include <getopt.h>             /* getopt_long() */
-
 #include <fcntl.h>              /* low-level i/o */
 #include <unistd.h>
 #include <errno.h>
@@ -997,9 +994,6 @@ int main(int argc, char *argv[]) {
 			}else{
 				logMessage("Accion desconocida");
 			}
-
-
-		
 		}else{
 			/* Imprime el tipo de comando que llegó */
 			logMessage("Comando normal");
@@ -1007,14 +1001,11 @@ int main(int argc, char *argv[]) {
 			/* Analiza el comando y realiza una acción */
 			if(parser_comandos(comando, cfd)==-1)
 				logMessage("No se ejecuto el comando adecuadamente");			
-		}
-
-		
-		
+		}	
 	}		 
 
-      	if (close(cfd) == -1)           /* Close connection */
-		logMessage("Close error (%s)", strerror(errno));	
+    if (close(cfd) == -1)           /* Close connection */
+	logMessage("Close error (%s)", strerror(errno));	
 	
 	logMessage("Finalizo rutina\n");
     	
