@@ -1,5 +1,24 @@
 #include "traccion_robocol.h"
 
+/*
+** ===================================================================
+**     Método      :  tr_build
+*/
+/*!
+**     @resumen
+**          Se inicializa el dispositivo encargado de controlar la 
+**			tracción del Rover. Para esto, se crean los dispositios que
+**			controlan los puente H, usando la librería ph_robocol.
+**     @param
+**          type     	   	- Tipo del dispositivo, indicando se es MASTER
+**							o SLAVE, y si está ubicado en RIGHT_SIDE o 
+**							LEFT_SIDE. Se puede instanciar este argumento
+**							usando OR bit a bit. Por ejemplo:
+**
+**								tr_build(MASTER|RIGHT);
+**							
+*/
+/* ===================================================================*/
 tr_st tr_build(uint8_t type,uint8_t side){
 	uint8_t master;
 	uint8_t right;
@@ -94,6 +113,17 @@ tr_st tr_build(uint8_t type,uint8_t side){
 	return TR_OK;
 }
 
+/*
+** ===================================================================
+**     Método      :  tr_setVP
+*/
+/*!
+**     @resumen
+**			Asignar pwm o velocidad objetivo según el estado de operación
+**			de la tracción. Se asigna también a la estructura
+**			global de tracción.
+*/
+/* ===================================================================*/
 tr_st tr_forward(uint8_t vp){
 
 	if (tr_device.mv_state==TR_BACKWARD){
@@ -125,6 +155,16 @@ tr_st tr_forward(uint8_t vp){
 }
 
 
+/*
+** ===================================================================
+**     Método      :  tr_eBrake
+*/
+/*!
+**     @resumen
+**			Freno de emergencia que activa el freno a VCC de los puentes
+** 			H de la tracción.
+*/
+/* ===================================================================*/
 tr_st tr_eBrake(void){
 	if (ph_vccBrake(tr_device.front_ph)){
 		printf("Error en eBrake para front_ph.(tr_eBrake -> traccion_robocol.c)\n");
@@ -136,7 +176,30 @@ tr_st tr_eBrake(void){
 		return TR_ERROR;
 	}
 
+	if (tr_setVP(0)){
+		printf("Error en el set de velocidad/pwm 0. (tr_eBrake -> traccion_robocol.c)\n");
+		return TR_ERROR;
+	}
+
+	tr_device.mv_state=TR_STOPPED;
+
 	return TR_OK;
+}
+
+tr_st tr_enable(void){
+
+	if(ph_enable(tr_device.front_ph)){
+		printf("Error en la habilitación del puenteH delantero.(tr_enable -> traccion_robocol.c)\n");
+		return TR_ERROR;
+	}
+
+	if (ph_enable(tr_device.back_ph)){
+		printf("Error en la habilitación del puenteH trasero.(tr_enable -> traccion_robocol.c)\n");
+		return TR_ERROR;
+	}
+
+	return TR_OK;
+
 }
 
 tr_st tr_setVP(uint8_t vp){
@@ -476,6 +539,20 @@ tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
 	return TR_OK;
 }
 
+/*
+** ===================================================================
+**     Método      :  tr_diaganostico
+*/
+/*!
+**     @resumen
+**			Método encargado de revisar conexión con los microcontroladores
+**			responsables del manejo de los motores . En dado caso 
+**			que estos dispositivos se encuentren on-line, se efectua
+**			petición de variables de corriente, velocidad y temperatura.
+**			La información obtenida por dicho proceso es guardada
+** 			en el archivo con ruta especificada por parámetro.
+*/
+/* ===================================================================*/
 tr_st tr_diagnostico(char *d_path){
 	char *path=d_path;
 	FILE* fdl;
@@ -550,6 +627,17 @@ tr_st tr_diagnostico(char *d_path){
 	return TR_OK;
 }
 
+/*
+** ===================================================================
+**     Método      :  tr_setCtlState
+*/
+/*!
+**     @resumen
+**			Método encargado de modificar el estado de operación
+**			de la tracción a TR_AUTO o TR_MANUAL según indicado 
+**			por parámetro.
+*/
+/* ===================================================================*/
 tr_st tr_setCtlState(uint8_t state){
 	uint8_t est=0;
 

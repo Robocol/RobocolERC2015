@@ -103,13 +103,14 @@ ssize_t readLine(int fd, void *buffer, size_t n){
 	return totRead;
 }
 
-int
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
+	size_t size=40;
+	char* line=malloc(size);
+	uint8_t number;
+	uint8_t rightCommand;
 	//Descriptores de archivos y valores de retorno	
-	char LenStr[INT_LEN];            /* Length of requested sequence */	
 	
-	char *reqLenStr;                    /* Requested length of sequence */
+	char *reqLenStr=malloc(30*sizeof(char));                    /* Requested length of sequence */
 	int cfd;
 
 	struct addrinfo hints;
@@ -148,42 +149,104 @@ main(int argc, char *argv[])
 		close(cfd);
 	}
 
-	if (rp == NULL)
-		printf("Could not connect socket to any address");
+	if (rp == NULL){
+		printf("Could not connect socket to any address\n");
+	}
 
 	freeaddrinfo(result);
 
 	/* Send requested sequence length, with terminating newline */
 
-	reqLenStr = "conectar";
-	if (write(cfd, reqLenStr, strlen(reqLenStr)) == -1)
-		printf("Partial/failed write (reqLenStr)");
-	if (write(cfd, "\n", 1) != 1)
-		printf("Partial/failed write (newline)");
 
-   	/* Read and display sequence number returned by server */
+	while(1){
+		printf("Ingrese un comando\n");
+		getline(&line,&size,stdin);
+		printf("El comando ingresado fue: %s \n",line);
+		
+		if(!strcmp(line,"f\n")){
+			printf("Ingrese la velocidad/pwm del movimiento\n");
+			getline(&line,&size,stdin);
+			if((number=atoi(line))==-1){
+				printf("Error en conversión de número ingresado\n");
+				rightCommand=0;
+			}else{
+				if(sprintf(reqLenStr,"mover/traccion/f/%d",number)<0){
+					printf("Error en la impresión a puntero de la dirección ingresado\n");
+					rightCommand=0;
+				}else{
+					rightCommand=1;
+				}
+			}
+		}else if(!strcmp(line,"b\n")){
+			printf("Ingrese la velocidad/pwm del movimiento\n");
+			getline(&line,&size,stdin);
+			if((number=atoi(line))==-1){
+				printf("Error en conversión de número ingresado\n");
+				rightCommand=0;
+			}else{
+				if(sprintf(reqLenStr,"mover/traccion/b/%d",number)<0){
+					printf("Error en la impresión a puntero de la dirección ingresado\n");
+					rightCommand=0;
+				}else{
+					rightCommand=1;
+				}
+			}
+		}else if(!strcmp(line,"r\n")){
+			printf("Ingrese la velocidad/pwm del movimiento\n");
+			getline(&line,&size,stdin);
+			if((number=atoi(line))==-1){
+				printf("Error en conversión de número ingresado\n");
+				rightCommand=0;
+			}else{
+				if(sprintf(reqLenStr,"mover/traccion/r/%d",number)<0){
+					printf("Error en la impresión a puntero de la dirección ingresado\n");
+					rightCommand=0;
+				}else{
+					rightCommand=1;
+				}
+			}
+		}else if(!strcmp(line,"l\n")){
+			printf("Ingrese la velocidad/pwm del movimiento\n");
+			getline(&line,&size,stdin);
+			if((number=atoi(line))==-1){
+				printf("Error en conversión de número ingresado\n");
+				rightCommand=0;
+			}else{
+				if(sprintf(reqLenStr,"mover/traccion/l/%d",number)<0){
+					printf("Error en la impresión a puntero de la dirección ingresado\n");
+					rightCommand=0;
+				}else{
+					rightCommand=1;
+				}
+			}
+		}else if(!strcmp(line,"c\n")){
+			printf("Ingrese la velocidad/pwm del movimiento\n");
+			getline(&line,&size,stdin);
+			if((number=atoi(line))==-1){
+				printf("Error en conversión de número ingresado\n");
+				rightCommand=0;
+			}else{
+				if(sprintf(reqLenStr,"mover/traccion/c/%d",number)<0){
+					printf("Error en la impresión a puntero de la dirección ingresado\n");
+					rightCommand=0;
+				}else{
+					rightCommand=1;
+				}
+			}
+		}
 
-        if (readLine(cfd, LenStr, INT_LEN) <= 0) {
-		close(cfd);
-		printf("No hay fin de línea\n");                
-       	}
+		if (rightCommand)
+		{
+			if (write(cfd, reqLenStr, strlen(reqLenStr)) == -1){
+				printf("Partial/failed write (reqLenStr)\n");
+			}
+			if (write(cfd, "\n", 1) != 1){
+				printf("Partial/failed write (newline)\n");
+			}
+		}
 
-	printf("valor igual a %x", LenStr);
-	//tam = atoi(LenStr)
+	}
 
-	//TODO: Método conectar. Cliente envía conectar, servidor responde OK
-
-	//TODO: Reportar_estado. Se llama, devuelve el estado y lo muestra en la consola
-
-	//TODO: 
-
-	reqLenStr = "tamanho";
-	if (write(cfd, reqLenStr, strlen(reqLenStr)) == -1)
-		printf("Partial/failed write (reqLenStr)");
-	if (write(cfd, "\n", 1) != 1)
-		printf("Partial/failed write (newline)");
-   
-	//Cerrar archivo
 	if(close(cfd) == -1){
 		perror("close");
 		exit(EXIT_FAILURE);

@@ -676,7 +676,7 @@ ph_st ph_vccBrake(ph_dev *dev){
 	printf("\nFRENO EFECTUADO\nDeshabilitando puenteH...\n");
 
 	if (ph_disable(dev)){
-		printf("Error desahbilitando el puenteH. (ph_totalBrake -> ph_robocol.c)\n");
+		printf("Error desahbilitando el puenteH. (ph_vccBrake -> ph_robocol.c)\n");
 		return PH_ERROR;
 	}
 
@@ -684,6 +684,7 @@ ph_st ph_vccBrake(ph_dev *dev){
 
 	return PH_OK;
 }
+
 
 ph_st ph_gndBrake(ph_dev *dev){
 
@@ -697,11 +698,6 @@ ph_st ph_gndBrake(ph_dev *dev){
 	}
 
 	printf("\nFRENO EFECTUADO\nDeshabilitando puenteH...\n");
-
-	if (ph_disable(dev)){
-		printf("Error desahbilitando el puenteH. (ph_totalBrake -> ph_robocol.c)\n");
-		return PH_ERROR;
-	}
 
 	printf("FRENO TOTAL EXITOSO\n");
 

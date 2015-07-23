@@ -21,15 +21,13 @@ off_t fsize(const char *filename) {
 ssize_t readLine(int fd, void *buffer, size_t n){
 	ssize_t numRead;                    /* # of bytes fetched by last read() */
 	size_t totRead;                     /* Total bytes read so far */
-	char *buf;
+	char *buf=buffer;
 	char ch;
 
-	if (n <= 0 || buffer == NULL) {
+	if (n <= 0 || buf == NULL) {
 	        errno = EINVAL;
 	        return -1;
 	}
-
-	buf = buffer;                       /* No pointer arithmetic on "void *" */
 
 	totRead = 0;
 	while(1){
@@ -151,13 +149,11 @@ int becomeDaemon(int flags)
 void logMessage(const char *format, ...)
 {
 	va_list argList;
-	const char *TIMESTAMP_FMT = "%F %X";        /* = YYYY-MM-DD HH:MM:SS */
 	char timestamp[TS_BUF_SIZE];
-	time_t t;
-	struct tm *loc;
+	const char *TIMESTAMP_FMT = "%F %X";        /* = YYYY-MM-DD HH:MM:SS */
+	time_t t=time(NULL);
+	struct tm *loc=localtime(&t);;
 
-	t = time(NULL);
-	loc = localtime(&t);
 	if (loc == NULL || strftime(timestamp, TS_BUF_SIZE, TIMESTAMP_FMT, loc) == 0)
 		fprintf(logfp, "???Unknown time????: ");
 	else
@@ -616,7 +612,7 @@ int parser_comandos_mov(char* comando, int cfd){
 			}
 			if(res){
 				logMessage("Error girando a la izquierda\n");
-				return -1:
+				return -1;
 			}			
 
 		}else if(strcmp(direccion,"c")==0){
@@ -652,8 +648,15 @@ int parser_comandos_mov(char* comando, int cfd){
 
 		}else if(!strcmp(direccion,"i")){
 			printf("Estado a %d\n",velocidad);
-			if(tr_setCtlState(velocidad)={
+			if(tr_setCtlState(velocidad)){
 				logMessage("Error en tr_setCtlState");
+				return -1;
+			}
+
+		}else if(!strcmp(direccion,"a")){
+			printf("Habilitando tracción\n");
+			if (tr_enable()){
+				logMessage("Error en enable de tracción");
 				return -1;
 			}
 

@@ -37,6 +37,75 @@
  */
 typedef int tr_st;
 
+/*
+** ==================================================================================
+** Estructura tr_dev:
+**
+**	Estructura de Tracción implementada para el manejo conjunto de dos motores
+**	en proyecto ERC Robocol 2015.
+**
+**	Los elementos estipulados para la estructura se describen a continuación:
+**
+**	mv_state: Estado de movimiento de la tracción . Los estados manejados
+**			  para esta variable son:
+**				
+** 				-TR_FORWARD: Moviendose hacia adelante
+** 				-TR_BACKWARD: Moviendose hacia atras
+** 				-TR_STEER: Girando
+** 				-TR_STOPPED: Estado estacionario
+**
+** ctl_state: Para este caso se tienen dos estados esperados por defecto,
+**			  heredados de las dos formas de controlar los motores 
+**			  a través del driver descrito en ph_robocol.c:
+**				-TR_AUTO: Estado en el cual la  velocidad y corriente de
+**						  los motores estan siendo controladas por
+**						  el controlador en cascada de los microcontroladores.
+**			
+**				-TR_MANUAL: Estado en el cual es solo modificable el 
+**							PWM para el manejo de los motores. No se 
+**							tiene habilitado el control de corriente
+**							y velocidad de los microcontroladores.
+**
+** side: En el proyecto ERC Robocol 2015, se implementó
+**		 una tracción con cuatro ruedas, un par a cada lado del armazón.
+**		 Para el manejo de los motores de dichas ruedas se posicionaron
+**		 dos tarjetas Intel Galileo , una de ellas para el par de ruedas
+**		 de la izquierda del armazón y la otra para el par de ruedas de 
+**		 la derecha. De este modo, se incluye una variable side en la 
+**		 estructura que identifica en cual de los dos lados de
+**		 la tracción se está declarando la misma.
+**		 Los valores estipulados para esta variable se listan a continuación:
+**			
+**				-TR_LEFT_SIDE
+**				-TR_RIGHT_SIDE
+**
+** type: Esta variable indica si la estructura de tracción para el manejo del
+**		 par de motores tan solo ejecuta comandos enviados por la central 
+**		 de control, TR_SLAVE, o en adición a ello los retransmite a la otra
+**		 tarjeta Intel Galileo encargada del control de la tracción,TR_MASTER. 
+**		 Así pues, los valores esperados para esta variable son_
+**
+**				-TR_MASTER
+**				-TR_SLAVE
+**
+**			
+** vel_pwm: Variable que indica el pwm(en modo TR_MANUAL) o velocidad (en modo TR_AUTO)
+**			en el/la cual estan opernado los motores que controla esta librería.
+**
+** front_ph: Puntero a estructura de puente H (descrita en ph_robocol.c)
+**			 que controla el motor delantero del lado especificado por side.
+** back_ph:  Puntero a estructura de puente H (descrita en ph_robocol.c)
+**			 que controla el motor trasero del lado especificado por side.
+**
+** device_built: Variable que indica si la estructura ya ha sido inicializada o no.
+**				Los valores esperados para esta variables son:
+**				-TR_BUILT
+**				-TR_NOT_BUILT
+*/
+/*!
+*/
+/* ==================================================================================*/
+
 typedef struct tr_dev{
 	uint8_t mv_state;
 	uint8_t ctl_state;
@@ -232,5 +301,36 @@ tr_st tr_eBrake(void);
 */
 /* ===================================================================*/
 tr_st tr_setVP(uint8_t vp);
+
+
+/*
+** ===================================================================
+**     Método      :  tr_diaganostico
+*/
+/*!
+**     @resumen
+**			Método encargado de revisar conexión con los microcontroladores
+**			responsables del manejo de los motores . En dado caso 
+**			que estos dispositivos se encuentren on-line, se efectua
+**			petición de variables de corriente, velocidad y temperatura.
+**			La información obtenida por dicho proceso es guardada
+** 			en el archivo con ruta especificada por parámetro.
+*/
+/* ===================================================================*/
+tr_st tr_diagnostico(char *d_path);
+
+
+/*
+** ===================================================================
+**     Método      :  tr_setCtlState
+*/
+/*!
+**     @resumen
+**			Método encargado de modificar el estado de operación
+**			de la tracción a TR_AUTO o TR_MANUAL según indicado 
+**			por parámetro.
+*/
+/* ===================================================================*/
+tr_st tr_setCtlState(uint8_t state);
 
 #endif
