@@ -1,5 +1,0 @@
-all: uartTest.g
-uartTest.g: uartTest.c
-	galileo-gcc uartTest.c -o uartTest.g
-clean:
-	rm uarTest.g
