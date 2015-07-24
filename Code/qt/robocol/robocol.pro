@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     dialogconectar.cpp \
     dialog_desconectar.cpp \
     menu.cpp \
-    giro.cpp
+    giro.cpp \
+    qmpwidget.cpp
 
 HEADERS  += mainwindow.h \
     comunicacion.h \
@@ -32,7 +33,9 @@ HEADERS  += mainwindow.h \
     dialogconectar.h \
     dialog_desconectar.h \
     menu.h \
-    giro.h
+    giro.h \
+    qmpyuvreader.h \
+    qmpwidget.h
 
 FORMS    += mainwindow.ui \
     cuerpo.ui \
