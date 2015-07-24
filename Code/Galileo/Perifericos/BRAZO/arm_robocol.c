@@ -30,43 +30,64 @@ arm_st arm_build(void){
 	(*u_actuator).pin_enable=PINE4;
 	(*u_actuator).addr=EXP1;
 
-	// (*sup).pin_cs=PIN6;
-	// (*sup).pin_dir=PIN2;
+	// (*wrist).pin_cs=PIN6;
+	// (*wrist).pin_dir=PIN2;
+	// (*wrist).pin_pwm=3;
+	// (*wrist).exp=EXP2;
+	// (*wrist).gear_ratio=14.9;
+	// (*wrist).step=2;
+	// (*wrist).pin_stndby=PINE0;
+	// (*wrist).pin_flag=PINE1;
+	
+	(*wrist).pin_cs=PIN7;
+	(*wrist).pin_dir=PIN5;
+	(*wrist).pin_stndby=PINE1;
+	(*wrist).pin_flag=0;
+	(*wrist).exp=EXP2;
+	(*wrist).pin_pwm=3;
+	//(*wrist).gear_ratio=14.9;
+	(*wrist).gear_ratio=15;
+	(*wrist).step=7;
+	(*wrist).period=5000;
+
+	// (*sup).pin_cs=PIN7;
+	// (*sup).pin_dir=PIN4;
 	// (*sup).pin_pwm=3;
 	// (*sup).exp=EXP2;
 	// (*sup).gear_ratio=14.9;
 	// (*sup).step=2;
-	// (*sup).pin_stndby=PINE0;
-	// (*sup).pin_flag=PINE1;
-	
+	// (*sup).pin_stndby=PINE2;
+	// (*sup).pin_flag=PINE3;
+	// (*sup).period=5000;
+
+
 	(*sup).pin_cs=PIN7;
-	(*sup).pin_dir=PIN5;
-	(*sup).pin_stndby=0x01;
-	(*sup).pin_flag=0;
-	(*sup).exp=EXP2;
+	(*sup).pin_dir=PIN4;
 	(*sup).pin_pwm=3;
-	//(*sup).gear_ratio=14.9;
-	(*sup).gear_ratio=15;
-	(*sup).step=7;
+	(*sup).exp=EXP2;
+	(*sup).gear_ratio=14.9;
+	(*sup).step=2;
+	(*sup).pin_stndby=PINE2;
+	(*sup).pin_flag=PINE3;
 	(*sup).period=5000;
 
-	(*wrist).pin_cs=PIN7;
-	(*wrist).pin_dir=PIN4;
-	(*wrist).pin_pwm=3;
-	(*wrist).exp=EXP2;
-	(*wrist).gear_ratio=14.9;
-	(*wrist).step=2;
-	(*wrist).pin_stndby=PINE2;
-	(*wrist).pin_flag=PINE3;
-	(*wrist).period=5000;
+	// (*claw).pin_cs=PIN8;
+	// (*claw).pin_dir=PIN5;
+	// (*claw).pin_pwm=3;
+	// (*claw).exp=EXP2
+	// (*claw).gear_ratio=14.9;
+	// (*claw).step=2;	
+	// (*claw).pin_stndby=PINE4;
+	// (*claw).pin_flag=PINE5;
+	// (*claw).period=5000;
 
 	(*claw).pin_cs=PIN8;
-	(*claw).pin_dir=PIN5;
-	(*claw).pin_pwm=3;
+	(*claw).pin_dir=PIN4;
+	(*claw).pin_pwm=6;
 	(*claw).exp=EXP2
 	(*claw).gear_ratio=14.9;
 	(*claw).step=2;	
-	(*claw).pin_stndby=PINE4;
+	(*claw).pin_stndby=PINE3;
 	(*claw).pin_flag=PINE5;
 	(*claw).period=5000;
 
