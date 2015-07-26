@@ -178,7 +178,7 @@ gps_st gps_getData(gps_dev *dev){
 */
 /* =====================================================================================*/
 gps_st gps_parser(char* line){
-	char 	*word=malloc(10*sizeof(char));
+	char 		*word=malloc(10*sizeof(char));
 	const char	delim[2]=",";
 
 	//Identificador del protocolo
@@ -186,12 +186,13 @@ gps_st gps_parser(char* line){
 	word = strtok(line,delim);
 	printf("word: %s\n",word );
 
-	if(strcmp(word,"GPRMC")|| line[65]=='*'){
+	if(strcmp(word,"GPRMC")|| strcmp(word,"GNGSA")){
 		printf("La linea ingresada por parámetro no corresponte al formato RMC. (gps_robocol -> gps_parser )\n");
 		return GPS_ERROR;
 	}
 	//Hora
 	word = strtok(NULL,delim);
+	printf("%c%c:%c%c:%c%c",word[0],word[1],word[2],word[3],word[4],word[5]);
 	sprintf(gps_device.time,"%c%c:%c%c:%c%c",word[0],word[1],word[2],word[3],word[4],word[5]);
 
 
@@ -300,40 +301,35 @@ float gps_parseLongitude(char* word){
 /* ===================================================================*/
 void *gps_writeFile(void* arg){
 
-	FILE *fd=malloc(sizeof(FILE));
-	char buff[68];
-
-	int d=0;
+	FILE *fd = alloca(sizeof(FILE));
+	char *line=alloca(68*sizeof(char));
 	
-	strcpy(buff,"writting");
-
-
 	printf("Archivo abierto!\n");
-	while(reading && d<20){
-		printf("dentro del loop\n");
 
-		if((fd=fopen(gps_device.ruta,"w"))==NULL){
-			printf("Error en apertura de archivo de reporte para el GPS\n");
-			perror("Causa:");
+	if((fd=fopen("/dev/ttyS0","r"))==NULL){
+		printf("Error en apertura de archivo de reporte para el GPS\n");
+		perror("Causa:");
+		free(fd);
+		return;
+	}
 
-			free(fd);
-			return;
-		}
-		//if(getWaitFlag()==TRUE){
-			//uart_read(&buf,68);
-			
-			printf("%s\n",buff);
-			fprintf(fd,"%s: %d\n",buff,d);
-			d++;
-			sleep(1);
-		//}
-		//setWaitFlag(TRUE);
-		if(fclose(fd)<0){
-			printf("Error en cierre de archivo de reporte para el GPS\n");
-			perror("Causa:");
-			free(fd);
-			return;
-		}
+	while(reading){
+	    printf("Dentro del loop\n");
+	    getline(&line,&size,fd);
+	    printf("Char: %s\n",line);
+
+	    if(gps_parser(line)){
+	    	printf("Error al procesar la información obtenida del GPS. (gps_robocol -> gps_writeFile)\n");
+	    }
+	    
+	}
+
+
+	if(fclose(fd)<0){
+		printf("Error en cierre de archivo de reporte para el GPS\n");
+		perror("Causa:");
+		free(fd);
+		return;
 	}
 
 	pthread_exit("writting stopped. (gps_robocol -> gps_writeFile )");

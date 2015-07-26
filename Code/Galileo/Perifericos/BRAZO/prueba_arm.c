@@ -51,7 +51,7 @@ int main(int argc, char const *argv[]){
 	}
 
 
-	if(arm_get_stp(SUP,&stepper)){
+	if(arm_get_stp(CLAW,&stepper)){
 		printf("Error en la captura del stp_device con el número %s asociado\n",*line );
 	}
 

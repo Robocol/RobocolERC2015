@@ -47,7 +47,7 @@ arm_st arm_build(void){
 	(*wrist).pin_pwm=3;
 	//(*wrist).gear_ratio=14.9;
 	(*wrist).gear_ratio=15;
-	(*wrist).step=7;
+	(*wrist).step=0;
 	(*wrist).period=5000;
 
 	// (*sup).pin_cs=PIN7;
@@ -66,7 +66,7 @@ arm_st arm_build(void){
 	(*sup).pin_pwm=3;
 	(*sup).exp=EXP2;
 	(*sup).gear_ratio=14.9;
-	(*sup).step=2;
+	(*sup).step=0;
 	(*sup).pin_stndby=PINE2;
 	(*sup).pin_flag=PINE3;
 	(*sup).period=5000;
@@ -86,7 +86,7 @@ arm_st arm_build(void){
 	(*claw).pin_pwm=6;
 	(*claw).exp=EXP2
 	(*claw).gear_ratio=14.9;
-	(*claw).step=2;	
+	(*claw).step=0;	
 	(*claw).pin_stndby=PINE3;
 	(*claw).pin_flag=PINE5;
 	(*claw).period=5000;
