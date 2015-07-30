@@ -77,6 +77,9 @@
 
 #define GPS_ERROR	0x01
 #define GPS_OK 		0x00
+
+	static char UART_PATH[11]= "/dev/ttyS0";
+	//static char UART_PATH[14]= "./testGPS.log";
 	pthread_t a_thread;
 	void *thread_result;
 
@@ -155,7 +158,7 @@ gps_st gps_parser(char* line);
 
 /*
 ** ===================================================================
-**     Método      :  gps_writeFile
+**     Método      :  gps_continuousUpdate
 */
 /*!
 **     @resumen
@@ -164,7 +167,7 @@ gps_st gps_parser(char* line);
 **          
 */
 /* ===================================================================*/
-void *gps_writeFile(void* arg);
+void *gps_continuousUpdate(void* arg);
 
 
 float gps_parseLatitude(char* word);

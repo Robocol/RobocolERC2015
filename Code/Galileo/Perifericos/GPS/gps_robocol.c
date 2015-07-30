@@ -81,7 +81,7 @@ gps_st gps_build(char* ruta){
 gps_st gps_start(void){
 	reading=TRUE;
 
-	if (pthread_create(&a_thread, NULL, gps_writeFile, (void *)NULL)) {
+	if (pthread_create(&a_thread, NULL, gps_continuousUpdate, (void *)NULL)) {
 		perror("Thread creation failed. (gps_robocol -> gps_start )");
 		return GPS_ERROR;
 	}
@@ -120,32 +120,6 @@ gps_st gps_stop(void){
 /* ===================================================================*/
 gps_st gps_getData(gps_dev *dev){
 
-	FILE *fd=alloca(sizeof(FILE));
-	char line[68];
-
-
-	if((fd=fopen(gps_device.ruta,"r"))<0){
-		printf("Error en apertura de archivo de reporte para el GPS\n");
-		perror("Causa:");
-		return;
-	}
-
-	if((fgets(line,68,fd))<0){
-		printf("Error al leer archivo de reporte para el GPS. (gps_robocol -> gps_getData)\n");
-		return GPS_ERROR;
-	}
-
-	if((fclose(fd))<0){
-		printf("Error en cierre de archivo de reporte para el GPS\n");
-		perror("Causa:");
-		return;
-	}
-
-	if(gps_parser(line)){
-		printf("Error interpretando los datos del gps. (gps_robocol -> gps_getData )\n");
-		return GPS_ERROR;
-	}
-
 	*dev=gps_device;
 
 	return GPS_OK;
@@ -178,65 +152,71 @@ gps_st gps_getData(gps_dev *dev){
 */
 /* =====================================================================================*/
 gps_st gps_parser(char* line){
-	char 		*word=malloc(10*sizeof(char));
+	char 	*word=malloc(10*sizeof(char));
+	char 	**pline	= &line;
 	const char	delim[2]=",";
+
 
 	//Identificador del protocolo
 	printf("line: %s\n",line );
-	word = strtok(line,delim);
+	word = strsep(pline,delim);
 	printf("word: %s\n",word );
 
-	if(strcmp(word,"GPRMC")|| strcmp(word,"GNGSA")){
+
+	if(!strcmp(word,"$GNGSA")||!strcmp(word,"$GPGSV")){
+		printf("Linea de control del GPS. Ignorada\n");
+		return GPS_OK;
+	}else if(strcmp(word,"$GPRMC")){
 		printf("La linea ingresada por parámetro no corresponte al formato RMC. (gps_robocol -> gps_parser )\n");
 		return GPS_ERROR;
 	}
 	//Hora
-	word = strtok(NULL,delim);
-	printf("%c%c:%c%c:%c%c",word[0],word[1],word[2],word[3],word[4],word[5]);
+	word = strsep(pline,delim);
+	printf("%c%c:%c%c:%c%c\n",word[0],word[1],word[2],word[3],word[4],word[5]);
 	sprintf(gps_device.time,"%c%c:%c%c:%c%c",word[0],word[1],word[2],word[3],word[4],word[5]);
 
 
 	//status
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 	gps_device.status = word[0];
 
 	//Latitude
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 
 	gps_device.latitude=gps_parseLatitude(word);
-	if(*strtok(NULL,delim)=='S'){
+	if(*strsep(pline,delim)=='S'){
 		gps_device.latitude=(-1)*gps_device.latitude;
 	}
 
 	//Longitude
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 
 	gps_device.longitude=gps_parseLongitude(word);
-	if(*strtok(NULL,delim)=='W'){
+	if(*strsep(pline,delim)=='W'){
 		gps_device.longitude=(-1)*gps_device.longitude;
 	}
 
 	//Velocidad
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 	gps_device.speed=atof(word)*1.852;
 	printf("speed: %f\n", gps_device.speed);
 
 	//Track Angle
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 	gps_device.track_angle=atof(word);
 	printf("t_angle: %f\n", gps_device.track_angle);
 
 	//Date
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 	printf("date: %c%c/%c%c/%c%c\n",word[0],word[1],word[2],word[3],word[4],word[5]);
 	sprintf(gps_device.date,"%c%c/%c%c/%c%c",word[0],word[1],word[2],word[3],word[4],word[5]);
 
 	//Magnetic Deviation
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 	gps_device.mag_dev=atof(word);
 	printf("m_dev: %f\n", gps_device.mag_dev);
 
-	word = strtok(NULL,delim);
+	word = strsep(pline,delim);
 	if(word[0]=='W'){
 		gps_device.mag_dev=(-1)*gps_device.mag_dev;
 	}
@@ -276,13 +256,20 @@ float gps_parseLongitude(char* word){
 	float deg=0;
 	float min=0;
 
+	printf("longitude %s\n", word);
 	strcpy(s_deg,word);
 
 	s_deg[3]='\0';
+
+	printf("s_deg%s\n", s_deg);
+	
 	s_min=&word[3];
 
-	deg=atoi(s_deg);
-	min=atoi(s_min);
+	deg=atof(s_deg);
+	printf("deg: %f\n",deg );
+
+	min=atof(s_min);
+	printf("min: %f\n",min );
 
 	deg=deg+min/60;
 	return deg;
@@ -299,14 +286,15 @@ float gps_parseLongitude(char* word){
 **			contenida para almacenarla en la estructura gps_device
 */
 /* ===================================================================*/
-void *gps_writeFile(void* arg){
-
-	FILE *fd = alloca(sizeof(FILE));
-	char *line=alloca(68*sizeof(char));
+void *gps_continuousUpdate(void* arg){
+	size_t size=100;
+	int s=0;
+	FILE *fd = malloc(sizeof(FILE));
+	char *line=calloc(size,sizeof(char));
 	
 	printf("Archivo abierto!\n");
 
-	if((fd=fopen("/dev/ttyS0","r"))==NULL){
+	if((fd=fopen(UART_PATH,"r"))==NULL){
 		printf("Error en apertura de archivo de reporte para el GPS\n");
 		perror("Causa:");
 		free(fd);
@@ -315,13 +303,18 @@ void *gps_writeFile(void* arg){
 
 	while(reading){
 	    printf("Dentro del loop\n");
-	    getline(&line,&size,fd);
-	    printf("Char: %s\n",line);
-
-	    if(gps_parser(line)){
-	    	printf("Error al procesar la información obtenida del GPS. (gps_robocol -> gps_writeFile)\n");
-	    }
-	    
+	    s=getline(&line,&size,fd);
+	    printf("SIZE: %d\n",(int)s );
+	    if(s>20){
+	    	printf("Char: %s\n",line);
+		    if(gps_parser(line)){
+		    	printf("Error al procesar la información obtenida del GPS. (gps_robocol -> gps_writeFile)\n");
+		    }
+		}else{
+			printf("Nada que leer\n");
+		}
+	    printf("LATIDUD DESPUES DE PARSER: %f\n",gps_device.latitude );
+	    printf("\n--------------------------------------------------------\n");
 	}
 
 
