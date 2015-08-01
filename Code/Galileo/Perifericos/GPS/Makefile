@@ -10,7 +10,7 @@ CFLAGS=-I../UART \
        -I../../MISC
 
 #Objetos de los cuales depende la compilación de los ejecutables SPI
-_OBJ = uart_robocol$(LEXT)\
+_OBJ = terminal_robocol$(LEXT)\
        misc_robocol$(LEXT)\
        gps_robocol$(LEXT)
 

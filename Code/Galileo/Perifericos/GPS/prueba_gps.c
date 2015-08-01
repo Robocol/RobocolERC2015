@@ -4,7 +4,7 @@ int main(){
 
 	gps_build("/home/german/GitHub/RobocolERC2015/Code/Galileo/Perifericos/GPS/gps.log");
 	gps_start();
-	sleep(10);
+	sleep(2);
 	printf("Stopping\n");
 	gps_stop();
 
@@ -12,6 +12,8 @@ int main(){
 	gps_getData(&datos);
 
 	printf("%f\n",datos.latitude );
+
+	gps_reportFile();
 
 	return 0;	
 }

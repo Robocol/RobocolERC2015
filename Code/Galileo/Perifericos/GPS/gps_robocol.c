@@ -65,7 +65,11 @@ multiplexores, referirse al esquema de conexión de los GPIO para la Intel Galil
 /* ===================================================================*/
 gps_st gps_build(char* ruta){
 	gps_device.ruta=ruta;
-	reading = FALSE;
+	gps_reading = FALSE;
+	if(term_open(&gps_term,"/dev/ttyS0","/dev/ttyS0")){
+		printf("Error en term_open.(gps_robocol -> gps_build)\n");
+		return 1;
+	}
 }
 
 /*
@@ -79,7 +83,7 @@ gps_st gps_build(char* ruta){
 */
 /* ===================================================================*/
 gps_st gps_start(void){
-	reading=TRUE;
+	gps_reading=TRUE;
 
 	if (pthread_create(&a_thread, NULL, gps_continuousUpdate, (void *)NULL)) {
 		perror("Thread creation failed. (gps_robocol -> gps_start )");
@@ -99,7 +103,7 @@ gps_st gps_start(void){
 */
 /* ===================================================================*/
 gps_st gps_stop(void){
-	reading=FALSE;
+	gps_reading=FALSE;
 	printf("Waiting for thread to finish... (gps_robocol -> gps_start )\n");
 	if (pthread_join(a_thread, &thread_result)) {
 		perror("Thread join failed. (gps_robocol -> gps_start )");
@@ -159,7 +163,10 @@ gps_st gps_parser(char* line){
 
 	//Identificador del protocolo
 	printf("line: %s\n",line );
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 	printf("word: %s\n",word );
 
 
@@ -171,52 +178,89 @@ gps_st gps_parser(char* line){
 		return GPS_ERROR;
 	}
 	//Hora
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 	printf("%c%c:%c%c:%c%c\n",word[0],word[1],word[2],word[3],word[4],word[5]);
 	sprintf(gps_device.time,"%c%c:%c%c:%c%c",word[0],word[1],word[2],word[3],word[4],word[5]);
 
 
 	//status
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
+	
 	gps_device.status = word[0];
 
 	//Latitude
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 
 	gps_device.latitude=gps_parseLatitude(word);
-	if(*strsep(pline,delim)=='S'){
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
+	if(*word=='S'){
 		gps_device.latitude=(-1)*gps_device.latitude;
 	}
 
 	//Longitude
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 
 	gps_device.longitude=gps_parseLongitude(word);
-	if(*strsep(pline,delim)=='W'){
+
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
+	if(*word=='W'){
 		gps_device.longitude=(-1)*gps_device.longitude;
 	}
 
 	//Velocidad
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 	gps_device.speed=atof(word)*1.852;
 	printf("speed: %f\n", gps_device.speed);
 
 	//Track Angle
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 	gps_device.track_angle=atof(word);
 	printf("t_angle: %f\n", gps_device.track_angle);
 
 	//Date
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 	printf("date: %c%c/%c%c/%c%c\n",word[0],word[1],word[2],word[3],word[4],word[5]);
 	sprintf(gps_device.date,"%c%c/%c%c/%c%c",word[0],word[1],word[2],word[3],word[4],word[5]);
 
 	//Magnetic Deviation
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 	gps_device.mag_dev=atof(word);
 	printf("m_dev: %f\n", gps_device.mag_dev);
 
-	word = strsep(pline,delim);
+	if((word = strsep(pline,delim))==NULL){
+		printf("Error: No se encontraron mas tokens en el string. (gps_robocol -> gps_parser)\n");
+		return GPS_ERROR;
+	}
 	if(word[0]=='W'){
 		gps_device.mag_dev=(-1)*gps_device.mag_dev;
 	}
@@ -236,14 +280,11 @@ float gps_parseLatitude(char* word){
 
 	s_deg[2]='\0';
 
-	printf("s_deg%s\n", s_deg);
 	s_min=&word[2];
 
 	deg=atof(s_deg);
-	printf("deg: %f\n",deg );
 
 	min=atof(s_min);
-	printf("min: %f\n",min );
 
 	deg=deg + min/60;
 	return deg;
@@ -256,7 +297,6 @@ float gps_parseLongitude(char* word){
 	float deg=0;
 	float min=0;
 
-	printf("longitude %s\n", word);
 	strcpy(s_deg,word);
 
 	s_deg[3]='\0';
@@ -266,10 +306,8 @@ float gps_parseLongitude(char* word){
 	s_min=&word[3];
 
 	deg=atof(s_deg);
-	printf("deg: %f\n",deg );
 
 	min=atof(s_min);
-	printf("min: %f\n",min );
 
 	deg=deg+min/60;
 	return deg;
@@ -278,52 +316,66 @@ float gps_parseLongitude(char* word){
 
 /*
 ** ===================================================================
-**     Método      :  gps_writeFile
+**     Método      :  gps_continuousUpdate
 */
 /*!
 **     @resumen
-**			Lee el archivo de reporte y procesa la información en el 
-**			contenida para almacenarla en la estructura gps_device
+**			Lee el canal UART y procesa la información obtenida
+**			para almacenarla en la estructura gps_device
 */
 /* ===================================================================*/
 void *gps_continuousUpdate(void* arg){
 	size_t size=100;
-	int s=0;
-	FILE *fd = malloc(sizeof(FILE));
-	char *line=calloc(size,sizeof(char));
-	
-	printf("Archivo abierto!\n");
+	char *line=alloca(size*sizeof(char));
 
-	if((fd=fopen(UART_PATH,"r"))==NULL){
-		printf("Error en apertura de archivo de reporte para el GPS\n");
-		perror("Causa:");
-		free(fd);
-		return;
-	}
-
-	while(reading){
+	while(gps_reading){
 	    printf("Dentro del loop\n");
-	    s=getline(&line,&size,fd);
-	    printf("SIZE: %d\n",(int)s );
-	    if(s>20){
-	    	printf("Char: %s\n",line);
-		    if(gps_parser(line)){
-		    	printf("Error al procesar la información obtenida del GPS. (gps_robocol -> gps_writeFile)\n");
-		    }
-		}else{
-			printf("Nada que leer\n");
+	    
+	    if(term_readln(&gps_term,&line)){
+	    	printf("Error leyendo gps por puerto UART. (gps_robocol -> gps_continuousUpdate)\n");
+	    }
+
+		if(gps_parser(line)){
+		   	printf("Error al procesar la información obtenida del GPS. (gps_robocol -> gps_continuousUpdate)\n");
 		}
-	    printf("LATIDUD DESPUES DE PARSER: %f\n",gps_device.latitude );
+		
+	    printf("LONGITUD DESPUES DE PARSER: %f\n",gps_device.longitude );
 	    printf("\n--------------------------------------------------------\n");
 	}
 
+	free(line);
+	pthread_exit("writting stopped. (gps_robocol -> gps_writeFile )");
+}
 
-	if(fclose(fd)<0){
-		printf("Error en cierre de archivo de reporte para el GPS\n");
-		perror("Causa:");
-		free(fd);
+/*
+** ===================================================================
+**     Método      :  gps_report
+*/
+/*!
+**     @resumen
+**			Lee el canal UART y procesa la información obtenida
+**			para almacenarla en la estructura gps_device
+*/
+/* ===================================================================*/
+gps_st gps_reportFile(void){
+	FILE *fs=alloca(sizeof(FILE));
+
+	if((fs=fopen(GPS_REPORT_FILE_PATH,"w"))<0){
+		printf("Error abriendo el archivo de reporte. (gps_robocol -> gps_reportFile)\n");
+		perror(":");
+		return GPS_ERROR;
+	}
+
+
+	if(fprintf(fs,"%f,%f,%f\n", gps_device.latitude, gps_device.longitude, gps_device.speed)){
+		printf("Error abriendo el archivo de reporte. (gps_robocol -> gps_reportFile)\n");
 		return;
 	}
 
-	pthread_exit("writting stopped. (gps_robocol -> gps_writeFile )");
+	if(fclose(fs)){
+		printf("Error cerrando el archivo de reporte. (gps_robocol -> gps_reportFile)\n");
+		return GPS_ERROR;
+	}
+	return GPS_OK;
 }
+

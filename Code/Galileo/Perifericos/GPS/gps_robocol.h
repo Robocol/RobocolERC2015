@@ -52,7 +52,7 @@
 #include <stdint.h>
 #include <pthread.h>
 #include "misc_robocol.h"
-#include "uart_robocol.h"
+#include "terminal_robocol.h"
 
 /*--------------------------------------------------------------------------*/
 /*
@@ -67,18 +67,19 @@
 		float 	longitude;		//Longitud en grados. Negativo si es latitud sur, positivo de lo contrario
 		float	speed;			//Velocidad en kilometros por hora
 		float 	track_angle;	//Angulo de trayectoria respecto al norte geografico
-		float	mag_dev;	//Desviación del polo magnetico respecto al geografico
-		char	date[10];			//Fecha en formato DD/MM/AA
-		char	time[10];			//Hora en formato hh:mm:ss UTC
+		float	mag_dev;		//Desviación del polo magnetico respecto al geografico
+		char	date[10];		//Fecha en formato DD/MM/AA
+		char	time[10];		//Hora en formato hh:mm:ss UTC
 	} gps_dev;
 
-	uint8_t reading;
+	uint8_t gps_reading;
 	struct gps_dev gps_device;
+	struct term_device gps_term;
 
 #define GPS_ERROR	0x01
 #define GPS_OK 		0x00
 
-	static char UART_PATH[11]= "/dev/ttyS0";
+	static char GPS_REPORT_FILE_PATH[40]= "/home/root/gps.log";
 	//static char UART_PATH[14]= "./testGPS.log";
 	pthread_t a_thread;
 	void *thread_result;
@@ -173,4 +174,5 @@ void *gps_continuousUpdate(void* arg);
 float gps_parseLatitude(char* word);
 float gps_parseLongitude(char* word);
 
+gps_st gps_reportFile(void);
 #endif
