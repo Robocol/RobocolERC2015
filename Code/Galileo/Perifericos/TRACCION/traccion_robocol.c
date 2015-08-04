@@ -362,58 +362,56 @@ tr_st tr_spin(uint8_t dir, uint8_t arg){
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-tr_st tr_diffTurn(uint8_t dir, uint32_t arg){
+tr_st tr_diffTurn(uint8_t dir, uint8_t vp, uint32_t arg){
 
-	uint8_t prev_vp;
 
 	if(dir!=TR_TURN_LEFT && dir!=TR_TURN_RIGHT){
 		printf("La dirección ingresada no es válida. Debe utilizarse TR_TURN_LEFT o TR_TURN_RIGHT  (tr_diffTurn -> traccion_robocol.c)\n");
 		return TR_ERROR;
 	}
 
-	prev_vp=tr_device.vel_pwm;
 
 	if(dir==TR_TURN_RIGHT){
 		if(tr_device.side==TR_RIGHT_SIDE){
-			if(tr_device.vel_pwm < arg){
-				if(tr_backward(arg - tr_device.vel_pwm)){
+			if(vp < arg){
+				if(tr_backward(arg -vp)){
 					printf("Error al tratar de mover el lado derecho hacia adelante (tr_diffTurn -> traccion_robocol.c)\n");
 					return TR_ERROR;
 				}
 			}else{
-				if(tr_forward(tr_device.vel_pwm-arg)){
+				if(tr_forward(vp-arg)){
 					printf("Error al tratar de mover el lado dercho hacia atrás (tr_diffTurn -> traccion_robocol.c)\n");
 					return TR_ERROR;
 				}
 			}
 		}else{
-			if(tr_forward(tr_device.vel_pwm)){
+			if(tr_forward(vp)){
 				printf("Error al tratar de mover el lado izquierdo hacia adelante (tr_diffTurn -> traccion_robocol.c)\n");
 				return TR_ERROR;
 			}
 		}
 	}else{
 		if(tr_device.side==TR_LEFT_SIDE){
-			if(tr_device.vel_pwm < arg){
-				if(tr_backward(arg - tr_device.vel_pwm)){
+			if(vp < arg){
+				if(tr_backward(arg - vp)){
 					printf("Error al tratar de mover el lado izquierdo hacia adelante (tr_diffTurn -> traccion_robocol.c)\n");
 					return TR_ERROR;
 				}
 			}else{
-				if(tr_forward(tr_device.vel_pwm-arg)){
+				if(tr_forward(vp-arg)){
 					printf("Error al tratar de mover el lado izquierdo hacia atrás (tr_diffTurn -> traccion_robocol.c)\n");
 					return TR_ERROR;
 				}
 			}
 		}else{
-			if(tr_forward(tr_device.vel_pwm)){
+			if(tr_forward(vp)){
 				printf("Error al tratar de mover el lado derecho hacia adelante (tr_diffTurn -> traccion_robocol.c)\n");
 				return TR_ERROR;
 			}
 		}
 	}
 
-	tr_device.vel_pwm=prev_vp;
+	tr_device.vel_pwm=vp;
 	
 	return TR_OK;
 }
@@ -431,7 +429,7 @@ tr_st tr_diffTurn(uint8_t dir, uint32_t arg){
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg){
+tr_st tr_diagonalDiffTurn(uint8_t dir, uint8_t vp, uint32_t arg){
 
 	uint8_t prev_vp;
 

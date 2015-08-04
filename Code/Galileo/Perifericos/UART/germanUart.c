@@ -13,7 +13,6 @@
 size_t size;
 char* line;
 
-char c;
 
 main()
 {
@@ -25,7 +24,6 @@ main()
   while(1){
     printf("Dentro del loop\n");
     getline(&line,&size,stdin);
-    c=getchar();
     printf("Char: %s\n",line);
   }
 }

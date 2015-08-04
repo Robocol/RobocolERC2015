@@ -92,8 +92,7 @@ int main(int argc, char const *argv[]){
 
 		}else if(!strcmp(line,"x\n")){
 			printf("Deteniendo\n");
-			tr_forward(0);
-
+			tr_setVP(0);
 		}else if(!strcmp(line,"e\n")){
 			printf("Freno de Emergencia!");
 			tr_eBrake();
@@ -106,10 +105,10 @@ int main(int argc, char const *argv[]){
 				res=tr_spin(TR_TURN_LEFT, vel_pwm);	
 			}else if(giro==2){
 				printf("Giro diferencial\n");
-				res=tr_diffTurn(TR_TURN_LEFT, arg);	
+				res=tr_diffTurn(TR_TURN_LEFT, vel_pwm, arg);	
 			}else if(giro==3){
 				printf("Giro diferencial diagonal\n");
-				res=tr_diagonalDiffTurn(TR_TURN_LEFT, arg);	
+				res=tr_diagonalDiffTurn(TR_TURN_LEFT, vel_pwm, arg);	
 			}
 			if(res){
 				printf("Error girando a la izquierda\n");
@@ -122,10 +121,10 @@ int main(int argc, char const *argv[]){
 				res=tr_spin(TR_TURN_RIGHT, vel_pwm);	
 			}else if(giro==2){
 				printf("Giro diferencial\n");
-				res=tr_diffTurn(TR_TURN_RIGHT, arg);	
+				res=tr_diffTurn(TR_TURN_RIGHT, vel_pwm, arg);	
 			}else if(giro==3){
 				printf("Giro diferencial diagonal\n");
-				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, arg);	
+				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, vel_pwm, arg);	
 			}
 
 			if(res){
@@ -165,7 +164,7 @@ int main(int argc, char const *argv[]){
 
 		}else if(!strcmp(line,"diag\n")){
 			printf("Ingrese la diferencia de velocidad/pwm para el giro diferencial deseado:\n");
-			tr_diagnostico();
+			tr_diagnostico("/home/root/diagnostico.txt");
 
 		}else if(!strcmp(line,"exit\n")){
 			finished=1;

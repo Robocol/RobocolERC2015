@@ -247,7 +247,7 @@ tr_st tr_spin(uint8_t dir, uint8_t arg);
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-tr_st tr_diffTurn(uint8_t dir, uint32_t arg);
+tr_st tr_diffTurn(uint8_t dir, uint8_t vp, uint32_t arg);
 
 /*
 ** ===================================================================
@@ -261,7 +261,7 @@ tr_st tr_diffTurn(uint8_t dir, uint32_t arg);
 **          dir     	   	- Dirección de giro
 */
 /* ===================================================================*/
-tr_st tr_diagonalDiffTurn(uint8_t dir, uint32_t arg);
+tr_st tr_diagonalDiffTurn(uint8_t dir, uint8_t vp, uint32_t arg);
 
 /*
 ** ===================================================================
