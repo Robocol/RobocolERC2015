@@ -12,5 +12,6 @@
         <file alias="fantasma2">imagenes/baro2/fantasma2.png</file>
         <file alias="fantasma3">imagenes/baro2/fantasma3.png</file>
         <file alias="fantasma4">imagenes/baro2/fantasma4.png</file>
+        <file alias="flecha">imagenes/flecha.png</file>
     </qresource>
 </RCC>

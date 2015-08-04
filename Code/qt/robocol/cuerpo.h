@@ -23,6 +23,8 @@ public:
     void adelante();
     void atras();
     void parar();
+    void girarDerecha(int numeroGiro);
+    void girarIzquierda(int numeroGiro);
     ~cuerpo();
 
 private slots:

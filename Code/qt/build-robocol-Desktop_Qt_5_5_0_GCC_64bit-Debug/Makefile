@@ -57,7 +57,8 @@ SOURCES       = ../robocol/main.cpp \
 		../robocol/dialogconectar.cpp \
 		../robocol/dialog_desconectar.cpp \
 		../robocol/menu.cpp \
-		../robocol/giro.cpp qrc_rsc.cpp \
+		../robocol/giro.cpp \
+		../robocol/qmpwidget.cpp qrc_rsc.cpp \
 		moc_mainwindow.cpp \
 		moc_cuerpo.cpp \
 		moc_brazo.cpp \
@@ -65,7 +66,9 @@ SOURCES       = ../robocol/main.cpp \
 		moc_dialogconectar.cpp \
 		moc_dialog_desconectar.cpp \
 		moc_menu.cpp \
-		moc_giro.cpp
+		moc_giro.cpp \
+		moc_qmpyuvreader.cpp \
+		moc_qmpwidget.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		cuerpo.o \
@@ -76,6 +79,7 @@ OBJECTS       = main.o \
 		dialog_desconectar.o \
 		menu.o \
 		giro.o \
+		qmpwidget.o \
 		qrc_rsc.o \
 		moc_mainwindow.o \
 		moc_cuerpo.o \
@@ -84,7 +88,9 @@ OBJECTS       = main.o \
 		moc_dialogconectar.o \
 		moc_dialog_desconectar.o \
 		moc_menu.o \
-		moc_giro.o
+		moc_giro.o \
+		moc_qmpyuvreader.o \
+		moc_qmpwidget.o
 DIST          = /home/jose/Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		/home/jose/Qt/5.5/gcc_64/mkspecs/common/unix.conf \
 		/home/jose/Qt/5.5/gcc_64/mkspecs/common/linux.conf \
@@ -224,7 +230,9 @@ DIST          = /home/jose/Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		../robocol/dialogconectar.h \
 		../robocol/dialog_desconectar.h \
 		../robocol/menu.h \
-		../robocol/giro.h ../robocol/main.cpp \
+		../robocol/giro.h \
+		../robocol/qmpyuvreader.h \
+		../robocol/qmpwidget.h ../robocol/main.cpp \
 		../robocol/mainwindow.cpp \
 		../robocol/cuerpo.cpp \
 		../robocol/brazo.cpp \
@@ -233,7 +241,8 @@ DIST          = /home/jose/Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		../robocol/dialogconectar.cpp \
 		../robocol/dialog_desconectar.cpp \
 		../robocol/menu.cpp \
-		../robocol/giro.cpp
+		../robocol/giro.cpp \
+		../robocol/qmpwidget.cpp
 QMAKE_TARGET  = robocol
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = robocol
@@ -556,8 +565,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../robocol/rsc.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../robocol/mainwindow.h ../robocol/comunicacion.h ../robocol/cuerpo.h ../robocol/brazo.h ../robocol/btazo2.h ../robocol/cliente.h ../robocol/dialogconectar.h ../robocol/dialog_desconectar.h ../robocol/menu.h ../robocol/giro.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../robocol/main.cpp ../robocol/mainwindow.cpp ../robocol/cuerpo.cpp ../robocol/brazo.cpp ../robocol/btazo2.cpp ../robocol/cliente.cpp ../robocol/dialogconectar.cpp ../robocol/dialog_desconectar.cpp ../robocol/menu.cpp ../robocol/giro.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../robocol/mainwindow.h ../robocol/comunicacion.h ../robocol/cuerpo.h ../robocol/brazo.h ../robocol/btazo2.h ../robocol/cliente.h ../robocol/dialogconectar.h ../robocol/dialog_desconectar.h ../robocol/menu.h ../robocol/giro.h ../robocol/qmpyuvreader.h ../robocol/qmpwidget.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../robocol/main.cpp ../robocol/mainwindow.cpp ../robocol/cuerpo.cpp ../robocol/brazo.cpp ../robocol/btazo2.cpp ../robocol/cliente.cpp ../robocol/dialogconectar.cpp ../robocol/dialog_desconectar.cpp ../robocol/menu.cpp ../robocol/giro.cpp ../robocol/qmpwidget.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../robocol/mainwindow.ui ../robocol/cuerpo.ui ../robocol/brazo.ui ../robocol/btazo2.ui ../robocol/dialogconectar.ui ../robocol/dialog_desconectar.ui ../robocol/menu.ui ../robocol/giro.ui $(DISTDIR)/
 
 
@@ -591,15 +600,16 @@ qrc_rsc.cpp: ../robocol/rsc.qrc \
 		../robocol/imagenes/baro2/fantasma2.png \
 		../robocol/imagenes/baro2/rosado.png \
 		../robocol/imagenes/baro2/fantasma3.png \
+		../robocol/imagenes/flecha.png \
 		../robocol/imagenes/llantaI.png \
 		../robocol/imagenes/Interfaz.png \
 		../robocol/imagenes/Antena.png \
 		../robocol/imagenes/llantaD.png
 	/home/jose/Qt/5.5/gcc_64/bin/rcc -name rsc ../robocol/rsc.qrc -o qrc_rsc.cpp
 
-compiler_moc_header_make_all: moc_mainwindow.cpp moc_cuerpo.cpp moc_brazo.cpp moc_btazo2.cpp moc_dialogconectar.cpp moc_dialog_desconectar.cpp moc_menu.cpp moc_giro.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_cuerpo.cpp moc_brazo.cpp moc_btazo2.cpp moc_dialogconectar.cpp moc_dialog_desconectar.cpp moc_menu.cpp moc_giro.cpp moc_qmpyuvreader.cpp moc_qmpwidget.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp moc_cuerpo.cpp moc_brazo.cpp moc_btazo2.cpp moc_dialogconectar.cpp moc_dialog_desconectar.cpp moc_menu.cpp moc_giro.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_cuerpo.cpp moc_brazo.cpp moc_btazo2.cpp moc_dialogconectar.cpp moc_dialog_desconectar.cpp moc_menu.cpp moc_giro.cpp moc_qmpyuvreader.cpp moc_qmpwidget.cpp
 moc_mainwindow.cpp: /home/jose/Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
@@ -1522,13 +1532,346 @@ moc_giro.cpp: /home/jose/Qt/5.5/gcc_64/include/QtWidgets/QDialog \
 		../robocol/giro.h
 	/home/jose/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/jose/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/jose/Documentos/RobocolERC2015/Code/qt/robocol -I/home/jose/Qt/5.5/gcc_64/include -I/home/jose/Qt/5.5/gcc_64/include/QtWebKitWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWebKit -I/home/jose/Qt/5.5/gcc_64/include/QtGui -I/home/jose/Qt/5.5/gcc_64/include/QtNetwork -I/home/jose/Qt/5.5/gcc_64/include/QtCore -I. ../robocol/giro.h -o moc_giro.cpp
 
-compiler_moc_source_make_all:
+moc_qmpyuvreader.cpp: /home/jose/Qt/5.5/gcc_64/include/QtGui/QImage \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qline.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDir \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdir.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfileinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QMutex \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QThread \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qthread.h \
+		../robocol/qmpyuvreader.h
+	/home/jose/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/jose/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/jose/Documentos/RobocolERC2015/Code/qt/robocol -I/home/jose/Qt/5.5/gcc_64/include -I/home/jose/Qt/5.5/gcc_64/include/QtWebKitWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWebKit -I/home/jose/Qt/5.5/gcc_64/include/QtGui -I/home/jose/Qt/5.5/gcc_64/include/QtNetwork -I/home/jose/Qt/5.5/gcc_64/include/QtCore -I. ../robocol/qmpyuvreader.h -o moc_qmpyuvreader.cpp
+
+moc_qmpwidget.cpp: /home/jose/Qt/5.5/gcc_64/include/QtCore/QHash \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QPointer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QTimer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasictimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QWidget \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qline.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qset.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../robocol/qmpwidget.h
+	/home/jose/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/jose/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/jose/Documentos/RobocolERC2015/Code/qt/robocol -I/home/jose/Qt/5.5/gcc_64/include -I/home/jose/Qt/5.5/gcc_64/include/QtWebKitWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWebKit -I/home/jose/Qt/5.5/gcc_64/include/QtGui -I/home/jose/Qt/5.5/gcc_64/include/QtNetwork -I/home/jose/Qt/5.5/gcc_64/include/QtCore -I. ../robocol/qmpwidget.h -o moc_qmpwidget.cpp
+
+compiler_moc_source_make_all: qmpwidget.moc
 compiler_moc_source_clean:
+	-$(DEL_FILE) qmpwidget.moc
+qmpwidget.moc: /home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAbstractSlider \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qline.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qset.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/QKeyEvent \
+		/home/jose/Qt/5.5/gcc_64/include/QtNetwork/QLocalSocket \
+		/home/jose/Qt/5.5/gcc_64/include/QtNetwork/qlocalsocket.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtNetwork/qabstractsocket.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/QPainter \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpainter.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QProcess \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qprocess.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QStringList \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QTemporaryFile \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtemporaryfile.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QThread \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qthread.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QtDebug \
+		../robocol/qmpwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QHash \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QPointer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QTimer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasictimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QWidget \
+		../robocol/qmpyuvreader.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/QImage \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDir \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdir.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfileinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QMutex \
+		../robocol/qmpwidget.cpp
+	/home/jose/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/jose/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/jose/Documentos/RobocolERC2015/Code/qt/robocol -I/home/jose/Qt/5.5/gcc_64/include -I/home/jose/Qt/5.5/gcc_64/include/QtWebKitWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWebKit -I/home/jose/Qt/5.5/gcc_64/include/QtGui -I/home/jose/Qt/5.5/gcc_64/include/QtNetwork -I/home/jose/Qt/5.5/gcc_64/include/QtCore -I. ../robocol/qmpwidget.cpp -o qmpwidget.moc
+
 compiler_uic_make_all: ui_mainwindow.h ui_cuerpo.h ui_brazo.h ui_btazo2.h ui_dialogconectar.h ui_dialog_desconectar.h ui_menu.h ui_giro.h
 compiler_uic_clean:
 	-$(DEL_FILE) ui_mainwindow.h ui_cuerpo.h ui_brazo.h ui_btazo2.h ui_dialogconectar.h ui_dialog_desconectar.h ui_menu.h ui_giro.h
-ui_mainwindow.h: ../robocol/mainwindow.ui \
-		/home/jose/Qt/5.5/gcc_64/include/QtWebKitWidgets/QWebView
+ui_mainwindow.h: ../robocol/mainwindow.ui
 	/home/jose/Qt/5.5/gcc_64/bin/uic ../robocol/mainwindow.ui -o ui_mainwindow.h
 
 ui_cuerpo.h: ../robocol/cuerpo.ui
@@ -1558,7 +1901,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_rcc_clean compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean compiler_moc_source_clean compiler_uic_clean 
 
 ####### Compile
 
@@ -1835,6 +2178,59 @@ mainwindow.o: ../robocol/mainwindow.cpp ../robocol/mainwindow.h \
 		../robocol/btazo2.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QGraphicsPixmapItem \
 		ui_mainwindow.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLayout \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QMenu \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qmenu.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QMenuBar \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qmenubar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QPlainTextEdit \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qplaintextedit.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtextedit.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextdocument.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qabstracttextdocumentlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qglyphrun.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qrawfont.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfontdatabase.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QScrollArea \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QSpacerItem \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QStatusBar \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstatusbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QTabWidget \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QToolBar \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtoolbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QToolBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtoolbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QSize \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDebug \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDateTime \
@@ -1846,6 +2242,10 @@ mainwindow.o: ../robocol/mainwindow.cpp ../robocol/mainwindow.h \
 		../robocol/dialog_desconectar.h \
 		../robocol/menu.h \
 		../robocol/giro.h \
+		../robocol/qmpwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QHash \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QPointer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpointer.h \
 		../robocol/cliente.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../robocol/mainwindow.cpp
 
@@ -1975,6 +2375,36 @@ cuerpo.o: ../robocol/cuerpo.cpp ../robocol/cuerpo.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/QPen \
 		../robocol/comunicacion.h \
 		ui_cuerpo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLCDNumber \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlcdnumber.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLabel \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QPushButton \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDebug \
 		../robocol/cliente.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cuerpo.o ../robocol/cuerpo.cpp
@@ -2094,7 +2524,37 @@ brazo.o: ../robocol/brazo.cpp ../robocol/brazo.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QGraphicsScene \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QGraphicsPixmapItem \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgraphicsitem.h \
-		ui_brazo.h
+		ui_brazo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o brazo.o ../robocol/brazo.cpp
 
 btazo2.o: ../robocol/btazo2.cpp ../robocol/btazo2.h \
@@ -2213,6 +2673,39 @@ btazo2.o: ../robocol/btazo2.cpp ../robocol/btazo2.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QGraphicsPixmapItem \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgraphicsitem.h \
 		ui_btazo2.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QDial \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdial.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QSlider \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDebug \
 		../robocol/cliente.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o btazo2.o ../robocol/btazo2.cpp
@@ -2390,7 +2883,56 @@ dialogconectar.o: ../robocol/dialogconectar.cpp ../robocol/dialogconectar.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
-		ui_dialogconectar.h
+		ui_dialogconectar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QDialogButtonBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLabel \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLineEdit \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlineedit.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextcursor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextformat.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QWidget
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dialogconectar.o ../robocol/dialogconectar.cpp
 
 dialog_desconectar.o: ../robocol/dialog_desconectar.cpp ../robocol/dialog_desconectar.h \
@@ -2498,6 +3040,54 @@ dialog_desconectar.o: ../robocol/dialog_desconectar.cpp ../robocol/dialog_descon
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
 		ui_dialog_desconectar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QCheckBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qcheckbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QDialogButtonBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QGroupBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgroupbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLabel \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dialog_desconectar.o ../robocol/dialog_desconectar.cpp
 
@@ -2606,6 +3196,49 @@ menu.o: ../robocol/menu.cpp ../robocol/menu.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
 		ui_menu.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QDialogButtonBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QGridLayout \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QRadioButton \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qradiobutton.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDebug \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/QKeyEvent
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o menu.o ../robocol/menu.cpp
@@ -2714,8 +3347,187 @@ giro.o: ../robocol/giro.cpp ../robocol/giro.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
-		ui_giro.h
+		ui_giro.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qicon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QDialogButtonBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QGridLayout \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QRadioButton \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qradiobutton.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o giro.o ../robocol/giro.cpp
+
+qmpwidget.o: ../robocol/qmpwidget.cpp /home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAbstractSlider \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmargins.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qrect.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsize.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpalette.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qcolor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qrgb.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qbrush.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qregion.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qline.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtransform.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qimage.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfont.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qcursor.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qevent.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qset.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qurl.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfile.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/QKeyEvent \
+		/home/jose/Qt/5.5/gcc_64/include/QtNetwork/QLocalSocket \
+		/home/jose/Qt/5.5/gcc_64/include/QtNetwork/qlocalsocket.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtNetwork/qabstractsocket.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/QPainter \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpainter.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qtextoption.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/qpen.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QProcess \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qprocess.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QStringList \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QTemporaryFile \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtemporaryfile.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QThread \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qthread.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QtDebug \
+		../robocol/qmpwidget.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QHash \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QPointer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qpointer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QTimer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasictimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QWidget \
+		../robocol/qmpyuvreader.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/QImage \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDir \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qdir.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qfileinfo.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QMutex \
+		qmpwidget.moc
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qmpwidget.o ../robocol/qmpwidget.cpp
 
 qrc_rsc.o: qrc_rsc.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_rsc.o qrc_rsc.cpp
@@ -2743,6 +3555,12 @@ moc_menu.o: moc_menu.cpp
 
 moc_giro.o: moc_giro.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_giro.o moc_giro.cpp
+
+moc_qmpyuvreader.o: moc_qmpyuvreader.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_qmpyuvreader.o moc_qmpyuvreader.cpp
+
+moc_qmpwidget.o: moc_qmpwidget.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_qmpwidget.o moc_qmpwidget.cpp
 
 ####### Install
 

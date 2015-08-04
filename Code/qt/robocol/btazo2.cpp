@@ -12,6 +12,25 @@ btazo2::btazo2(QWidget *parent) :
     scene = new QGraphicsScene(0,0,618,498);
     ui->grafico->setScene(scene);
 
+    flechaBase = new QGraphicsPixmapItem;
+    QPixmap fl("://flecha");
+    flechaBase->setPixmap(fl);
+    flechaBase->setTransformOriginPoint(128,128);
+    flechaBase->setPos(493-100,373-100);
+    flechaBase->setScale(0.3);
+    scene->addItem(flechaBase);
+    angulo_flecha_bace = 45;
+    flechaBase->setRotation(angulo_flecha_bace);
+
+    flechaMuneca = new QGraphicsPixmapItem;
+    flechaMuneca->setPixmap(fl);
+    flechaMuneca->setTransformOriginPoint(128,128);
+    flechaMuneca->setPos(493-200,373-100);
+    flechaMuneca->setScale(0.3);
+    scene->addItem(flechaMuneca);
+    angulo_flecha_muneca = 45;
+    flechaMuneca->setRotation(angulo_flecha_muneca);
+
     bace =new QGraphicsPixmapItem;
     QPixmap ba("://amarillo");
     bace->setPixmap(ba);
@@ -189,7 +208,7 @@ void btazo2::enviarPosicion(char *ip, int estado, int a1, int a2, int a3)
 void btazo2::enviarPosicion2(char *ip)
 {
     int sfd = conectarServidor(ip);
-    QString comando = QString("mover/brazo/normal/%1/%2/%3").arg(-angulo_rojo).arg(-angulo_rosado).arg(-angulo_azul);
+    QString comando = QString("mover/brazo/%1/%2/%3/%4/a/%5").arg(-angulo_rojo).arg(-angulo_rosado).arg(-angulo_azul).arg(angulo_flecha_bace).arg(angulo_flecha_muneca);
     QByteArray ba = comando.toLocal8Bit();
     const char* linea = ba.data();
     enviarComando((char*)linea,sfd);

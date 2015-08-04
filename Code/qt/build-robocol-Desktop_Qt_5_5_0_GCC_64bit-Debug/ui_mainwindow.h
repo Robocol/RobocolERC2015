@@ -10,7 +10,6 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtWebKitWidgets/QWebView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
@@ -43,6 +42,7 @@ public:
     QAction *actionMansar_Fecha;
     QAction *actionMandar_fecha;
     QAction *actionComando;
+    QAction *actionCamara;
     QWidget *centralWidget;
     QToolBox *toolBox;
     QWidget *page;
@@ -67,8 +67,6 @@ public:
     QWidget *contenedorCuerpo;
     QWidget *tab_4;
     QWidget *contenedorBrazo;
-    QWidget *tab_2;
-    QWebView *webView;
     QMenuBar *menuBar;
     QMenu *menuStart;
     QMenu *menuAcciones;
@@ -96,6 +94,8 @@ public:
         actionMandar_fecha->setObjectName(QStringLiteral("actionMandar_fecha"));
         actionComando = new QAction(MainWindow);
         actionComando->setObjectName(QStringLiteral("actionComando"));
+        actionCamara = new QAction(MainWindow);
+        actionCamara->setObjectName(QStringLiteral("actionCamara"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         toolBox = new QToolBox(centralWidget);
@@ -206,13 +206,6 @@ public:
         contenedorBrazo->setObjectName(QStringLiteral("contenedorBrazo"));
         contenedorBrazo->setGeometry(QRect(0, 0, 621, 501));
         tabWidget_2->addTab(tab_4, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QStringLiteral("tab_2"));
-        webView = new QWebView(tab_2);
-        webView->setObjectName(QStringLiteral("webView"));
-        webView->setGeometry(QRect(0, 0, 621, 491));
-        webView->setUrl(QUrl(QStringLiteral("http://admin@157.253.235.209/videostream.cgi?user=admin")));
-        tabWidget_2->addTab(tab_2, QString());
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -237,12 +230,13 @@ public:
         menuStart->addAction(actionEstado_actual);
         menuAcciones->addAction(actionMandar_fecha);
         menuAcciones->addAction(actionComando);
+        menuAcciones->addAction(actionCamara);
 
         retranslateUi(MainWindow);
 
         toolBox->setCurrentIndex(4);
         Inferior->setCurrentIndex(0);
-        tabWidget_2->setCurrentIndex(0);
+        tabWidget_2->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -259,6 +253,7 @@ public:
         actionMansar_Fecha->setText(QApplication::translate("MainWindow", "Mandar_fecha", 0));
         actionMandar_fecha->setText(QApplication::translate("MainWindow", "Mandar_fecha", 0));
         actionComando->setText(QApplication::translate("MainWindow", "comando", 0));
+        actionCamara->setText(QApplication::translate("MainWindow", "camara", 0));
         toolBox->setItemText(toolBox->indexOf(page), QApplication::translate("MainWindow", "Motor 1", 0));
         toolBox->setItemText(toolBox->indexOf(page_3), QApplication::translate("MainWindow", "Motor 2", 0));
         toolBox->setItemText(toolBox->indexOf(Motor3), QApplication::translate("MainWindow", "Motor 3", 0));
@@ -266,7 +261,6 @@ public:
         Inferior->setTabText(Inferior->indexOf(tab), QApplication::translate("MainWindow", "Consola", 0));
         tabWidget_2->setTabText(tabWidget_2->indexOf(tab_3), QApplication::translate("MainWindow", "Chasis", 0));
         tabWidget_2->setTabText(tabWidget_2->indexOf(tab_4), QApplication::translate("MainWindow", "Brazo", 0));
-        tabWidget_2->setTabText(tabWidget_2->indexOf(tab_2), QApplication::translate("MainWindow", "Camara1", 0));
         menuStart->setTitle(QApplication::translate("MainWindow", "Inicio", 0));
         menuAcciones->setTitle(QApplication::translate("MainWindow", "Acciones", 0));
     } // retranslateUi

@@ -14,6 +14,7 @@
 #include "dialog_desconectar.h"
 #include "menu.h"
 #include "giro.h"
+#include "qmpwidget.h"
 
 #include"cliente.h"
 
@@ -31,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ventanaCuerpo = new cuerpo(ui->contenedorCuerpo);
     ventanaBrazo = new btazo2(ui->contenedorBrazo);
+
+
+
     ui->contenedorCuerpo->resize(622,528);
     ui->scrollArea->installEventFilter(this);
     QFile file("in.txt");
@@ -53,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionDesconectar,SIGNAL(triggered()),this,SLOT(desconectar()));
     connect(ui->actionMandar_fecha,SIGNAL(triggered()),this,SLOT(mandarFecha()));
     connect(ui->actionComando,SIGNAL(triggered()),this,SLOT(comando()));
+    connect(ui->actionCamara,SIGNAL(triggered()),this,SLOT(camara()));
 
 
     //inicializacion de la estructura de estados
@@ -66,6 +71,11 @@ MainWindow::MainWindow(QWidget *parent) :
     //timer->start(2000);
 
 
+}
+
+void MainWindow::camara()
+{
+    system("mplayer -user admin -passwd 12345 rtsp://10.5.5.105:554//Streaming/Channels/1");
 }
 
 /**
@@ -141,6 +151,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
                 sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
                 enviarComando("c/1",sfd2);
+                numGiro = 1;
                 break;
             case 2:
                 sfd = conectarServidor(IP_LLANTAS_DERECHA);
@@ -148,6 +159,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
                 sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
                 enviarComando("c/2",sfd2);
+                numGiro = 2;
                 break;
             case 3:
                 sfd = conectarServidor(IP_LLANTAS_DERECHA);
@@ -155,6 +167,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
                 sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
                 enviarComando("c/3",sfd2);
+                numGiro=3;
                 break;
             default:
                 break;
@@ -170,10 +183,21 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             ventanaCuerpo->adelante();
         }
 
-        //letra vvv
+        //letra v
         if(event->key()==86)
         {
             ventanaCuerpo->atras();
+        }
+        //lentra u
+        if(event->key()==85)
+        {
+            ventanaCuerpo->girarDerecha(numGiro);
+        }
+
+        //lentra q
+        if(event->key()==81)
+        {
+            ventanaCuerpo->girarIzquierda(numGiro);
         }
 
         //letra l. mandar a 0 velocidad
@@ -199,6 +223,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
 
     }
+
     else if(funcion==1)
     {
         //letra v o b

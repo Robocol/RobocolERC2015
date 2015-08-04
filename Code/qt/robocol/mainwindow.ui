@@ -261,7 +261,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -296,26 +296,6 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Camara1</string>
-     </attribute>
-     <widget class="QWebView" name="webView">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>621</width>
-        <height>491</height>
-       </rect>
-      </property>
-      <property name="url">
-       <url>
-        <string>http://admin@157.253.235.209/videostream.cgi?user=admin</string>
-       </url>
-      </property>
-     </widget>
-    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -342,6 +322,7 @@
     </property>
     <addaction name="actionMandar_fecha"/>
     <addaction name="actionComando"/>
+    <addaction name="actionCamara"/>
    </widget>
    <addaction name="menuStart"/>
    <addaction name="menuAcciones"/>
@@ -395,15 +376,13 @@
     <string>comando</string>
    </property>
   </action>
+  <action name="actionCamara">
+   <property name="text">
+    <string>camara</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

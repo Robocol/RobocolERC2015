@@ -57,6 +57,8 @@ private:
     QGraphicsPixmapItem* rojo;
     QGraphicsPixmapItem* rosado;
     QGraphicsPixmapItem* azul;
+    QGraphicsPixmapItem* flechaBase;
+    QGraphicsPixmapItem* flechaMuneca;
 
     QGraphicsPixmapItem* bace_fantasma;
     QGraphicsPixmapItem* rojo_fantasma;
@@ -75,6 +77,8 @@ private:
     int angulo_rojo;
     int angulo_rosado;
     int angulo_azul;
+    int angulo_flecha_bace;
+    int angulo_flecha_muneca;
 
     int angulo_rojo_fantasma;
     int angulo_rosado_fantasma;

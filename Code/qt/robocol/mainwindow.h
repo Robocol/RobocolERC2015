@@ -42,6 +42,7 @@ private slots:
     void mandarFecha();
     void slotTimer();
     void comando();
+    void camara();
 
 
 private:
@@ -59,6 +60,7 @@ private:
     static const int ERROR_RECUPERACION = 4;
 
     QTimer *timer;
+    int numGiro;
 
 
 protected:
