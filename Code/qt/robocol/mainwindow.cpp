@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
     cursor = ui->plainTextEdit->textCursor();
     qDebug() << cursor.columnNumber();
 
+    fino = 0;
+
     // conexion de los votones de menu con el mundo
     connect(ui->actionEstado_actual,SIGNAL(triggered()),this,SLOT(estadoActual()));
     connect(ui->actionConectar_2,SIGNAL(triggered()),this,SLOT(conectar()));
@@ -279,10 +281,31 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         //letra y
         if(event->key()==89)
         {
-            ventanaBrazo->enviarPosicion2(IP_LLANTAS_DERECHA);
+            ventanaBrazo->enviarPosicion2(IP_BRAZO);
             ui->plainTextEdit->insertPlainText("Angulos enviado\n");
             ui->plainTextEdit->insertPlainText("Mensage>> ");
         }
+        //letra w movimiento fino hacia arriva
+        if(event->key()==87 && fino!=0)
+        {
+            qDebug()<<"envio comando1";
+            int sfd = conectarServidor(IP_BRAZO);
+            QString comando = QString("mover/brazo/fino/%1/1").arg(fino);
+            QByteArray ba = comando.toLocal8Bit();
+            const char* linea = ba.data();
+            enviarComando((char*)linea,sfd);
+        }
+        //letra s movimieno fino hacia abajo
+        if(event->key()==83 && fino!=0)
+        {
+            qDebug()<<"envio comando2";
+            int sfd = conectarServidor(IP_BRAZO);
+            QString comando = QString("mover/brazo/fino/%1/0").arg(fino);
+            QByteArray ba = comando.toLocal8Bit();
+            const char* linea = ba.data();
+            enviarComando((char*)linea,sfd);
+        }
+
     }
 
 
@@ -405,25 +428,26 @@ void MainWindow::conectar()
         break;
     }
 
-    //   retorno = conectarServidores(IP_BRAZO);
-    //   switch (retorno) {
-    //   case -1:
-    //       qDebug()<<"no se pudo conectar a brazo";
-    //       break;
-    //   case -2:
-    //       qDebug()<<"no se pudo enviar comando a brazo";
-    //       break;
-    //   case -3:
-    //       qDebug()<<"no se pudo recibir respuesta de brazo";
-    //       break;
-    //   default:
-    //       estado.brazo=retorno;
-    //       break;
-    //   }
+    retorno = conectarServidores(IP_BRAZO);
+    switch (retorno) {
+    case -1:
+        qDebug()<<"no se pudo conectar a brazo";
+        break;
+    case -2:
+        qDebug()<<"no se pudo enviar comando a brazo";
+        break;
+    case -3:
+        qDebug()<<"no se pudo recibir respuesta de brazo";
+        break;
+    default:
+        estado.brazo=retorno;
+        break;
+    }
 
     DialogConectar diag;
     diag.cambiarDer(estado.llantas_der);
     diag.cambiarIzq(estado.llantas_izq);
+    diag.cambiarBrazo(estado.brazo);
     diag.setModal(true);
     diag.exec();
 
@@ -504,6 +528,17 @@ void MainWindow::mandarFecha()
     qDebug()<<respuesta;
     enviarComando((char*)linea,sfd2);
     cerrarConexion(sfd2);
+
+
+    //mandar fecha al servidor 2
+    int sfd3 = conectarServidor(IP_BRAZO);
+    enviarComando("fecha",sfd3);
+    char LenStr3[INT_LEN];
+    readLine(sfd, LenStr3, INT_LEN);
+    respuesta = LenStr3;
+    qDebug()<<respuesta;
+    enviarComando((char*)linea,sfd3);
+    cerrarConexion(sfd3);
 }
 
 /**
@@ -574,3 +609,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+void MainWindow::on_comboBox_currentIndexChanged(int index)
+{
+    fino = index;
+    qDebug()<<fino;
+}

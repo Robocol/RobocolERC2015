@@ -208,7 +208,7 @@ void btazo2::enviarPosicion(char *ip, int estado, int a1, int a2, int a3)
 void btazo2::enviarPosicion2(char *ip)
 {
     int sfd = conectarServidor(ip);
-    QString comando = QString("mover/brazo/%1/%2/%3/%4/a/%5").arg(-angulo_rojo).arg(-angulo_rosado).arg(-angulo_azul).arg(angulo_flecha_bace).arg(angulo_flecha_muneca);
+    QString comando = QString("mover/brazo/auto/%1/%2/%3/%4/a/%5").arg(-angulo_rojo).arg(-angulo_rosado).arg(-angulo_azul).arg(angulo_flecha_bace).arg(angulo_flecha_muneca);
     QByteArray ba = comando.toLocal8Bit();
     const char* linea = ba.data();
     enviarComando((char*)linea,sfd);

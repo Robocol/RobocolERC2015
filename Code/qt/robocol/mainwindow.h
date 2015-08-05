@@ -45,6 +45,8 @@ private slots:
     void camara();
 
 
+    void on_comboBox_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     cuerpo *ventanaCuerpo;
@@ -61,6 +63,7 @@ private:
 
     QTimer *timer;
     int numGiro;
+    int fino;
 
 
 protected:

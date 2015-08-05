@@ -13,7 +13,9 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
@@ -43,6 +45,11 @@ public:
     QAction *actionMandar_fecha;
     QAction *actionComando;
     QAction *actionCamara;
+    QAction *actionHombro;
+    QAction *actionAnteBrazo;
+    QAction *actionMuneca;
+    QAction *actionBace;
+    QAction *actionGarra;
     QWidget *centralWidget;
     QToolBox *toolBox;
     QWidget *page;
@@ -57,6 +64,10 @@ public:
     QLineEdit *rosado;
     QSpacerItem *verticalSpacer_2;
     QLineEdit *azul;
+    QWidget *widget;
+    QVBoxLayout *verticalLayout_2;
+    QLabel *label;
+    QComboBox *comboBox;
     QTabWidget *Inferior;
     QWidget *tab;
     QScrollArea *scrollArea;
@@ -67,11 +78,11 @@ public:
     QWidget *contenedorCuerpo;
     QWidget *tab_4;
     QWidget *contenedorBrazo;
+    QToolBar *mainToolBar;
+    QStatusBar *statusBar;
     QMenuBar *menuBar;
     QMenu *menuStart;
     QMenu *menuAcciones;
-    QToolBar *mainToolBar;
-    QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -96,6 +107,16 @@ public:
         actionComando->setObjectName(QStringLiteral("actionComando"));
         actionCamara = new QAction(MainWindow);
         actionCamara->setObjectName(QStringLiteral("actionCamara"));
+        actionHombro = new QAction(MainWindow);
+        actionHombro->setObjectName(QStringLiteral("actionHombro"));
+        actionAnteBrazo = new QAction(MainWindow);
+        actionAnteBrazo->setObjectName(QStringLiteral("actionAnteBrazo"));
+        actionMuneca = new QAction(MainWindow);
+        actionMuneca->setObjectName(QStringLiteral("actionMuneca"));
+        actionBace = new QAction(MainWindow);
+        actionBace->setObjectName(QStringLiteral("actionBace"));
+        actionGarra = new QAction(MainWindow);
+        actionGarra->setObjectName(QStringLiteral("actionGarra"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         toolBox = new QToolBox(centralWidget);
@@ -164,6 +185,24 @@ public:
 
         verticalLayout->addWidget(azul);
 
+        widget = new QWidget(page_4);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(10, 190, 151, 52));
+        verticalLayout_2 = new QVBoxLayout(widget);
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        label = new QLabel(widget);
+        label->setObjectName(QStringLiteral("label"));
+
+        verticalLayout_2->addWidget(label);
+
+        comboBox = new QComboBox(widget);
+        comboBox->setObjectName(QStringLiteral("comboBox"));
+
+        verticalLayout_2->addWidget(comboBox);
+
         toolBox->addItem(page_4, QStringLiteral("Brazo"));
         Inferior = new QTabWidget(centralWidget);
         Inferior->setObjectName(QStringLiteral("Inferior"));
@@ -207,6 +246,12 @@ public:
         contenedorBrazo->setGeometry(QRect(0, 0, 621, 501));
         tabWidget_2->addTab(tab_4, QString());
         MainWindow->setCentralWidget(centralWidget);
+        mainToolBar = new QToolBar(MainWindow);
+        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
+        MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
+        statusBar = new QStatusBar(MainWindow);
+        statusBar->setObjectName(QStringLiteral("statusBar"));
+        MainWindow->setStatusBar(statusBar);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 833, 25));
@@ -215,12 +260,6 @@ public:
         menuAcciones = new QMenu(menuBar);
         menuAcciones->setObjectName(QStringLiteral("menuAcciones"));
         MainWindow->setMenuBar(menuBar);
-        mainToolBar = new QToolBar(MainWindow);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
-        MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
-        statusBar = new QStatusBar(MainWindow);
-        statusBar->setObjectName(QStringLiteral("statusBar"));
-        MainWindow->setStatusBar(statusBar);
 
         menuBar->addAction(menuStart->menuAction());
         menuBar->addAction(menuAcciones->menuAction());
@@ -254,9 +293,25 @@ public:
         actionMandar_fecha->setText(QApplication::translate("MainWindow", "Mandar_fecha", 0));
         actionComando->setText(QApplication::translate("MainWindow", "comando", 0));
         actionCamara->setText(QApplication::translate("MainWindow", "camara", 0));
+        actionHombro->setText(QApplication::translate("MainWindow", "Hombro", 0));
+        actionAnteBrazo->setText(QApplication::translate("MainWindow", "AnteBrazo", 0));
+        actionMuneca->setText(QApplication::translate("MainWindow", "Muneca", 0));
+        actionBace->setText(QApplication::translate("MainWindow", "Bace", 0));
+        actionGarra->setText(QApplication::translate("MainWindow", "Garra", 0));
         toolBox->setItemText(toolBox->indexOf(page), QApplication::translate("MainWindow", "Motor 1", 0));
         toolBox->setItemText(toolBox->indexOf(page_3), QApplication::translate("MainWindow", "Motor 2", 0));
         toolBox->setItemText(toolBox->indexOf(Motor3), QApplication::translate("MainWindow", "Motor 3", 0));
+        label->setText(QApplication::translate("MainWindow", "Movimiento fino", 0));
+        comboBox->clear();
+        comboBox->insertItems(0, QStringList()
+         << QApplication::translate("MainWindow", "null", 0)
+         << QApplication::translate("MainWindow", "Brazo", 0)
+         << QApplication::translate("MainWindow", "Ante brazo", 0)
+         << QApplication::translate("MainWindow", "Mu\303\261eca", 0)
+         << QApplication::translate("MainWindow", "Bace", 0)
+         << QApplication::translate("MainWindow", "Garra", 0)
+         << QApplication::translate("MainWindow", "Jiro garra", 0)
+        );
         toolBox->setItemText(toolBox->indexOf(page_4), QApplication::translate("MainWindow", "Brazo", 0));
         Inferior->setTabText(Inferior->indexOf(tab), QApplication::translate("MainWindow", "Consola", 0));
         tabWidget_2->setTabText(tabWidget_2->indexOf(tab_3), QApplication::translate("MainWindow", "Chasis", 0));
