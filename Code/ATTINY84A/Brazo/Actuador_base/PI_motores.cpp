@@ -50,6 +50,7 @@
 #define CAMBIAR_PWM	0x0A
 #define DAR_ESTADO	0x0B
 #define MEDIR_TEMP	0x0C
+#define MOVER_PASO  0x0D
 
 //Valores a transmitir por SPI que no contienen información propiamente
 #define ACK_galileo	0xAA
@@ -111,6 +112,7 @@ uint8_t tempAct;
 
 // Ciclo útil
 uint8_t PWM=0;
+uint8_t tiempoPasito=0;
 
 // Registro de buffer de entrada:
 // Los bytes de entrada son guardados en este byte hasta que la transferencia
@@ -516,6 +518,9 @@ void control_parser(){
 	int8_t error;
 	if(parsear){
 		switch (encabezado){
+			case MOVER_PASO:
+			tiempoPasito=argumento;
+			break;
 			case MEDIR_CORRIENTE:
 			//control_getActualCurrent();
 			spi_put(curAct);
@@ -590,6 +595,14 @@ ISR(USI_OVF_vect)
 	sei();
 }
 
+void control_darPasito(){
+	uint8_t time;
+	pwm_set(127);
+	for(time=0;time<tiempoPasito;time++);
+	pwm_set(0);
+	tiempoPasito=0;
+}
+
 int main(void) {
 	int error_posicion=0;
 	int16_t error_corriente=0;
@@ -601,6 +614,9 @@ int main(void) {
 	spi_initslave(0);
 	pwm_set(0);
 	ESTADO=MANUAL_EST;
+	
+	uint8_t tiempoAnt=0;
+	unsigned char toggle=0;
 
 	sei();
 	while (1) {
@@ -664,8 +680,16 @@ int main(void) {
 
 			break;
 		case MANUAL_EST:
-			gpio_put(LED_PIN,1);
 			pwm_set(PWM);
+			control_getActualCurrent();
+			control_getActualPosition();
+			control_getTemp();
+			if(tiempoPasito!=tiempoAnt){
+				control_darPasito();
+				gpio_put(LED_PIN, toggle);
+				toggle=!toggle;
+				tiempoAnt=tiempoPasito;
+			}
 			break;
 		case FAIL_EST:
 			gpio_put(LED_PIN,0);
