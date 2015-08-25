@@ -401,6 +401,7 @@ int configurar_fecha(char* fecha_hora){
 ** ===================================================================*/
 int parser_comandos(char* comando, int cfd){
 	char str[18];
+	char line_gps[100];
 	rover_status status = NC;
 	/* Si hay una peticion de conectar */
 	if(strcmp(comando,"conectar\n")==0){ //Comando que retorna el estado de la tarjeta y pasa a estado SAFE
@@ -411,7 +412,27 @@ int parser_comandos(char* comando, int cfd){
 		logMessage("Paso a estado Safe");
 
 		//Imprime el status en la variable str
+		
+
 		sprintf(str, "%u", status);
+		if(escribir_respuesta(str,cfd)==-1){
+			logMessage("Error al responder");
+			return -1;
+		}
+
+	}else if(memcmp(comando,"gps",3)==0){ //Comando que retorna el estado de la tarjeta y pasa a estado SAFE
+		logMessage("Llego el comando GPS");
+
+		//Cambia el estado de la Galileo
+		status=SAFE;
+		logMessage("Paso a estado Safe");
+		gps_report(line_gps);
+		printf("Line: %s\n", line_gps );
+
+		gps_device.latitude+=0.000034;
+		gps_device.longitude+=0.000019;
+		//Imprime el status en la variable str
+		sprintf(str, line_gps);
 		if(escribir_respuesta(str,cfd)==-1){
 			logMessage("Error al responder");
 			return -1;
@@ -494,6 +515,7 @@ int parser_comandos_mov(char* comando, int cfd){
 	char* 	direccion;
 	char* 	s_velocidad;
 	uint8_t	velocidad;
+	uint8_t	velocidad2;
 	char* 	angulo1;
 	char* 	angulo2;
 	char* 	angulo3;
@@ -583,11 +605,15 @@ int parser_comandos_mov(char* comando, int cfd){
 				logMessage("Giro sobre el eje\n");
 				res=tr_spin(TR_TURN_RIGHT, velocidad);	
 			}else if(giro==2){
+				s_velocidad = strtok(NULL, "/");
+				velocidad2=atoi(s_velocidad);
 				logMessage("Giro diferencial\n");
-				res=tr_diffTurn(TR_TURN_RIGHT, velocidad);	
+				res=tr_diffTurn(TR_TURN_RIGHT, velocidad,velocidad2);	
 			}else if(giro==3){
+				s_velocidad = strtok(NULL, "/");
+				velocidad2=atoi(s_velocidad);
 				logMessage("Giro diferencial diagonal\n");
-				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, velocidad);
+				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, velocidad, velocidad2);
 			}
 			if(res){
 				printf("Error girando a la derecha\n");
@@ -604,11 +630,15 @@ int parser_comandos_mov(char* comando, int cfd){
 				logMessage("Giro sobre el eje\n");
 				res=tr_spin(TR_TURN_LEFT, velocidad);	
 			}else if(giro==2){
+				s_velocidad = strtok(NULL, "/");
+				velocidad2=atoi(s_velocidad);				
 				logMessage("Giro diferencial\n");
-				res=tr_diffTurn(TR_TURN_LEFT, velocidad);	
+				res=tr_diffTurn(TR_TURN_LEFT, velocidad, velocidad2);	
 			}else if(giro==3){
+				s_velocidad = strtok(NULL, "/");
+				velocidad2=atoi(s_velocidad);				
 				logMessage("Giro diferencial diagonal\n");
-				res=tr_diagonalDiffTurn(TR_TURN_LEFT, velocidad);	
+				res=tr_diagonalDiffTurn(TR_TURN_LEFT, velocidad, velocidad2);	
 			}
 			if(res){
 				logMessage("Error girando a la izquierda\n");
@@ -650,7 +680,7 @@ int parser_comandos_mov(char* comando, int cfd){
 			printf("Estado a %d\n",velocidad);
 			if(tr_setCtlState(velocidad)){
 				logMessage("Error en tr_setCtlState");
-				return -1;
+				return -1; 
 			}
 
 		}else if(!strcmp(direccion,"a")){
@@ -758,7 +788,7 @@ int parser_comandos_diag(char* comando, int cfd){
 		close(fd);
 	}else if(strcmp(parte,"traccion\n")==0){
 		logMessage("Se va a diagnosticar la traccion");
-		if (tr_diagnostico()){
+		if (tr_diagnostico("/home/root/diagnostico.txt")){
 			logMessage("Error en el diagnóstico de tracción");
 			return -1;
 		}

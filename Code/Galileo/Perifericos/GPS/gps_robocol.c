@@ -64,12 +64,13 @@ multiplexores, referirse al esquema de conexión de los GPIO para la Intel Galil
 */
 /* ===================================================================*/
 gps_st gps_build(char* ruta){
-	gps_device.ruta=ruta;
 	gps_reading = FALSE;
 	if(term_open(&gps_term,"/dev/ttyS0","/dev/ttyS0")){
 		printf("Error en term_open.(gps_robocol -> gps_build)\n");
 		return 1;
 	}
+	gps_device.latitude=4.7539505;
+	gps_device.longitude=-74.0657646;
 }
 
 /*
@@ -357,25 +358,13 @@ void *gps_continuousUpdate(void* arg){
 **			para almacenarla en la estructura gps_device
 */
 /* ===================================================================*/
-gps_st gps_reportFile(void){
-	FILE *fs=alloca(sizeof(FILE));
+gps_st gps_report(char *line){
 
-	if((fs=fopen(GPS_REPORT_FILE_PATH,"w"))<0){
+	if(sprintf(line,"%f,%f,%f", gps_device.latitude, gps_device.longitude, gps_device.speed)<0){
 		printf("Error abriendo el archivo de reporte. (gps_robocol -> gps_reportFile)\n");
-		perror(":");
 		return GPS_ERROR;
 	}
-
-
-	if(fprintf(fs,"%f,%f,%f\n", gps_device.latitude, gps_device.longitude, gps_device.speed)){
-		printf("Error abriendo el archivo de reporte. (gps_robocol -> gps_reportFile)\n");
-		return;
-	}
-
-	if(fclose(fs)){
-		printf("Error cerrando el archivo de reporte. (gps_robocol -> gps_reportFile)\n");
-		return GPS_ERROR;
-	}
+	
 	return GPS_OK;
 }
 

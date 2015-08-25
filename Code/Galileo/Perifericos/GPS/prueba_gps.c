@@ -2,9 +2,10 @@
 
 int main(){
 
+	char *line = malloc(100*sizeof(char));
 	gps_build("/home/german/GitHub/RobocolERC2015/Code/Galileo/Perifericos/GPS/gps.log");
 	gps_start();
-	sleep(2);
+	sleep(10);
 	printf("Stopping\n");
 	gps_stop();
 
@@ -13,7 +14,8 @@ int main(){
 
 	printf("%f\n",datos.latitude );
 
-	gps_reportFile();
+	gps_report(line);
+	printf("%s\n", line );
 
 	return 0;	
 }

@@ -15,12 +15,16 @@ int32_t position,status,config=0;
 uint8_t step,ocd,tval;
 uint8_t alarm,corr,debug;
 int32_t buf,buf2;
+uint8_t selected=1;
 double fbuf;
 
 debug=0x5A;
 
 printf("----------Prueba Driver Stepper----------\n");
 stp_device dev1;
+stp_device dev2;
+stp_device dev3;
+
 dev1.pin_cs=PIN7;
 dev1.pin_dir=PIN5;
 dev1.pin_stndby=1;
@@ -31,9 +35,36 @@ dev1.gear_ratio=15;
 dev1.step=7;
 dev1.period=5000;
 
+dev1.pin_cs=PIN7;
+dev1.pin_dir=PIN5;
+dev1.pin_stndby=1;
+dev1.pin_flag=0;
+dev1.exp=EXP2;
+dev1.pin_pwm=3;
+dev1.gear_ratio=15;
+dev1.step=7;
+dev1.period=5000;
+
+dev3.pin_cs=PIN8;
+dev3.pin_dir=PIN4;
+dev3.pin_pwm=6;
+dev3.exp=EXP2
+dev3.gear_ratio=14.9;
+dev3.step=0;	
+dev3.pin_stndby=PINE3;
+dev3.pin_flag=PINE5;
+dev3.period=5000;
+
+
 printf("Pin del stepper_device para chip select de Spi: %d\n",dev1.pin_cs);
 if(stp_build(&dev1)){
-	printf("Error en la construccion de stepper\n" );
+	printf("Error en la construccion de stepper1\n" );
+}
+if(stp_build(&dev2)){
+	printf("Error en la construccion de stepper2\n" );
+}
+if(stp_build(&dev3)){
+	printf("Error en la construccion de stepper3\n" );
 }
 printf("Tras construccion de stepper\n");
 printf("Pin del stepper_device para chip select de Spi: %d\n",(*dev1.spi).pin);
@@ -43,7 +74,32 @@ printf("Pin del stepper_device para chip select de Spi: %d\n",(*dev1.spi).pin);
 
 
 
-devptr=&dev1;
+while(selected){
+
+	printf("Bienvenido al test de funcionamiento de Steppers (URC 2015-ROBOCOL).\n "
+		"Seleccione el motor con el cual desea trabajar:\n"
+		"\t1\tSelecciona el stp1\n"
+		"\t2\tSelecciona el stp2\n"
+		"\t3\tSelecciona el stp3\n");
+	printf("Ingrese el numero del stp\n");
+	getline(&line,&size,stdin);
+	printf("El comando ingresado fue: %s \n",line);
+	if(!strcmp(line,"1\n")){
+		devptr=&dev1;
+		printf("Stepper 1 seleccionado\n");
+		selected=0;
+	}else if (!strcmp(line,"2\n")){
+		devptr=&dev2;
+		printf("Stepper 2 seleccionado\n");
+		selected=0;
+	}else if (!strcmp(line,"3\n")){
+		devptr=&dev3;
+		printf("Stepper 3 seleccionado\n");
+		selected=0;
+	}else{
+		printf("Numero de Stepper ingresado no valido.\n");
+	}
+}
 
 if(stp_master_disable(devptr)){
 	printf("Error en Master Disable inicial\n");
@@ -240,6 +296,25 @@ while(1){
 		}else if(!strcmp(line,"cero\n")){
 			printf("Volviendo a casa:\n");
 			stp_returnToZero(devptr);
+		}else if(!strcmp(line,"stp\n")){
+			printf("Ingrese el numero del stp\n");
+			getline(&line,&size,stdin);
+			printf("El comando ingresado fue: %s \n",line);
+			if(!strcmp(line,"1\n")){
+				devptr=&dev1;
+				printf("Stepper 1 seleccionado\n");
+				selected=0;
+			}else if (!strcmp(line,"2\n")){
+				devptr=&dev2;
+				printf("Stepper 2 seleccionado\n");
+				selected=0;
+			}else if (!strcmp(line,"3\n")){
+				devptr=&dev3;
+				printf("Stepper 3 seleccionado\n");
+				selected=0;
+			}else{
+				printf("Numero de Stepper ingresado no valido.\n");
+			}
 		}else{
 		printf("Bienvenido al test de funcionamiento de Puente H (ERC 2015-ROBOCOL).\n Utilice una de los siguientes comandos:\n" 
 				"\t master-enable\t\t\t-Habilita el stepper\n"

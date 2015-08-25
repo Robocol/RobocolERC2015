@@ -10,7 +10,18 @@ int main(int argc, char *argv[]) {
 	char* comando_filtrado;
 	char* comando_analizar;
 	char* param1_comando;
+	char* gps_line=malloc(60*sizeof(char));
 	uint8_t estado;
+
+
+	gps_build("/home/german/GitHub/RobocolERC2015/Code/Galileo/Perifericos/GPS/gps.log");
+	// gps_start();
+	// sleep(2);
+	// printf("Stopping\n");
+	// gps_stop();
+
+	gps_report(gps_line);
+	printf("%s\n",gps_line );
 	
 	if (argc==2)
 	{
@@ -39,9 +50,9 @@ int main(int argc, char *argv[]) {
 	tr_setCtlState(TR_AUTO);
 
 	/* El proceso se convierte en un demonio */
-	if(becomeDaemon(0) == -1){
-		printf("\nEl proceso del servidor no pudo volverse un demonio\n");
-	}
+	// if(becomeDaemon(0) == -1){
+	// 	printf("\nEl proceso del servidor no pudo volverse un demonio\n");
+	// }
 	
 	logOpen(LOG_FILE);
 	
