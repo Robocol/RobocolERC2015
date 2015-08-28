@@ -1,0 +1,13 @@
+if [[ $1 = "f" ]]; then
+	./client 10.5.5.103 f $2
+	./client 10.5.5.102 f $2
+elif [[ $1 = "b" ]]; then
+	./client 10.5.5.103 b $2
+	./client 10.5.5.102 b $2
+else
+	echo "Comando no valido"
+fi
+
+
+	#statements
+#echo "End of the commands"

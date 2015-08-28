@@ -601,10 +601,10 @@ int parser_comandos_mov(char* comando, int cfd){
 			logMessage("girar derecha");
 			logMessage("Velocidad: %d",velocidad);						
 
-			if(giro==1){
-				logMessage("Giro sobre el eje\n");
-				res=tr_spin(TR_TURN_RIGHT, velocidad);	
-			}else if(giro==2){
+			//if(giro==1){
+			logMessage("Giro sobre el eje\n");
+			res=tr_spin(TR_TURN_RIGHT, velocidad);	
+			/*}else if(giro==2){
 				s_velocidad = strtok(NULL, "/");
 				velocidad2=atoi(s_velocidad);
 				logMessage("Giro diferencial\n");
@@ -614,7 +614,8 @@ int parser_comandos_mov(char* comando, int cfd){
 				velocidad2=atoi(s_velocidad);
 				logMessage("Giro diferencial diagonal\n");
 				res=tr_diagonalDiffTurn(TR_TURN_RIGHT, velocidad, velocidad2);
-			}
+			}*/
+				
 			if(res){
 				printf("Error girando a la derecha\n");
 			}
