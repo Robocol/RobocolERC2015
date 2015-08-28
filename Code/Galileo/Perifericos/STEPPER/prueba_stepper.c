@@ -35,24 +35,24 @@ dev1.gear_ratio=15;
 dev1.step=7;
 dev1.period=5000;
 
-dev1.pin_cs=PIN7;
-dev1.pin_dir=PIN5;
-dev1.pin_stndby=1;
-dev1.pin_flag=0;
-dev1.exp=EXP2;
-dev1.pin_pwm=3;
-dev1.gear_ratio=15;
-dev1.step=7;
-dev1.period=5000;
+dev2.pin_cs=PIN8;
+dev2.pin_dir=PIN4;
+dev2.pin_pwm=6;
+dev2.exp=EXP2
+dev2.gear_ratio=14.9;
+dev2.step=0;	
+dev2.pin_stndby=PINE3;
+dev2.pin_flag=PINE5;
+dev2.period=5000;
 
-dev3.pin_cs=PIN8;
-dev3.pin_dir=PIN4;
-dev3.pin_pwm=6;
-dev3.exp=EXP2
-dev3.gear_ratio=14.9;
-dev3.step=0;	
-dev3.pin_stndby=PINE3;
-dev3.pin_flag=PINE5;
+dev3.pin_cs=PIN7;
+dev3.pin_dir=PIN5;
+dev3.pin_stndby=1;
+dev3.pin_flag=0;
+dev3.exp=EXP2;
+dev3.pin_pwm=3;
+dev3.gear_ratio=15;
+dev3.step=7;
 dev3.period=5000;
 
 

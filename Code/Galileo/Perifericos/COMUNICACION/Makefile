@@ -11,21 +11,25 @@ CFLAGS=-I../I2C \
        -I../SPI \
        -I../../MISC\
        -I../PH\
+       -I../UART\
+       -I../GPS\
        -I../TRACCION\
        -I../COMUNICACION
 
 #Objetos de los cuales depende la compilación de los ejecutables PH
 _OBJ = spi_robocol$(LEXT) \
        i2c_robocol$(LEXT) \
+       terminal_robocol$(LEXT) \
        gpio_robocol$(LEXT)\
        ph_robocol$(LEXT) \
+       gps_robocol$(LEXT)\
        traccion_robocol$(LEXT)\
        misc_robocol$(LEXT)\
        servidor_robocol$(LEXT)
-
 _OBJ2= spi_robocol$(LEXT) \
        i2c_robocol$(LEXT) \
        gpio_robocol$(LEXT)\
+       gps_robocol$(LEXT)\
        ph_robocol$(LEXT) \
        traccion_robocol$(LEXT)\
        misc_robocol$(LEXT)
@@ -43,9 +47,9 @@ OBJ2= $(patsubst %,$(ODIR)/%,$(_OBJ2))
 all: test_servidor servidor_no_lib
 #Regla de compilación de ejecutable para prueba del driver
 test_servidor: $(OBJ)
-	$(CC) -o $@$(EEXT) test_servidor.c $^ $(CFLAGS)
+	$(CC) -o $@$(EEXT) test_servidor.c $^ $(CFLAGS) -lpthread
 
 servidor_no_lib: $(OBJ2)
-	$(CC) -o $@$(EEXT) servidor_no_lib.c $^ $(CFLAGS)
+	$(CC) -o $@$(EEXT) servidor_no_lib.c $^ $(CFLAGS) -lpthread
 
 include ../Makefile
