@@ -49,6 +49,9 @@ all: test_servidor servidor_no_lib
 test_servidor: $(OBJ)
 	$(CC) -o $@$(EEXT) test_servidor.c $^ $(CFLAGS) -lpthread
 
+wSafety:$(OBJ)
+	$(CC) -o $@$(EEXT) wSafety.c $^ $(CFLAGS) -lpthread
+
 servidor_no_lib: $(OBJ2)
 	$(CC) -o $@$(EEXT) servidor_no_lib.c $^ $(CFLAGS) -lpthread
 

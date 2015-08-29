@@ -618,6 +618,7 @@ int parser_comandos_mov(char* comando, int cfd){
 				
 			if(res){
 				printf("Error girando a la derecha\n");
+				logMessage("Error girando a la derecha\n");
 			}
 
 			/*TODO Comandos para girar a la derecha */
@@ -627,10 +628,10 @@ int parser_comandos_mov(char* comando, int cfd){
 			logMessage("Velocidad: %d",velocidad);
 
 			/*TODO Comandos para girar a la izquierda */
-			if(giro==1){
-				logMessage("Giro sobre el eje\n");
-				res=tr_spin(TR_TURN_LEFT, velocidad);	
-			}else if(giro==2){
+			//if(giro==1){
+			logMessage("Giro sobre el eje\n");
+			res=tr_spin(TR_TURN_LEFT, velocidad);	
+			/*}else if(giro==2){
 				s_velocidad = strtok(NULL, "/");
 				velocidad2=atoi(s_velocidad);				
 				logMessage("Giro diferencial\n");
@@ -641,10 +642,11 @@ int parser_comandos_mov(char* comando, int cfd){
 				logMessage("Giro diferencial diagonal\n");
 				res=tr_diagonalDiffTurn(TR_TURN_LEFT, velocidad, velocidad2);	
 			}
+			*/
 			if(res){
+				printf("Error girando a la derecha\n");
 				logMessage("Error girando a la izquierda\n");
-				return -1;
-			}			
+			}		
 
 		}else if(strcmp(direccion,"c")==0){
 
@@ -839,4 +841,13 @@ int parser_comandos_diag(char* comando, int cfd){
 
 	return 0;
 
+}
+
+
+int ignoreSigpipe(void){
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR){
+	    logMessage("Fail ignoring SIGPIPE ");
+	    return -1;
+	}
+	return 0;
 }

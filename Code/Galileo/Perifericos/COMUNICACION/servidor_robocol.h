@@ -92,3 +92,4 @@ int configurar_fecha(char* fecha_hora);
 int parser_comandos(char* comando, int cfd);
 int parser_comandos_mov(char* comando, int cfd);
 int parser_comandos_diag(char* comando, int cfd);
+int ignoreSigpipe(void);
