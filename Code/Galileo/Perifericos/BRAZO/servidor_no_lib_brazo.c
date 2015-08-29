@@ -817,6 +817,16 @@ int parser_comandos_mov(char* comando, int cfd){
 			logMessage("Pinza (A:Abierto; C:Cerrado): %s",garra);
 			supinacion = strtok(NULL, "/");
 			logMessage("Supinacion: %s",supinacion);
+
+			posicionCentral.ang_motor=base;
+			posicionCentral.ang_b_actuator=elevacion_hombro;
+			posicionCentral.ang_u_actuator=antebrazo;
+			posicionCentral.ang_sup=supinacion;
+			posicionCentral.ang_wrist=elevacion_munheca;
+			posicionCentral.ang_claw=garra;
+
+
+			arm_moveToPos(posicionCentral,0);
 		
 			//TODO: Se mueven todos los grados del brazo
 

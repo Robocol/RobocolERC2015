@@ -39,8 +39,8 @@ arm_st arm_build(void){
 	// (*wrist).pin_stndby=PINE0;
 	// (*wrist).pin_flag=PINE1;
 	
-	(*wrist).pin_cs=PIN7;
-	(*wrist).pin_dir=PIN5;
+	(*wrist).pin_cs=PINA3;
+	(*wrist).pin_dir=PIN2;
 	(*wrist).pin_stndby=PINE1;
 	(*wrist).pin_flag=0;
 	(*wrist).exp=EXP2;
@@ -92,6 +92,7 @@ arm_st arm_build(void){
 	(*claw).period=5000;
 
 
+	posicionA.ang_motor=0;
 	posicionA.ang_motor=0;
 	posicionA.ang_b_actuator=0;
 	posicionA.ang_u_actuator=-30;
@@ -410,12 +411,12 @@ arm_st arm_moveUActToAngle(int8_t angle){
 **          angle    	   	- Ángulo objetivo.
 */
 /* ===================================================================*/
-arm_st arm_moveSupToAngle(int8_t angle){
+arm_st arm_moveWristToAngle(int8_t angle){
 	//return stp_moveToAngle((*armdev).sup,angle);
 
 	int32_t 	curr_ang,degrees;
 	int32_t		t;
-	stp_device* dev=(*armdev).sup;
+	stp_device* dev=(*armdev).wrist;
 	uint8_t 	step=((*dev).step>4)? 4 : (*dev).step;
 	uint32_t	goal_pos=(int)(degrees*pow(2,step)*((*dev).gear_ratio)/1.8);
 
@@ -511,17 +512,61 @@ arm_st arm_moveToPos(arm_pos posicion, uint8_t delay){
 		st=ARM_ERROR;
 	}
 
-	// if(arm_moveWristToAngle(posicion.ang_sup)){
-	// 	printf("Error llevando el Supinador a la posición\n");
-	//	st=ARM_ERROR;
-	// }
+	if(arm_moveWristToAngle(posicion.ang_sup)){
+	 	printf("Error llevando el Supinador a la posición\n");
+		st=ARM_ERROR;
+	}
 
-	// if(arm_moveClawToAngle(posicion.ang_sup)){
-	// 	printf("Error llevando el Supinador a la posición\n");
-	//	st=ARM_ERROR;
-	// }
+	if(arm_moveClawToAngle(posicion.ang_sup)){
+	 	printf("Error llevando el Supinador a la posición\n");
+		st=ARM_ERROR;
+	}
 
 	return st;
 }
+
+arm_st arm_report(char *line){
+
+	int32_t 	sup_ang,wrist_ang,u_pos,b_pos,m_pos,adc_pos;
+	stp_device* dev=(*armdev).sup;
+
+	if(stp_getAngularPosition(dev,&sup_ang)){
+		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+		return ARM_ERROR;
+	}
+
+	dev=(*armdev).wrist;
+	if(stp_getAngularPosition(dev,&wrist_ang)){
+		printf("Error getting current position. (stepper_robocol.c>stp_relative_displacement)\n");
+		return ARM_ERROR;
+	}
+
+	if(ph_getVelocidad((*armdev).u_actuator, &adc_pos)){
+		printf("Error al obtener posición. (ph_robocol.c -> ph_move_to_angle)\n");
+		return ARM_ERROR;
+	}
+	u_pos=(int)(adc_pos*0.9569325 - 162.298373);
+
+	if(ph_getVelocidad((*armdev).b_actuator, &curr_pos)){
+		printf("Error al obtener posición. (ph_robocol.c -> ph_move_to_angle)\n");
+		return ARM_ERROR;
+	}
+	b_pos=(int)(adc_pos*0.84236 - 134.62112);
+
+
+	if(ph_getVelocidad((*armdev).b_actuator, &curr_pos)){
+		printf("Error al obtener posición. (ph_robocol.c -> ph_move_to_angle)\n");
+		return ARM_ERROR;
+	}
+	m_pos=(int)(adc_pos*0.84236 - 134.62112);
+
+
+	if(sprintf(line,"%d/%d/%d/%d/%d", m_poa, b_pos, u_pos, sup_angle, wrist_angle)<0){
+		printf("Error abriendo el archivo de reporte. (gps_robocol -> gps_reportFile)\n");
+		return ARM_ERROR;
+	}
+
+}
+
 
 
