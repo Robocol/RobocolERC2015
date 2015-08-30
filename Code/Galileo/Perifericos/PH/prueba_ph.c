@@ -24,12 +24,38 @@ int main(){
 	printf("----------Prueba Driver Puente H----------\n");
 
 
-	ph_dev dev1={PINA0,0,1,4};
+/*	ph_dev dev1={PINA0,0,1,4};
 	dev1.addr=EXP1;
 	ph_dev dev2={PINA1,2,3,4};
-	dev2.addr=EXP1;
-	ph_build(&dev1);
-	ph_build(&dev2);
+	dev2.addr=EXP1;*/
+	ph_dev* dev1=malloc(sizeof(ph_dev));
+	ph_dev* dev2=malloc(sizeof(ph_dev));
+	ph_dev* dev3=malloc(sizeof(ph_dev));
+
+	(*dev1).pin_cs=PINA0;
+	(*dev1).pin_in_a=PINE0;
+	(*dev1).pin_in_b=PINE1;
+	(*dev1).pin_enable=PINE4;
+	(*dev1).addr=EXP1;
+
+	(*dev2).pin_cs=PINA1;
+	(*dev2).pin_in_a=PINE2;
+	(*dev2).pin_in_b=PINE3;
+	(*dev2).pin_enable=PINE4;
+	(*dev2).addr=EXP1;
+
+	(*dev3).pin_cs=PINA2;
+	(*dev3).pin_in_a=PINE5;
+	(*dev3).pin_in_b=PINE6;
+	(*dev3).pin_enable=PINE7;
+	(*dev3).addr=EXP1;
+
+
+	ph_build(dev1);
+	ph_build(dev2);
+	ph_build(dev3);
+
+
 
 
 	while(selected){
@@ -37,17 +63,22 @@ int main(){
 		printf("Bienvenido al test de funcionamiento de Puente H (URC 2015-ROBOCOL).\n "
 			"Seleccione el motor con el cual desea trabajar:\n"
 			"\t1\tSelecciona el motor1\n"
-			"\t2\tSelecciona el motor2\n");
+			"\t2\tSelecciona el motor2\n"
+			"\t3\tSelecciona el motor3\n");
 		printf("Ingrese el numero del motor\n");
 		getline(&line,&size,stdin);
 		printf("El comando ingresado fue: %s \n",line);
 		if(!strcmp(line,"1\n")){
-			devptr=&dev1;
+			devptr=dev1;
 			printf("Motor 1 seleccionado\n");
 			selected=0;
 		}else if (!strcmp(line,"2\n")){
-			devptr=&dev2;
+			devptr=dev2;
 			printf("Motor 2 seleccionado\n");
+			selected=0;
+		}else if (!strcmp(line,"3\n")){
+			devptr=dev3;
+			printf("Motor 3 seleccionado\n");
 			selected=0;
 		}else{
 			printf("Numero de motor ingresado no valido.\n");
@@ -208,11 +239,14 @@ int main(){
 				buf=atoi(line);
 				printf("Cambiando Motor a: %d \n",buf);
 				if(buf==1){
-					devptr=&dev1;
+					devptr=dev1;
+					printf("%d\n", (*devptr).pin_in_b);
+				}else if(buf==2){
+					devptr=dev2;
 					printf("%d\n", (*devptr).pin_in_b);
 				}else{
-					devptr=&dev2;
-					printf("%d\n", (*devptr).pin_in_b);
+					devptr=dev3;
+					printf("%d\n", (*devptr).pin_in_b);					
 				}
 
 			}else if(!strcmp(line,"exit\n")){

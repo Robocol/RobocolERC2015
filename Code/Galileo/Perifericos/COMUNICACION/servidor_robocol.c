@@ -851,3 +851,73 @@ int ignoreSigpipe(void){
 	}
 	return 0;
 }
+
+int wsafety_thread(void){
+	printf("Inside wsafety\n");
+	uint8_t i;
+	wsfty_connfail=0;
+
+	if (pthread_create(&ws_thread, NULL, cmd_wsfty, (void *)NULL)) {
+		printf("Error en creación de thread\n");
+		logMessage("[wsafety_thread] Thread creation failed. )");
+		return 1;
+	}
+
+	return 0;
+}
+
+
+void *cmd_wsfty(void* arg){
+	FILE *shell;
+	uint8_t count=0;
+	char buff[512];
+	const char *failSentence="received, 100";
+
+	logMessage("================[cmd_wsfty]================");
+	while(1){
+		if (!wsfty_connfail)
+		{
+			if(!(shell = popen("ping -c 10 10.5.5.1", "r"))){
+				logMessage("[cmd_wsfty]Could not open the shell pipe.");
+				break;
+			}
+
+
+			if(fgets(buff, sizeof(buff), shell)==NULL){
+				logMessage("[cmd_wsfty]Error en la lectura inicial\n");
+			}
+
+			while(fgets(buff, sizeof(buff), shell)!=NULL){
+				if (count<10){
+					count++;
+				}else{
+					break;
+				}
+				
+			}
+
+			//count=0 . No connection to red handling
+			//strstr(failSentence,buff).Connection to network but not to destination host handling
+			if (count==0 || (strstr(buff,"transmitted")!=NULL)){
+				logMessage("[cmd_wsfty] DETENCIÓN DEL ROVER, FALLÓ EN LA CONEXIÓN\n");
+				if(tr_eBrake()){
+					logMessage("[cmd_wsfty]Could not set VP to zero in H bridge");
+				}else if(tr_disable()){
+					logMessage("[cmd_wsfty]Fatal Error. Could not stop the rover under connection fail.");
+				}
+				wsfty_connfail=1;
+			}else{
+				logMessage("KEEP GOING\n================[cmd_wsfty]================");
+			}
+
+			count=0;
+
+
+			if(pclose(shell)<0){
+				logMessage("Error en pclose\n");
+			}
+
+			sleep(timer_wsfty);
+		}
+	}
+}

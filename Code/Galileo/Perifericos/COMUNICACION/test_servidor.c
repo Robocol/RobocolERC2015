@@ -50,17 +50,16 @@ int main(int argc, char *argv[]) {
 	tr_setCtlState(TR_AUTO);
 
 	/* El proceso se convierte en un demonio */
-	// if(becomeDaemon(0) == -1){
-	// 	printf("\nEl proceso del servidor no pudo volverse un demonio\n");
-	// }
+	if(becomeDaemon(0) == -1){
+		printf("\nEl proceso del servidor no pudo volverse un demonio\n");
+	}
 	
 	logOpen(LOG_FILE);
 	
 
 	/* Ignore the SIGPIPE signal, so that we find out about broken connection
 	errors via a failure from write(). */
-	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR){
-	        logMessage("Fail ignoring SIGPIPE ");
+	if(ignoreSigpipe()){
 		exit(EXIT_FAILURE);
 	}
 
@@ -71,6 +70,11 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	printf("Before creation of thread.\n");
+	if(wsafety_thread()){
+		logMessage("Error Creating the wsafety_thread.");
+		printf("failed\n");
+	}
 
 	for (;;) {                  /* Loop infinito que  maneja las peticiones de los clientes */
 		logMessage("Estado de Traccion: %d",tr_device.ctl_state);
@@ -94,7 +98,10 @@ int main(int argc, char *argv[]) {
 			close(cfd);
 			logMessage("No hay fin de línea");	
 			continue;                   
-        	}
+        }
+        logMessage("wsfty_connfail=0");
+        wsfty_connfail=0;
+
 
 		/* Imprime el texto que llegó */
 		logMessage("Comando: %s",comando);
@@ -133,7 +140,6 @@ int main(int argc, char *argv[]) {
 				logMessage("No se ejecuto el comando adecuadamente");			
 		}
 
-		
 		
 	}		 
 

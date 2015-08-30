@@ -202,6 +202,22 @@ tr_st tr_enable(void){
 
 }
 
+tr_st tr_disable(void){
+
+	if(ph_disable(tr_device.front_ph)){
+		printf("Error en la habilitación del puenteH delantero.(tr_enable -> traccion_robocol.c)\n");
+		return TR_ERROR;
+	}
+
+	if (ph_disable(tr_device.back_ph)){
+		printf("Error en la habilitación del puenteH trasero.(tr_enable -> traccion_robocol.c)\n");
+		return TR_ERROR;
+	}
+
+	return TR_OK;
+
+}
+
 tr_st tr_setVP(uint8_t vp){
 	printf("Changing speed to %d (tr_setVP -> traccion_robocol.c)\n",vp);
 
