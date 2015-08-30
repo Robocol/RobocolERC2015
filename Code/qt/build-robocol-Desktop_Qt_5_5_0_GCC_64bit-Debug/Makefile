@@ -594,13 +594,14 @@ compiler_rcc_clean:
 qrc_rsc.cpp: ../robocol/rsc.qrc \
 		../robocol/imagenes/baro2/fantasma4.png \
 		../robocol/imagenes/baro2/amarillo.png \
+		../robocol/imagenes/munecaFlecha.png \
 		../robocol/imagenes/baro2/azul.png \
+		../robocol/imagenes/baseFlecha.png \
 		../robocol/imagenes/baro2/rojo.png \
 		../robocol/imagenes/baro2/fantasma1.png \
 		../robocol/imagenes/baro2/fantasma2.png \
 		../robocol/imagenes/baro2/rosado.png \
 		../robocol/imagenes/baro2/fantasma3.png \
-		../robocol/imagenes/flecha.png \
 		../robocol/imagenes/llantaI.png \
 		../robocol/imagenes/Interfaz.png \
 		../robocol/imagenes/Antena.png \
@@ -871,6 +872,9 @@ moc_cuerpo.cpp: /home/jose/Qt/5.5/gcc_64/include/QtWidgets/QWidget \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QPoint \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/QPen \
 		../robocol/comunicacion.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QTimer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasictimer.h \
 		../robocol/cuerpo.h
 	/home/jose/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/home/jose/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/jose/Documentos/RobocolERC2015/Code/qt/robocol -I/home/jose/Qt/5.5/gcc_64/include -I/home/jose/Qt/5.5/gcc_64/include/QtWebKitWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWidgets -I/home/jose/Qt/5.5/gcc_64/include/QtWebKit -I/home/jose/Qt/5.5/gcc_64/include/QtGui -I/home/jose/Qt/5.5/gcc_64/include/QtNetwork -I/home/jose/Qt/5.5/gcc_64/include/QtCore -I. ../robocol/cuerpo.h -o moc_cuerpo.cpp
 
@@ -2184,11 +2188,8 @@ mainwindow.o: ../robocol/mainwindow.cpp ../robocol/mainwindow.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
-		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
-		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
-		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
-		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
-		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QComboBox \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qcombobox.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
@@ -2199,6 +2200,13 @@ mainwindow.o: ../robocol/mainwindow.cpp ../robocol/mainwindow.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLabel \
+		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QLayout \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
@@ -2374,6 +2382,9 @@ cuerpo.o: ../robocol/cuerpo.cpp ../robocol/cuerpo.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QPoint \
 		/home/jose/Qt/5.5/gcc_64/include/QtGui/QPen \
 		../robocol/comunicacion.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/QTimer \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qtimer.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtCore/qbasictimer.h \
 		ui_cuerpo.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QVariant \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/QAction \
@@ -2406,7 +2417,8 @@ cuerpo.o: ../robocol/cuerpo.cpp ../robocol/cuerpo.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qpushbutton.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtWidgets/qabstractbutton.h \
 		/home/jose/Qt/5.5/gcc_64/include/QtCore/QDebug \
-		../robocol/cliente.h
+		../robocol/cliente.h \
+		/home/jose/Qt/5.5/gcc_64/include/QtGui/QKeyEvent
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cuerpo.o ../robocol/cuerpo.cpp
 
 brazo.o: ../robocol/brazo.cpp ../robocol/brazo.h \

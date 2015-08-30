@@ -43,6 +43,7 @@ private slots:
     void slotTimer();
     void comando();
     void camara();
+    void reporte();
 
 
     void on_comboBox_currentIndexChanged(int index);
@@ -64,6 +65,7 @@ private:
     QTimer *timer;
     int numGiro;
     int fino;
+    int ac;
 
 
 protected:

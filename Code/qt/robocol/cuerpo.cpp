@@ -2,6 +2,7 @@
 #include "ui_cuerpo.h"
 #include <QDebug>
 #include "cliente.h"
+#include <QKeyEvent>
 
 
 
@@ -31,7 +32,10 @@ cuerpo::cuerpo(QWidget *parent) :
     pwm2 = 0;
     pwm3 = 0;
     pwm4 = 0;
+
+
 }
+
 
 void cuerpo::adelante()
 {
@@ -114,56 +118,28 @@ void cuerpo::parar()
     ui->dere_inf->display(pwm4);
 }
 
-void cuerpo::girarDerecha(int numeroGiro)
+void cuerpo::girarDerecha()
 {
-        if(numeroGiro==1)
-        {
-            pwm2 = pwm2+1;
-            pwm4 = pwm4+1;
-            pwm1 = -pwm2;
-            pwm3 = -pwm4;
-            ui->izq_sup->display(pwm1);
-            ui->dere_sup->display(pwm2);
-            ui->izq_inf->display(pwm3);
-            ui->dere_inf->display(pwm4);
-            QString comando = QString("mover/traccion/d/%1").arg(pwm2);
-            QByteArray ba = comando.toLocal8Bit();
-            const char* linea = ba.data();
+    qDebug()<<"entro a giro r";
+    int sfd = conectarServidor(IP_LLANTAS_DERECHA);
+    enviarComando("mover/traccion/r/220/0",sfd);
+    cerrarConexion(sfd);
 
-            int sfd = conectarServidor(IP_LLANTAS_DERECHA);
-            enviarComando((char*)linea,sfd);
-            cerrarConexion(sfd);
-
-            int sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
-            enviarComando((char*)linea,sfd2);
-            cerrarConexion(sfd2);
-        }
+    int sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
+    enviarComando("mover/traccion/r/220/0",sfd2);
+    cerrarConexion(sfd2);
 }
 
-void cuerpo::girarIzquierda(int numeroGiro)
+void cuerpo::girarIzquierda()
 {
-    if(numeroGiro==1)
-    {
-        pwm1 = pwm1+1;
-        pwm3 = pwm3+1;
-        pwm2 = -pwm1;
-        pwm4 = -pwm3;
-        ui->izq_sup->display(pwm1);
-        ui->dere_sup->display(pwm2);
-        ui->izq_inf->display(pwm3);
-        ui->dere_inf->display(pwm4);
-        QString comando = QString("mover/traccion/a/%1").arg(pwm3);
-        QByteArray ba = comando.toLocal8Bit();
-        const char* linea = ba.data();
+    qDebug()<<"entro a giro l";
+    int sfd = conectarServidor(IP_LLANTAS_DERECHA);
+    enviarComando("mover/traccion/l/200/0",sfd);
+    cerrarConexion(sfd);
 
-        int sfd = conectarServidor(IP_LLANTAS_DERECHA);
-        enviarComando((char*)linea,sfd);
-        cerrarConexion(sfd);
-
-        int sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
-        enviarComando((char*)linea,sfd2);
-        cerrarConexion(sfd2);
-    }
+    int sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
+    enviarComando("mover/traccion/l/200/0",sfd2);
+    cerrarConexion(sfd2);
 }
 
 cuerpo::~cuerpo()
@@ -176,3 +152,4 @@ void cuerpo::on_pushButton_clicked()
     g2+=10;
     antena->setRotation(g2);
 }
+

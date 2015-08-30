@@ -12,25 +12,29 @@ btazo2::btazo2(QWidget *parent) :
     scene = new QGraphicsScene(0,0,618,498);
     ui->grafico->setScene(scene);
 
+    // giro base y muñeca
     flechaBase = new QGraphicsPixmapItem;
-    QPixmap fl("://flecha");
+    QPixmap fl("://fbase");
     flechaBase->setPixmap(fl);
     flechaBase->setTransformOriginPoint(128,128);
     flechaBase->setPos(493-100,373-100);
     flechaBase->setScale(0.3);
     scene->addItem(flechaBase);
-    angulo_flecha_bace = 45;
+    angulo_flecha_bace = 0;
     flechaBase->setRotation(angulo_flecha_bace);
 
+
     flechaMuneca = new QGraphicsPixmapItem;
-    flechaMuneca->setPixmap(fl);
+    QPixmap fm("://fmuneca");
+    flechaMuneca->setPixmap(fm);
     flechaMuneca->setTransformOriginPoint(128,128);
     flechaMuneca->setPos(493-200,373-100);
     flechaMuneca->setScale(0.3);
     scene->addItem(flechaMuneca);
-    angulo_flecha_muneca = 45;
+    angulo_flecha_muneca = 0;
     flechaMuneca->setRotation(angulo_flecha_muneca);
 
+    //brazo
     bace =new QGraphicsPixmapItem;
     QPixmap ba("://amarillo");
     bace->setPixmap(ba);
@@ -150,15 +154,19 @@ btazo2::btazo2(QWidget *parent) :
 
 }
 
-void btazo2::set_fantasma(int red, int pink, int blue)
+void btazo2::set_fantasma(int red, int pink, int blue,int bace,int muneca)
 {
-    angulo_rojo_fantasma = red;
+    angulo_rojo_fantasma = red*-1;
     angulo_rosado_fantasma = pink;
     angulo_azul_fantasma = blue;
+    angulo_flecha_bace = bace;
+    angulo_flecha_muneca=muneca;
 
     grupoBrazo2_fantasma->setRotation(angulo_rojo_fantasma+default_rojo);
     grupoBrazo3_fantasma->setRotation(angulo_rosado_fantasma+default_rosado);
     azul_fantasma->setRotation(angulo_azul_fantasma+default_azul);
+    flechaBase->setRotation(angulo_flecha_bace);
+    flechaMuneca->setRotation(angulo_flecha_muneca);
 }
 
 void btazo2::rotarVerde(int key)

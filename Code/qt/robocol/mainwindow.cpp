@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionMandar_fecha,SIGNAL(triggered()),this,SLOT(mandarFecha()));
     connect(ui->actionComando,SIGNAL(triggered()),this,SLOT(comando()));
     connect(ui->actionCamara,SIGNAL(triggered()),this,SLOT(camara()));
+    connect(ui->actionReporte,SIGNAL(triggered()),this,SLOT(reporte()));
 
 
     //inicializacion de la estructura de estados
@@ -70,14 +71,29 @@ MainWindow::MainWindow(QWidget *parent) :
     //timer para pedir reporte
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()),this, SLOT(slotTimer()));
-    //timer->start(2000);
+    ac = 0;
 
+
+}
+
+void MainWindow::reporte()
+{
+    if(ac == 0)
+    {
+        timer->start(2000);
+        ac = 1;
+    }
+    else
+    {
+        timer->stop();
+        ac = 0;
+    }
 
 }
 
 void MainWindow::camara()
 {
-    system("mplayer -user admin -passwd 12345 rtsp://10.5.5.105:554//Streaming/Channels/1");
+    system("mplayer -user admin -passwd 12345 rtsp://10.5.5.105:554//Streaming/Channels/1 -vf mirror");
 }
 
 /**
@@ -89,25 +105,16 @@ void MainWindow::slotTimer()
     ui->plainTextEdit->insertPlainText("leer archivo brazo\nMensage>> ");
 
     // diagnostico brazo
-    int sfd = conectarServidor(IP_LLANTAS_DERECHA);
+    int sfd = conectarServidor(IP_BRAZO);
     enviarComando("diagnosticar/brazo",sfd);
-    recibirAArchivo(sfd,"brazo.txt");
-    QFile file("brazo.txt");
-    QTextStream in(&file);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        qDebug()<<"error al leer el archivo";
+    char LenStr[INT_LEN];
+    readLine(sfd, LenStr, INT_LEN);
+    QString respuesta = LenStr;
+    ui->plainTextEdit->insertPlainText(respuesta+"\n");
+    QStringList list2 = respuesta.split("/");
 
-    QString palabra = "";
-    in>>palabra;
-    QStringList list = palabra.split(":");
-    QString comando = list.at(0);
-    if(QString::compare(comando,"brazo")==0)
-    {
-        QStringList list2 = list.at(1).split(",");
-        ventanaBrazo->set_fantasma(list2.at(0).toInt(),list2.at(1).toInt(),list2.at(2).toInt());
-    }
-
-    timer->stop();
+    ventanaBrazo->set_fantasma(list2.at(1).toInt(),list2.at(2).toInt(),list2.at(3).toInt(),list2.at(0).toInt(),list2.at(4).toInt());
+    //timer->stop();
 
 
 }
@@ -138,43 +145,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         control.exec();
         funcion=control.valor;
 
-        if(funcion==2)
-        {
-            Giro giro;
-            giro.setModal(true);
-            giro.exec();
-            int sfd;
-            int sfd2;
-
-            switch (giro.tipoGiro) {
-            case 1:
-                sfd = conectarServidor(IP_LLANTAS_DERECHA);
-                enviarComando("c/1",sfd);
-
-                sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
-                enviarComando("c/1",sfd2);
-                numGiro = 1;
-                break;
-            case 2:
-                sfd = conectarServidor(IP_LLANTAS_DERECHA);
-                enviarComando("c/2",sfd);
-
-                sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
-                enviarComando("c/2",sfd2);
-                numGiro = 2;
-                break;
-            case 3:
-                sfd = conectarServidor(IP_LLANTAS_DERECHA);
-                enviarComando("c/3",sfd);
-
-                sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
-                enviarComando("c/3",sfd2);
-                numGiro=3;
-                break;
-            default:
-                break;
-            }
-        }
     }
 
     if(funcion==2)
@@ -193,16 +163,16 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         //lentra u
         if(event->key()==85)
         {
-            ventanaCuerpo->girarDerecha(numGiro);
+            ventanaCuerpo->girarDerecha();
         }
 
         //lentra q
         if(event->key()==81)
         {
-            ventanaCuerpo->girarIzquierda(numGiro);
+            ventanaCuerpo->girarIzquierda();
         }
 
-        //letra l. mandar a 0 velocidad
+        //letra j. mandar a 0 velocidad
         if(event->key()==74)
         {
             ventanaCuerpo->parar();

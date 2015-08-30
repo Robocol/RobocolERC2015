@@ -50,6 +50,7 @@ public:
     QAction *actionMuneca;
     QAction *actionBace;
     QAction *actionGarra;
+    QAction *actionReporte;
     QWidget *centralWidget;
     QToolBox *toolBox;
     QWidget *page;
@@ -64,7 +65,7 @@ public:
     QLineEdit *rosado;
     QSpacerItem *verticalSpacer_2;
     QLineEdit *azul;
-    QWidget *widget;
+    QWidget *layoutWidget1;
     QVBoxLayout *verticalLayout_2;
     QLabel *label;
     QComboBox *comboBox;
@@ -117,6 +118,8 @@ public:
         actionBace->setObjectName(QStringLiteral("actionBace"));
         actionGarra = new QAction(MainWindow);
         actionGarra->setObjectName(QStringLiteral("actionGarra"));
+        actionReporte = new QAction(MainWindow);
+        actionReporte->setObjectName(QStringLiteral("actionReporte"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         toolBox = new QToolBox(centralWidget);
@@ -185,20 +188,20 @@ public:
 
         verticalLayout->addWidget(azul);
 
-        widget = new QWidget(page_4);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(10, 190, 151, 52));
-        verticalLayout_2 = new QVBoxLayout(widget);
+        layoutWidget1 = new QWidget(page_4);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(10, 190, 151, 52));
+        verticalLayout_2 = new QVBoxLayout(layoutWidget1);
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(widget);
+        label = new QLabel(layoutWidget1);
         label->setObjectName(QStringLiteral("label"));
 
         verticalLayout_2->addWidget(label);
 
-        comboBox = new QComboBox(widget);
+        comboBox = new QComboBox(layoutWidget1);
         comboBox->setObjectName(QStringLiteral("comboBox"));
 
         verticalLayout_2->addWidget(comboBox);
@@ -270,6 +273,7 @@ public:
         menuAcciones->addAction(actionMandar_fecha);
         menuAcciones->addAction(actionComando);
         menuAcciones->addAction(actionCamara);
+        menuAcciones->addAction(actionReporte);
 
         retranslateUi(MainWindow);
 
@@ -298,6 +302,7 @@ public:
         actionMuneca->setText(QApplication::translate("MainWindow", "Muneca", 0));
         actionBace->setText(QApplication::translate("MainWindow", "Bace", 0));
         actionGarra->setText(QApplication::translate("MainWindow", "Garra", 0));
+        actionReporte->setText(QApplication::translate("MainWindow", "reporte", 0));
         toolBox->setItemText(toolBox->indexOf(page), QApplication::translate("MainWindow", "Motor 1", 0));
         toolBox->setItemText(toolBox->indexOf(page_3), QApplication::translate("MainWindow", "Motor 2", 0));
         toolBox->setItemText(toolBox->indexOf(Motor3), QApplication::translate("MainWindow", "Motor 3", 0));
@@ -308,7 +313,7 @@ public:
          << QApplication::translate("MainWindow", "Brazo", 0)
          << QApplication::translate("MainWindow", "Ante brazo", 0)
          << QApplication::translate("MainWindow", "Mu\303\261eca", 0)
-         << QApplication::translate("MainWindow", "Bace", 0)
+         << QApplication::translate("MainWindow", "Base", 0)
          << QApplication::translate("MainWindow", "Garra", 0)
          << QApplication::translate("MainWindow", "Jiro garra", 0)
         );

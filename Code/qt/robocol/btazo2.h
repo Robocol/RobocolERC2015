@@ -32,7 +32,7 @@ public:
     void posicion_b();
     void posicion_c();
     void posicion_d();
-    void set_fantasma(int red,int pink,int blue);
+    void set_fantasma(int red, int pink, int blue, int bace, int muneca);
 
     int darRojo();
     int darRosado();

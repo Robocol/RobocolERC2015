@@ -174,7 +174,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -215,7 +215,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Bace</string>
+           <string>Base</string>
           </property>
          </item>
          <item>
@@ -390,6 +390,7 @@
     <addaction name="actionMandar_fecha"/>
     <addaction name="actionComando"/>
     <addaction name="actionCamara"/>
+    <addaction name="actionReporte"/>
    </widget>
    <addaction name="menuStart"/>
    <addaction name="menuAcciones"/>
@@ -462,6 +463,11 @@
   <action name="actionGarra">
    <property name="text">
     <string>Garra</string>
+   </property>
+  </action>
+  <action name="actionReporte">
+   <property name="text">
+    <string>reporte</string>
    </property>
   </action>
  </widget>

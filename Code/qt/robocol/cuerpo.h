@@ -9,6 +9,7 @@
 #include <QPoint>
 #include <QPen>
 #include "comunicacion.h"
+#include <QTimer>
 
 namespace Ui {
 class cuerpo;
@@ -23,9 +24,10 @@ public:
     void adelante();
     void atras();
     void parar();
-    void girarDerecha(int numeroGiro);
-    void girarIzquierda(int numeroGiro);
+    void girarDerecha();
+    void girarIzquierda();
     ~cuerpo();
+    bool oprimido;
 
 private slots:
     void on_pushButton_clicked();
@@ -46,6 +48,9 @@ private:
     int pwm2;
     int pwm3;
     int pwm4;
+    QTimer *contador;
+
+
 
 };
 
