@@ -73,6 +73,17 @@ static FILE *logfp;                 /* Log file stream */
 
 //Observar si es posible modificarlo
 static const char *LOG_FILE = "/tmp/log_servidor.log";
+//Modificar en caso de que se requiera hacer la comprobación de conexión
+// en una frecuencia diferente a 200ms.
+static const uint8_t timer_wsfty=10;
+
+static const uint8_t ping_Number=10;
+static const char* chck_ip="10.5.5.1";
+
+//Instrucción de comparación para verificación de falla 
+uint8_t wsfty_connfail;
+
+pthread_t ws_thread;
 
 
 ///////////////////////////////////////////////////////////////////
@@ -93,3 +104,5 @@ int parser_comandos(char* comando, int cfd);
 int parser_comandos_mov(char* comando, int cfd);
 int parser_comandos_diag(char* comando, int cfd);
 int ignoreSigpipe(void);
+int wsafety_thread(void);
+void *cmd_wsfty(void* arg);
