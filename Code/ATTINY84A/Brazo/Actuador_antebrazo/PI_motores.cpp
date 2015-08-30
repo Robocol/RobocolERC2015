@@ -50,6 +50,7 @@
 #define CAMBIAR_PWM	0x0A
 #define DAR_ESTADO	0x0B
 #define MEDIR_TEMP	0x0C
+#define MOVER_PASO	0x0D
 
 //Valores a transmitir por SPI que no contienen información propiamente
 #define ACK_galileo	0xAA
@@ -111,6 +112,8 @@ uint8_t tempAct;
 
 // Ciclo útil
 uint8_t PWM=0;
+// tiempo en que da un paso
+uint8_t tiempoPaso=1000;
 
 // Registro de buffer de entrada:
 // Los bytes de entrada son guardados en este byte hasta que la transferencia
@@ -502,6 +505,7 @@ unsigned char debug(unsigned char msg) {
 	return spi_get();
 }
 
+
 /*********************************************************************************************************
 ** Function name: control_parser
 ** Descriptions: Determina la acción que se debe tomar dependiendo de la orden que recibió el uC por SPI
@@ -512,8 +516,11 @@ void control_parser(){
 	int8_t error;
 	if(parsear){
 		switch (encabezado){
+			case MOVER_PASO:
+			tiempoPaso=argumento;
+			break;
 			case MEDIR_CORRIENTE:
-			control_getActualCurrent();
+			//control_getActualCurrent();
 			spi_put(curAct);
 			break;
 			case MEDIR_VELOCIDAD:
@@ -521,10 +528,10 @@ void control_parser(){
 			spi_put(PosAct);
 			break;
 			case MEDIR_TEMP:
-			error=errorAnterior_P;
+			//error=errorAnterior_P;
 //			control_getTemp();
-//			spi_put(tempAct);
-			spi_put(PWM);
+			spi_put(tempAct);
+//			spi_put(PWM);
 			break;
 			case DAR_ESTADO:
 			spi_put(ESTADO);
@@ -587,6 +594,13 @@ ISR(USI_OVF_vect)
 	sei();
 }
 
+void control_darPasito(){
+	uint8_t time = 0;
+	pwm_set(127);
+	for(;time<tiempoPaso;time++);
+	pwm_set(0);
+}
+
 int main(void) {
 	char activacion=1;
 	int16_t error_posicion=0;
@@ -601,6 +615,9 @@ int main(void) {
 	pwm_set(PWM);
 	ESTADO=MANUAL_EST;
 
+	uint8_t tiempoAnt=0;
+	unsigned char toggle=0;
+	
 	sei();
 	while (1) {
 		
@@ -682,6 +699,15 @@ int main(void) {
 			break;
 		case MANUAL_EST:
 			pwm_set(PWM);
+			control_getActualCurrent();
+			control_getActualPosition();
+			control_getTemp();
+			if(tiempoPaso!=tiempoAnt){
+				control_darPasito();
+				gpio_put(LED_PIN, toggle);
+				toggle=!toggle;
+				tiempoAnt=tiempoPaso;
+			}
 			break;
 		case FAIL_EST:
 			pwm_set(0);

@@ -238,7 +238,9 @@ $(ODIR)/traccion_robocol$(LEXT): ../TRACCION/traccion_robocol.c ../TRACCION/trac
 
 $(ODIR)/servidor_robocol$(LEXT): ../COMUNICACION/servidor_robocol.c ../COMUNICACION/servidor_robocol.h  $(ODIR)/i2c_robocol$(LEXT)  \
                                                             					$(ODIR)/gpio_robocol$(LEXT) \
+                                                            					$(ODIR)/terminal_robocol$(LEXT) \
                                                             					$(ODIR)/spi_robocol$(LEXT)	\
+                                                            					$(ODIR)/gps_robocol$(LEXT)	\
  		                                           								$(ODIR)/misc_robocol$(LEXT) \
        																			$(ODIR)/pwmg_robocol$(LEXT) \
        																			$(ODIR)/ph_robocol$(LEXT)	\
@@ -246,8 +248,10 @@ $(ODIR)/servidor_robocol$(LEXT): ../COMUNICACION/servidor_robocol.c ../COMUNICAC
 	$(CC) -c -o $@ $< -I../GPIO \
 						-I../I2C  \
 						-I../SPI  \
+						-I../UART  \
 						-I../../MISC \
 						-I../PH \
+						-I../GPS \
 						-I../PWM \
                         -I../TRACCION\
                         -I../COMUNICACION   																			
@@ -257,10 +261,10 @@ $(ODIR)/servidor_robocol$(LEXT): ../COMUNICACION/servidor_robocol.c ../COMUNICAC
 ################################################################################################
 
 
-$(ODIR)/gps_robocol$(LEXT): ../GPS/gps_robocol.c ../GPS/gps_robocol.h  $(ODIR)/uart_robocol$(LEXT)  \
- 		                                           								$(ODIR)/misc_robocol$(LEXT) 
+$(ODIR)/gps_robocol$(LEXT): ../GPS/gps_robocol.c ../GPS/gps_robocol.h  $(ODIR)/terminal_robocol$(LEXT)  \
+ 		                                           						$(ODIR)/misc_robocol$(LEXT) 
 	$(CC) -c -o $@ $< -I../UART \
-						-I../../MISC   
+					-I../../MISC   
 
 .PHONY: clean
 

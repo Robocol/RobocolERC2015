@@ -61,7 +61,6 @@
 	typedef int gps_st;
 
 	typedef struct gps_dev{
-		char*	ruta;			//Ruta al archivo de reporte
 		char	status;			//Status A=active or V=Void - Indica si existe conexion satelital
 		float 	latitude;		//Latitud en grados. Negativo si es latitud sur, positivo de lo contrario
 		float 	longitude;		//Longitud en grados. Negativo si es latitud sur, positivo de lo contrario
@@ -169,10 +168,8 @@ gps_st gps_parser(char* line);
 */
 /* ===================================================================*/
 void *gps_continuousUpdate(void* arg);
-
-
 float gps_parseLatitude(char* word);
 float gps_parseLongitude(char* word);
+gps_st gps_report(char *line);
 
-gps_st gps_reportFile(void);
 #endif

@@ -205,44 +205,44 @@ tr_st tr_enable(void){
 tr_st tr_setVP(uint8_t vp){
 	printf("Changing speed to %d (tr_setVP -> traccion_robocol.c)\n",vp);
 
-	if (tr_device.mv_state==TR_STOPPED){
+/*	if (tr_device.mv_state==TR_STOPPED){
 		printf("Debe primero asignar la dirección de movimiento. Estado de movimiento se encuentra en TR_STOPPED. (tr_setVP->traccion_robocol.c)\n");
 		return TR_ERROR;
-	}else{
-		if(tr_device.ctl_state==TR_AUTO){
-			if(ph_setVel(tr_device.front_ph,vp)){
-				printf("Error en asignación de velocidad para front_ph.(tr_setVP->traccion_robocol.c)\n");
-				return TR_ERROR;
-			}
-
-			if(ph_setVel(tr_device.back_ph,vp)){
-				printf("Error en asignación de velocidad para back_ph.(tr_setVP->traccion_robocol.c)\n");
-				return TR_ERROR;
-			}
-
-		}else if(tr_device.ctl_state==TR_MANUAL){
-			if(ph_setPWM(tr_device.front_ph,vp)){
-				printf("Error en asignación de PWM para front_ph.(tr_setVP->traccion_robocol.c)\n");
-				return TR_ERROR;
-			}
-			printf("pwm front set to %d\n",vp);
-
-			if(ph_setPWM(tr_device.back_ph,vp)){
-				printf("Error en asignación de PWM para back_ph.(tr_setVP->traccion_robocol.c)\n");
-				return TR_ERROR;
-			}
-
-		}else{
-			printf("Error en el estado de la estructura tracción. No se identifica estado TR_MANUAL O TR_AUTO. (tr_setVP->traccion_robocol.c)\n");
+	}else{*/
+	if(tr_device.ctl_state==TR_AUTO){
+		if(ph_setVel(tr_device.front_ph,vp)){
+			printf("Error en asignación de velocidad para front_ph.(tr_setVP->traccion_robocol.c)\n");
 			return TR_ERROR;
 		}
 
-		if (vp==0){
-			tr_device.mv_state=TR_STOPPED;
+		if(ph_setVel(tr_device.back_ph,vp)){
+			printf("Error en asignación de velocidad para back_ph.(tr_setVP->traccion_robocol.c)\n");
+			return TR_ERROR;
 		}
 
-		tr_device.vel_pwm=vp;
+	}else if(tr_device.ctl_state==TR_MANUAL){
+		if(ph_setPWM(tr_device.front_ph,vp)){
+			printf("Error en asignación de PWM para front_ph.(tr_setVP->traccion_robocol.c)\n");
+			return TR_ERROR;
+		}
+		printf("pwm front set to %d\n",vp);
+
+		if(ph_setPWM(tr_device.back_ph,vp)){
+			printf("Error en asignación de PWM para back_ph.(tr_setVP->traccion_robocol.c)\n");
+			return TR_ERROR;
+		}
+
+	}else{
+		printf("Error en el estado de la estructura tracción. No se identifica estado TR_MANUAL O TR_AUTO. (tr_setVP->traccion_robocol.c)\n");
+		return TR_ERROR;
 	}
+
+	if (vp==0){
+		tr_device.mv_state=TR_STOPPED;
+	}
+
+	tr_device.vel_pwm=vp;
+	//}
 	return TR_OK;
 }
 

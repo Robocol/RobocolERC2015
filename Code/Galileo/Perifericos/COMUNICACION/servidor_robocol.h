@@ -24,6 +24,7 @@
 #include <time.h>
 #include <syslog.h>
 #include <stdarg.h>
+#include "gps_robocol.h"
 #include "traccion_robocol.h"
 
 #define PORT_NUM "50002"        /* Port number for server */
@@ -91,3 +92,4 @@ int configurar_fecha(char* fecha_hora);
 int parser_comandos(char* comando, int cfd);
 int parser_comandos_mov(char* comando, int cfd);
 int parser_comandos_diag(char* comando, int cfd);
+int ignoreSigpipe(void);

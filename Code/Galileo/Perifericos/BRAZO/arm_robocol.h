@@ -46,6 +46,7 @@ typedef struct
 
 arm_dev* armdev;
 
+arm_pos posicionCentral;
 arm_pos posicionA;
 arm_pos posicionB;
 arm_pos posicionC;

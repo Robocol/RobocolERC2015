@@ -27,6 +27,10 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 prueba_adc: $(OBJ)
 	$(CC) -o $@$(EEXT) adc_test.c $^ $(CFLAGS)
 
+#Regla de compilación de ejecutable para prueba del driver
+medicion_voltaje: $(OBJ)
+	$(CC) -o $@$(EEXT) medicion_voltaje.c $^ $(CFLAGS)
+
 
 include ../Makefile
 
