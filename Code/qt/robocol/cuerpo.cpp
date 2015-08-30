@@ -63,13 +63,15 @@ void cuerpo::enviarDireccion()
     qDebug()<< "envio comando de movimiento";
     entro = false;
     espera->stop();
+    time = 200;
 }
 
 void cuerpo::adelante()
 {
     if(!entro)
     {
-        contador->start(200);
+        qDebug()<< "empezo a contar";
+        espera->start(time);
         entro = true;
     }
 
@@ -110,6 +112,14 @@ void cuerpo::adelante()
 
 void cuerpo::atras()
 {
+
+    if(!entro)
+    {
+        qDebug()<< "empezo a contar";
+        espera->start(time);
+        entro = true;
+    }
+
     if(pwm1!=-244)
         pwm1 =pwm1-1 ;
     if(pwm2!=-244)
@@ -123,21 +133,24 @@ void cuerpo::atras()
     ui->dere_sup->display(pwm2);
     ui->izq_inf->display(pwm3);
     ui->dere_inf->display(pwm4);
-    QString comando;
-    if(pwm2<0)
-        comando = QString("mover/traccion/b/%1").arg(pwm2*-1);
-    else
-        comando = QString("mover/traccion/f/%1").arg(pwm2);
-    QByteArray ba = comando.toLocal8Bit();
-    const char* linea = ba.data();
 
-    int sfd = conectarServidor(IP_LLANTAS_DERECHA);
-    enviarComando((char*)linea,sfd);
-    cerrarConexion(sfd);
 
-    int sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
-    enviarComando((char*)linea,sfd2);
-    cerrarConexion(sfd2);
+//    QString comando;
+//    if(pwm2<0)
+//        comando = QString("mover/traccion/b/%1").arg(pwm2*-1);
+//    else
+//        comando = QString("mover/traccion/f/%1").arg(pwm2);
+
+//    QByteArray ba = comando.toLocal8Bit();
+//    const char* linea = ba.data();
+
+//    int sfd = conectarServidor(IP_LLANTAS_DERECHA);
+//    enviarComando((char*)linea,sfd);
+//    cerrarConexion(sfd);
+
+//    int sfd2 = conectarServidor(IP_LLANTAS_IZQUIERDA);
+//    enviarComando((char*)linea,sfd2);
+//    cerrarConexion(sfd2);
 
 }
 

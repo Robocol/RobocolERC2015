@@ -52,6 +52,7 @@ private:
     int pwm4;
     QTimer *contador;
     bool entro;
+    int time;
 
 
 
