@@ -875,9 +875,8 @@ void *cmd_wsfty(void* arg){
 
 	logMessage("================[cmd_wsfty]================");
 	while(1){
-		if (!wsfty_connfail)
-		{
-			if(!(shell = popen("ping -c 10 10.5.5.1", "r"))){
+		if (!wsfty_connfail){
+			if(!(shell = popen("ping -c 3 10.5.5.1", "r"))){
 				logMessage("[cmd_wsfty]Could not open the shell pipe.");
 				break;
 			}
@@ -888,7 +887,7 @@ void *cmd_wsfty(void* arg){
 			}
 
 			while(fgets(buff, sizeof(buff), shell)!=NULL){
-				if (count<10){
+				if (count<3){
 					count++;
 				}else{
 					break;
@@ -899,7 +898,7 @@ void *cmd_wsfty(void* arg){
 			//count=0 . No connection to red handling
 			//strstr(failSentence,buff).Connection to network but not to destination host handling
 			if (count==0 || (strstr(buff,"transmitted")!=NULL)){
-				logMessage("[cmd_wsfty] DETENCIÓN DEL ROVER, FALLÓ EN LA CONEXIÓN\n");
+				logMessage("\n================[cmd_wsfty|STOP ROVER]================\nDETENCIÓN DEL ROVER, FALLÓ EN LA CONEXIÓN\n");
 				if(tr_eBrake()){
 					logMessage("[cmd_wsfty]Could not set VP to zero in H bridge");
 				}else if(tr_disable()){
@@ -907,7 +906,7 @@ void *cmd_wsfty(void* arg){
 				}
 				wsfty_connfail=1;
 			}else{
-				logMessage("KEEP GOING\n================[cmd_wsfty]================");
+				logMessage("\n================[cmd_wsfty|KEEP GOING]================\n");
 			}
 
 			count=0;
